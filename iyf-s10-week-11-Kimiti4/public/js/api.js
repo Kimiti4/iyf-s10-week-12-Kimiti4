@@ -1,190 +1,109 @@
 /**
- * 🔹 public/js/api.js - Updated for JWT Auth
+ * 🔹 Jamii Link KE - API Client
+ * Uses relative paths since frontend is served from same domain
  */
+
 const API_CONFIG = {
-  BASE_URL: '/api',  // Relative path (same server)
-  TIMEOUT: 10000
+    BASE_URL: '/api',
+    TIMEOUT: 10000,
+    DEMO_TOKEN: 'jamii-link-ke-2026'
 };
 
-// Get auth token from localStorage
-function getAuthHeader() {
-  const token = localStorage.getItem('jamii_token');
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
+// Store auth token in localStorage if available
+let authToken = localStorage.getItem('auth_token') || API_CONFIG.DEMO_TOKEN;
+
+// Helper: Build query string
+function buildQuery(params) {
+    const qs = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+            qs.append(key, value);
+        }
+    });
+    return qs.toString();
 }
 
-// Handle API response
+// Helper: Handle response
 async function handleResponse(response) {
-  if (!response.ok) {
-    let errorData = { message: `HTTP ${response.status}` };
-    try { errorData = await response.json(); } catch {}
-    throw new Error(errorData.error?.message || errorData.message || 'API request failed');
-  }
-  return response.json();
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error?.message || 'API Error');
+    }
+    return data;
 }
 
-// ===== AUTH API =====
-const authAPI = {
-  async register(userData) {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-      body: JSON.stringify(userData)
-    });
-    const result = await handleResponse(response);
-    if (result.token) {
-      localStorage.setItem('jamii_token', result.token);
-      localStorage.setItem('jamii_user', JSON.stringify(result.user));
-    }
-    return result;
-  },
-  
-  async login(credentials) {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
-    });
-    const result = await handleResponse(response);
-    if (result.token) {
-      localStorage.setItem('jamii_token', result.token);
-      localStorage.setItem('jamii_user', JSON.stringify(result.user));
-    }
-    return result;
-  },
-  
-  async getMe() {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/auth/me`, {
-      headers: getAuthHeader()
-    });
-    return handleResponse(response);
-  },
-  
-  async updateProfile(profileData) {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/auth/me`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-      body: JSON.stringify(profileData)
-    });
-    return handleResponse(response);
-  },
-  
-  logout() {
-    localStorage.removeItem('jamii_token');
-    localStorage.removeItem('jamii_user');
-  },
-  
-  getCurrentUser() {
-    const userStr = localStorage.getItem('jamii_user');
-    return userStr ? JSON.parse(userStr) : null;
-  },
-  
-  isAuthenticated() {
-    return !!localStorage.getItem('jamii_token');
-  }
-};
+// Generic fetch wrapper
+async function apiRequest(endpoint, options = {}) {
+    const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+        },
+        ...options
+    };
 
-// ===== POSTS API (with auth) =====
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+    config.signal = controller.signal;
+
+    try {
+        const response = await fetch(url, config);
+        clearTimeout(timeout);
+        return await handleResponse(response);
+    } catch (error) {
+        clearTimeout(timeout);
+        if (error.name === 'AbortError') {
+            throw new Error('Request timeout');
+        }
+        throw error;
+    }
+}
+
+// Export API modules
 const postsAPI = {
-  async getAll(filters = {}) {
-    const params = new URLSearchParams(filters).toString();
-    const response = await fetch(`${API_CONFIG.BASE_URL}/posts?${params}`, {
-      headers: getAuthHeader()
-    });
-    return handleResponse(response);
-  },
-  
-  async getById(id, includeComments = false) {
-    const url = `${API_CONFIG.BASE_URL}/posts/${id}${includeComments ? '?populate=comments' : ''}`;
-    const response = await fetch(url, { headers: getAuthHeader() });
-    return handleResponse(response);
-  },
-  
-  async create(postData) {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/posts`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-      body: JSON.stringify(postData)
-    });
-    return handleResponse(response);
-  },
-  
-  async update(id, postData) {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/posts/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-      body: JSON.stringify(postData)
-    });
-    return handleResponse(response);
-  },
-  
-  async delete(id) {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/posts/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeader()
-    });
-    return response.ok;
-  },
-  
-  async engage(id, type = 'like') {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/posts/${id}/engage?type=${type}`, {
-      method: 'PATCH',
-      headers: getAuthHeader()
-    });
-    return handleResponse(response);
-  }
+    getAll: (filters = {}) => apiRequest(`/posts?${buildQuery(filters)}`),
+    getById: (id) => apiRequest(`/posts/${id}`),
+    create: (data) => apiRequest('/posts', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+    update: (id, data) => apiRequest(`/posts/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+    }),
+    delete: (id) => apiRequest(`/posts/${id}`, { method: 'DELETE' }),
+    engage: (id, type = 'like') => apiRequest(`/posts/${id}/engage?type=${type}`),
+    getComments: (postId) => apiRequest(`/posts/${postId}/comments`),
+    addComment: (postId, content, author) => apiRequest(`/posts/${postId}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ content, author })
+    }),
+    deleteComment: (postId, commentId) => apiRequest(`/posts/${postId}/comments/${commentId}`, {
+        method: 'DELETE'
+    })
 };
 
-// ===== COMMENTS API =====
-const commentsAPI = {
-  async getForPost(postId) {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/posts/${postId}/comments`, {
-      headers: getAuthHeader()
-    });
-    return handleResponse(response);
-  },
-  
-  async create(postId, commentData) {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/posts/${postId}/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-      body: JSON.stringify(commentData)
-    });
-    return handleResponse(response);
-  },
-  
-  async delete(postId, commentId) {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/posts/${postId}/comments/${commentId}`, {
-      method: 'DELETE',
-      headers: getAuthHeader()
-    });
-    return response.ok;
-  }
-};
-
-// ===== MARKET API (unchanged) =====
 const marketAPI = {
-  async getPrices(filters = {}) {
-    const params = new URLSearchParams(filters).toString();
-    const response = await fetch(`${API_CONFIG.BASE_URL}/market/prices?${params}`);
-    return handleResponse(response);
-  }
+    getPrices: (filters = {}) => apiRequest(`/market/prices?${buildQuery(filters)}`)
 };
 
-// Health check
-async function checkHealth() {
-  try {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/health`);
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
+const locationsAPI = {
+    getAll: (filters = {}) => apiRequest(`/locations?${buildQuery(filters)}`)
+};
+
+const healthAPI = {
+    check: () => apiRequest('/health')
+};
 
 // Export for use in other modules
 window.JamiiAPI = {
-  auth: authAPI,
-  posts: postsAPI,
-  comments: commentsAPI,
-  market: marketAPI,
-  health: { check: checkHealth }
+    posts: postsAPI,
+    market: marketAPI,
+    locations: locationsAPI,
+    health: healthAPI,
+    setAuthToken: (token) => {
+        authToken = token;
+        localStorage.setItem('auth_token', token);
+    }
 };

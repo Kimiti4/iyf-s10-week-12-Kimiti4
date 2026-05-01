@@ -1,38 +1,24 @@
 /**
- * 🔹 Server Entry Point - Week 11
- * Connects to DB first, then starts Express
+ * 🔹 Week 10 Entry Point
+ * Loads environment and starts Express app
  */
 require('dotenv').config();
 const app = require('./src/app');
-const connectDB = require('./src/config/database');
-const mongoose = require('mongoose');
 
 const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Connect to database, then start server
-const startServer = async () => {
-  try {
-    await connectDB();
-    
-    app.listen(PORT, () => {
-      console.log(`🚀 Jamii Link KE API running on port ${PORT}`);
-      console.log(`🌐 Frontend: http://localhost:${PORT}`);
-      console.log(`📡 API: http://localhost:${PORT}/api`);
-      console.log(`🔐 Auth: POST /api/auth/register, /api/auth/login`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-};
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`🚀 Jamii Link KE API running in ${NODE_ENV} mode`);
+  console.log(`🌐 Server: http://localhost:${PORT}`);
+  console.log(`📊 Health: http://localhost:${PORT}/api/health`);
+  console.log(`📝 Posts: http://localhost:${PORT}/api/posts`);
+  console.log(`🌾 Farm Prices: http://localhost:${PORT}/api/market/prices`);
+  console.log(`💡 Tip: Use category=mtaani|skill|farm|gig to filter posts`);
+});
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM received, closing DB connection...');
-  mongoose.connection.close(() => {
-    console.log('✅ MongoDB connection closed');
-    process.exit(0);
-  });
+  console.log('🛑 Shutting down gracefully');
+  process.exit(0);
 });
