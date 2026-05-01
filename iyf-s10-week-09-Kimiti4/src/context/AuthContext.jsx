@@ -54,17 +54,21 @@ export function AuthProvider({ children }) {
             
             const response = await authAPI.login(credentials);
             
+            console.log('Login response:', response);
+            
             // Store token and user info
             if (response.token) {
                 localStorage.setItem('token', response.token);
             }
             
+            // Backend returns { success: true, message, token, user: {...} }
             const userData = response.user || response;
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
             
             return userData;
         } catch (err) {
+            console.error('Login error:', err);
             setError(err.message || 'Login failed');
             throw err;
         } finally {
@@ -80,7 +84,11 @@ export function AuthProvider({ children }) {
             setError(null);
             setLoading(true);
             
+            console.log('Registering with data:', userData);
+            
             const response = await authAPI.register(userData);
+            
+            console.log('Register response:', response);
             
             // Store token and user info
             if (response.token) {
@@ -93,6 +101,7 @@ export function AuthProvider({ children }) {
             
             return newUser;
         } catch (err) {
+            console.error('Registration error:', err);
             setError(err.message || 'Registration failed');
             throw err;
         } finally {

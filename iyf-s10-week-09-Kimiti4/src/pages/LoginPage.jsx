@@ -14,6 +14,7 @@ export default function LoginPage() {
     
     // Get redirect path from location state or default to home
     const from = location.state?.from?.pathname || '/';
+    const successMessage = location.state?.message;
     
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -39,6 +40,12 @@ export default function LoginPage() {
                 {error && (
                     <div className="error-message" role="alert">
                         {error}
+                    </div>
+                )}
+                
+                {successMessage && (
+                    <div className="success-message" role="status">
+                        {successMessage}
                     </div>
                 )}
                 
