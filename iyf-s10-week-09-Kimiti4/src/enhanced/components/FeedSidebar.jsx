@@ -1,10 +1,12 @@
 /**
  * 🔹 Feed Sidebar Component - Tumblr Style
- * Category-based feed navigation
+ * Category-based feed navigation with collapsible feature
  */
 
-import { motion } from 'framer-motion';
-import { FaHome, FaBell, FaHandshake, FaSeedling, FaBriefcase, FaCompass } from 'react-icons/fa';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaHome, FaBell, FaHandshake, FaSeedling, FaBriefcase, FaCompass, FaFilm, FaChevronRight } from 'react-icons/fa';
 import './FeedSidebar.css';
 
 const FEED_CATEGORIES = [
@@ -46,11 +48,36 @@ const FEED_CATEGORIES = [
 ];
 
 export default function FeedSidebar({ activeFeed, onFeedChange }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const navigate = useNavigate();
+    
+    const handleSidebarClick = () => {
+        setIsExpanded(!isExpanded);
+    };
+    
     return (
-        <aside className="feed-sidebar">
+        <aside 
+            className={`feed-sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}
+            onClick={handleSidebarClick}
+        >
+            {/* Expand/Collapse Indicator */}
+            <div className="sidebar-toggle-indicator">
+                <FaChevronRight className={`toggle-icon ${isExpanded ? 'rotated' : ''}`} />
+            </div>
+            
             <div className="sidebar-header">
                 <FaCompass className="sidebar-icon" />
-                <h3>Feeds</h3>
+                <AnimatePresence>
+                    {isExpanded && (
+                        <motion.h3
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                        >
+                            Feeds
+                        </motion.h3>
+                    )}
+                </AnimatePresence>
             </div>
             
             <nav className="feed-nav">
@@ -62,11 +89,14 @@ export default function FeedSidebar({ activeFeed, onFeedChange }) {
                         <motion.button
                             key={category.id}
                             className={`feed-nav-item ${isActive ? 'active' : ''}`}
-                            onClick={() => onFeedChange(category.id)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onFeedChange(category.id);
+                            }}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            whileHover={{ x: 5 }}
+                            transition={{ delay: index * 0.05 }}
+                            whileHover={{ x: isExpanded ? 5 : 0 }}
                             whileTap={{ scale: 0.95 }}
                         >
                             <div className="feed-icon-wrapper" style={{ 
@@ -75,11 +105,20 @@ export default function FeedSidebar({ activeFeed, onFeedChange }) {
                             }}>
                                 <Icon />
                             </div>
-                            <div className="feed-info">
-                                <span className="feed-name">{category.name}</span>
-                                <span className="feed-description">{category.description}</span>
-                            </div>
-                            {isActive && (
+                            <AnimatePresence>
+                                {isExpanded && (
+                                    <motion.div 
+                                        className="feed-info"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                    >
+                                        <span className="feed-name">{category.name}</span>
+                                        <span className="feed-description">{category.description}</span>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                            {isActive && isExpanded && (
                                 <motion.div
                                     className="active-indicator"
                                     layoutId="activeFeed"
@@ -91,17 +130,53 @@ export default function FeedSidebar({ activeFeed, onFeedChange }) {
                 })}
             </nav>
             
-            {/* Trending Tags Section */}
-            <div className="trending-section">
-                <h4>Trending Tags</h4>
-                <div className="trending-tags">
-                    <span className="trending-tag">#Nairobi</span>
-                    <span className="trending-tag">#Skills</span>
-                    <span className="trending-tag">#FreshProduce</span>
-                    <span className="trending-tag">#Gigs</span>
-                    <span className="trending-tag">#Community</span>
+            {/* Reels Button */}
+            <motion.button
+                className="reels-sidebar-button"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/reels');
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+            >
+                <div className="reels-icon-wrapper">
+                    <FaFilm />
                 </div>
-            </div>
+                <AnimatePresence>
+                    {isExpanded && (
+                        <motion.span
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="reels-button-text"
+                        >
+                            Watch Reels
+                        </motion.span>
+                    )}
+                </AnimatePresence>
+            </motion.button>
+            
+            {/* Trending Tags Section */}
+            <AnimatePresence>
+                {isExpanded && (
+                    <motion.div 
+                        className="trending-section"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                    >
+                        <h4>Trending Tags</h4>
+                        <div className="trending-tags">
+                            <span className="trending-tag">#Nairobi</span>
+                            <span className="trending-tag">#Skills</span>
+                            <span className="trending-tag">#FreshProduce</span>
+                            <span className="trending-tag">#Gigs</span>
+                            <span className="trending-tag">#Community</span>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </aside>
     );
 }
