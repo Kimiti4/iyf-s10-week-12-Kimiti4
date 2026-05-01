@@ -17,6 +17,7 @@ import SearchResultsPage from './pages/SearchResultsPage'
 import EnhancedLoginPage from './enhanced/pages/EnhancedLoginPage'
 import EnhancedRegisterPage from './enhanced/pages/EnhancedRegisterPage'
 import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
+import ReelsPage from './enhanced/pages/ReelsPage'
 import './App.css'
 
 function NavBar() {
@@ -64,6 +65,7 @@ function App() {
               <Route path="/" element={<EnhancedFeedPage />} />
               <Route path="/login" element={<EnhancedLoginPage />} />
               <Route path="/register" element={<EnhancedRegisterPage />} />
+              <Route path="/reels" element={<ReelsPage />} />
               
               {/* Original Pages (Backup for Debugging) */}
               <Route path="/original/home" element={<HomePage />} />

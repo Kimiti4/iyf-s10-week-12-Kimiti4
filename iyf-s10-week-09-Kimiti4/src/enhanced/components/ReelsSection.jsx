@@ -4,8 +4,9 @@
  */
 
 import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaPlay, FaPause, FaHeart, FaComment, FaShare, FaMusic } from 'react-icons/fa';
+import { FaPlay, FaPause, FaHeart, FaComment, FaShare, FaMusic, FaArrowRight } from 'react-icons/fa';
 import './ReelsSection.css';
 
 // Mock reels data
@@ -69,6 +70,7 @@ const MOCK_REELS = [
 ];
 
 export default function ReelsSection() {
+    const navigate = useNavigate();
     const [currentReelIndex, setCurrentReelIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
     const containerRef = useRef(null);
@@ -192,6 +194,17 @@ export default function ReelsSection() {
             <div className="scroll-indicator">
                 <span>{currentReelIndex + 1} / {MOCK_REELS.length}</span>
             </div>
+
+            {/* See More Button */}
+            <motion.button 
+                className="see-more-button"
+                onClick={() => navigate('/reels')}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+            >
+                <span>See More Reels</span>
+                <FaArrowRight />
+            </motion.button>
         </section>
     );
 }
