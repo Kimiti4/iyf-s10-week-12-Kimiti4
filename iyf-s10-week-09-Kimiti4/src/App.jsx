@@ -7,12 +7,13 @@ import HomePage from './pages/HomePage'
 import PostListPage from './pages/PostListPage'
 import PostDetailPage from './pages/PostDetailPage'
 import AboutPage from './pages/AboutPage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
+// Original pages (backup for debugging)
+import OriginalLoginPage from './pages/LoginPage'
+import OriginalRegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import CreatePostPage from './pages/CreatePostPage'
 import SearchResultsPage from './pages/SearchResultsPage'
-// Enhanced Social Media Pages
+// Enhanced Social Media Pages (now the main pages)
 import EnhancedLoginPage from './enhanced/pages/EnhancedLoginPage'
 import EnhancedRegisterPage from './enhanced/pages/EnhancedRegisterPage'
 import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
@@ -27,14 +28,14 @@ function NavBar() {
         <Link to="/" className="logo">JamiiLink</Link>
         <SearchBar />
         <div className="nav-links">
-          <Link to="/">Home</Link>
-          <Link to="/posts">Posts</Link>
-          <Link to="/about">About</Link>
+          <Link to="/">Feed</Link>
+          <Link to="/original/posts">Posts</Link>
+          <Link to="/original/about">About</Link>
           
           {isAuthenticated ? (
             <>
-              <Link to="/posts/create" className="btn-create">+ Create Post</Link>
-              <Link to={`/profile/${user._id}`} className="nav-user">
+              <Link to="/original/posts/create" className="btn-create">+ Create Post</Link>
+              <Link to={`/original/profile/${user._id}`} className="nav-user">
                 {user.name}
               </Link>
               <button onClick={logout} className="btn-logout">Logout</button>
@@ -59,28 +60,28 @@ function App() {
           <NavBar />
           <main className="main-content">
             <Routes>
-              {/* Original Routes */}
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/posts" element={<PostListPage />} />
-              <Route path="/posts/:id" element={<PostDetailPage />} />
-              <Route path="/search" element={<SearchResultsPage />} />
-              <Route path="/profile/:id?" element={<ProfilePage />} />
+              {/* Main Routes - Now Using Enhanced Pages */}
+              <Route path="/" element={<EnhancedFeedPage />} />
+              <Route path="/login" element={<EnhancedLoginPage />} />
+              <Route path="/register" element={<EnhancedRegisterPage />} />
+              
+              {/* Original Pages (Backup for Debugging) */}
+              <Route path="/original/home" element={<HomePage />} />
+              <Route path="/original/login" element={<OriginalLoginPage />} />
+              <Route path="/original/register" element={<OriginalRegisterPage />} />
+              <Route path="/original/posts" element={<PostListPage />} />
+              <Route path="/original/posts/:id" element={<PostDetailPage />} />
+              <Route path="/original/search" element={<SearchResultsPage />} />
+              <Route path="/original/profile/:id?" element={<ProfilePage />} />
               <Route 
-                path="/posts/create" 
+                path="/original/posts/create" 
                 element={
                   <ProtectedRoute>
                     <CreatePostPage />
                   </ProtectedRoute>
                 } 
               />
-              <Route path="/about" element={<AboutPage />} />
-              
-              {/* Enhanced Social Media Routes */}
-              <Route path="/enhanced/login" element={<EnhancedLoginPage />} />
-              <Route path="/enhanced/register" element={<EnhancedRegisterPage />} />
-              <Route path="/enhanced/feed" element={<EnhancedFeedPage />} />
+              <Route path="/original/about" element={<AboutPage />} />
             </Routes>
           </main>
           <footer className="footer">

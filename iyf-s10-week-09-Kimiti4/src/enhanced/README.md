@@ -1,6 +1,19 @@
 # 🌟 Enhanced Social Media Features - JamiiLink
 
-This folder contains the **enhanced social media version** of JamiiLink with modern UI/UX, animations, and advanced features.
+This folder contains the **enhanced social media version** of JamiiLink that **replaces the original pages** as the default experience.
+
+## 📌 **Architecture**
+
+The enhanced features are in `src/enhanced/` folder to:
+- ✅ **Separate enhanced code from original** for easy debugging
+- ✅ **Keep originals as backup** under `/original/*` routes
+- ✅ **Allow quick rollback** if issues arise
+- ✅ **Enable A/B testing** between versions
+
+### **Current Setup:**
+- **Main App Routes:** Enhanced pages (login, register, feed)
+- **Backup Routes:** Original pages at `/original/*`
+- **Enhanced Code:** Isolated in `src/enhanced/` folder
 
 ## ✨ Features Included
 
@@ -186,15 +199,29 @@ const handleSocialLogin = (provider) => {
 
 ## 🎯 Integration Notes
 
-The enhanced pages are **separate** from the original pages, so you can:
-- Keep both versions running simultaneously
-- Test new features without affecting production
-- Gradually migrate users to enhanced version
-- A/B test different designs
+The enhanced pages are now the **default** experience, but original pages are preserved for debugging:
 
-Routes are prefixed with `/enhanced/` to avoid conflicts:
-- Original: `/login`, `/register`
-- Enhanced: `/enhanced/login`, `/enhanced/register`
+### **Route Structure:**
+
+| Feature | Main Route (Enhanced) | Backup Route (Original) |
+|---------|----------------------|------------------------|
+| Homepage | `/` | `/original/home` |
+| Login | `/login` | `/original/login` |
+| Register | `/register` | `/original/register` |
+| Feed | `/` (root) | N/A |
+| Posts | N/A | `/original/posts` |
+| Post Detail | N/A | `/original/posts/:id` |
+| Profile | N/A | `/original/profile/:id` |
+| Create Post | N/A | `/original/posts/create` |
+| About | N/A | `/original/about` |
+| Search | N/A | `/original/search` |
+
+### **Benefits:**
+- ✅ Enhanced pages are the **default user experience**
+- ✅ Original pages accessible at `/original/*` for **debugging**
+- ✅ Enhanced code isolated in `src/enhanced/` for **easy maintenance**
+- ✅ **Quick rollback:** Just swap routes in App.jsx if needed
+- ✅ **No code duplication:** Original pages remain untouched
 
 ## 🌈 Color Palette
 
