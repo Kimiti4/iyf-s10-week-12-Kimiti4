@@ -189,8 +189,16 @@ npm run dev
 
 ## Live Demo (if deployed)
 
+<<<<<<< HEAD
 - **Frontend:** [https://jamii-link.vercel.app](https://jamiilink-ke.vercel.app)
 
 - **Backend API:** [https://jamii-link-api.onrender.com](in progress)
 
 - **Health Check:** [https://jamii-link-api.onrender.com/api/health](in progress)
+=======
+- **Frontend:** [https://jamii-link.vercel.app](https://jamii-link.vercel.app)
+
+- **Backend API:** [https://jamii-link-api.onrender.com](https://jamii-link-api.onrender.com)
+
+- **Health Check:** [https://jamii-link-api.onrender.com/api/health](https://jamii-link-api.onrender.com/api/health)
+>>>>>>> 5ea27cd (Week 12: Complete JamiiLink with backend code ready for deployment)
