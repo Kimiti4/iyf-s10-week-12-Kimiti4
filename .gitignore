@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+
+# Environment variables (SENSITIVE - NEVER COMMIT)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Build outputs
+dist/
+build/
+out/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Misc
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ===== Week 12 Submission Exclusions =====
+# Text requirement files (instructions, not code)
+*.txt
+
+# Large auto-generated files
+DIRECTORY_TREE.txt
+
+# Redundant/backup documentation (keep only essential docs)
+*.md.backup
+WEEK12_FEATURES_GUIDE.md
+QUICK_START_WEEK12.md
+NEXT_STEPS.md
