@@ -12,6 +12,10 @@ import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import CreatePostPage from './pages/CreatePostPage'
 import SearchResultsPage from './pages/SearchResultsPage'
+// Enhanced Social Media Pages
+import EnhancedLoginPage from './enhanced/pages/EnhancedLoginPage'
+import EnhancedRegisterPage from './enhanced/pages/EnhancedRegisterPage'
+import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
 import './App.css'
 
 function NavBar() {
@@ -55,6 +59,7 @@ function App() {
           <NavBar />
           <main className="main-content">
             <Routes>
+              {/* Original Routes */}
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
@@ -71,6 +76,11 @@ function App() {
                 } 
               />
               <Route path="/about" element={<AboutPage />} />
+              
+              {/* Enhanced Social Media Routes */}
+              <Route path="/enhanced/login" element={<EnhancedLoginPage />} />
+              <Route path="/enhanced/register" element={<EnhancedRegisterPage />} />
+              <Route path="/enhanced/feed" element={<EnhancedFeedPage />} />
             </Routes>
           </main>
           <footer className="footer">

@@ -1,0 +1,232 @@
+.enhanced-post-card {
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(147, 197, 253, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.enhanced-post-card:hover {
+    border-color: rgba(147, 197, 253, 0.4);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Post Header */
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.author-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(147, 197, 253, 0.3);
+}
+
+.author-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.author-name {
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.post-time {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.verified-badge {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* Post Content */
+.post-content {
+    margin-bottom: 1rem;
+}
+
+.post-title {
+    color: #f8fafc;
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.post-text {
+    color: #cbd5e1;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.post-image {
+    margin: 1rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.post-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.tag {
+    color: #60a5fa;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.tag:hover {
+    color: #93c5fd;
+}
+
+/* Engagement Stats */
+.engagement-stats {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid rgba(147, 197, 253, 0.1);
+    border-bottom: 1px solid rgba(147, 197, 253, 0.1);
+    margin-bottom: 1rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+/* Action Buttons */
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(15, 23, 42, 0.5);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn span {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.action-btn:hover {
+    background: rgba(15, 23, 42, 0.8);
+    transform: translateY(-2px);
+}
+
+/* Like Button */
+.like-btn.active {
+    border-color: #ec4899;
+    color: #ec4899;
+    background: rgba(236, 72, 153, 0.1);
+}
+
+.like-btn:hover {
+    color: #ec4899;
+}
+
+/* Downvote Button */
+.downvote-btn.active {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.downvote-btn:hover {
+    color: #ef4444;
+}
+
+/* Comment Button */
+.comment-btn:hover {
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Reblog Button */
+.reblog-btn.active {
+    border-color: #10b981;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.reblog-btn:hover {
+    color: #10b981;
+}
+
+/* Share Button */
+.share-btn:hover {
+    color: #8b5cf6;
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+/* Bookmark Button */
+.bookmark-btn.active {
+    border-color: #f59e0b;
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.bookmark-btn:hover {
+    color: #f59e0b;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .enhanced-post-card {
+        padding: 1rem;
+    }
+    
+    .post-title {
+        font-size: 1.1rem;
+    }
+    
+    .action-btn span {
+        display: none;
+    }
+}
