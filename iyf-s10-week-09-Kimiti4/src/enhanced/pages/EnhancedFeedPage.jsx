@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaArrowUp } from 'react-icons/fa';
 import ConstellationBackground from '../components/ConstellationBackground';
 import EnhancedPostCard from '../components/EnhancedPostCard';
 import FeedSidebar from '../components/FeedSidebar';
@@ -18,6 +19,7 @@ export default function EnhancedFeedPage() {
     const [loading, setLoading] = useState(true);
     const [showHeader, setShowHeader] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
+    const [showBackToTop, setShowBackToTop] = useState(false);
     
     // Mock data for demonstration with categories
     useEffect(() => {
@@ -223,7 +225,7 @@ export default function EnhancedFeedPage() {
         }
     }, [activeFeed, posts]);
     
-    // Handle scroll to hide/show header
+    // Handle scroll to hide/show header and back to top button
     useEffect(() => {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
@@ -236,12 +238,22 @@ export default function EnhancedFeedPage() {
                 setShowHeader(true);
             }
             
+            // Show/hide back to top button
+            setShowBackToTop(currentScrollY > 500);
+            
             setLastScrollY(currentScrollY);
         };
         
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastScrollY]);
+    
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
     
     const handleFeedChange = (feedId) => {
         setActiveFeed(feedId);
@@ -325,6 +337,23 @@ export default function EnhancedFeedPage() {
                     )}
                 </main>
             </div>
+            
+            {/* Back to Top Button */}
+            <AnimatePresence>
+                {showBackToTop && (
+                    <motion.button
+                        className="back-to-top-button"
+                        onClick={scrollToTop}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                    >
+                        <FaArrowUp />
+                    </motion.button>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
