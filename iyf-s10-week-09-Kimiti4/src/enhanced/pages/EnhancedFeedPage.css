@@ -12,6 +12,17 @@
     position: sticky;
     top: 0;
     z-index: 10;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.feed-header.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.feed-header.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
 }
 
 .feed-header h1 {
