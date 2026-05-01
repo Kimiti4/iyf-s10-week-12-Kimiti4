@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ConstellationBackground from '../components/ConstellationBackground';
 import EnhancedPostCard from '../components/EnhancedPostCard';
 import FeedSidebar from '../components/FeedSidebar';
+import ReelsSection from '../components/ReelsSection';
 import './EnhancedFeedPage.css';
 
 export default function EnhancedFeedPage() {
@@ -15,6 +16,8 @@ export default function EnhancedFeedPage() {
     const [posts, setPosts] = useState([]);
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showHeader, setShowHeader] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
     
     // Mock data for demonstration with categories
     useEffect(() => {
@@ -220,6 +223,26 @@ export default function EnhancedFeedPage() {
         }
     }, [activeFeed, posts]);
     
+    // Handle scroll to hide/show header
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling down - hide header
+                setShowHeader(false);
+            } else if (currentScrollY < lastScrollY || currentScrollY <= 100) {
+                // Scrolling up or at top - show header
+                setShowHeader(true);
+            }
+            
+            setLastScrollY(currentScrollY);
+        };
+        
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY]);
+    
     const handleFeedChange = (feedId) => {
         setActiveFeed(feedId);
     };
@@ -228,11 +251,12 @@ export default function EnhancedFeedPage() {
         <div className="enhanced-feed-page">
             <ConstellationBackground />
             
-            {/* Header */}
+            {/* Header - hides on scroll down, shows on scroll up */}
             <motion.header 
-                className="feed-header"
+                className={`feed-header ${showHeader ? 'visible' : 'hidden'}`}
                 initial={{ y: -50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
+                animate={{ y: showHeader ? 0 : -100, opacity: showHeader ? 1 : 0 }}
+                transition={{ duration: 0.3 }}
             >
                 <h1>🌟 JamiiLink Feed</h1>
                 <p>Discover what's happening in your community</p>
@@ -245,6 +269,11 @@ export default function EnhancedFeedPage() {
                 
                 {/* Posts Feed */}
                 <main className="feed-content">
+                    {/* Reels Section - Only show on "For You" feed */}
+                    {activeFeed === 'all' && (
+                        <ReelsSection />
+                    )}
+                    
                     {/* Feed Title */}
                     <motion.div 
                         className="feed-title"
