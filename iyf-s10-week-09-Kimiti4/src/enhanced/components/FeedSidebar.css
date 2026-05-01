@@ -1,0 +1,170 @@
+.feed-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(147, 197, 253, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(147, 197, 253, 0.2);
+}
+
+.sidebar-icon {
+    font-size: 1.5rem;
+    color: #60a5fa;
+}
+
+.sidebar-header h3 {
+    color: #f8fafc;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.feed-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.feed-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.feed-nav-item:hover {
+    background: rgba(15, 23, 42, 0.5);
+    border-color: rgba(147, 197, 253, 0.2);
+}
+
+.feed-nav-item.active {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(147, 197, 253, 0.3);
+}
+
+.feed-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.feed-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+}
+
+.feed-name {
+    color: #f8fafc;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.feed-description {
+    color: #94a3b8;
+    font-size: 0.8rem;
+}
+
+.active-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Trending Section */
+.trending-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(147, 197, 253, 0.2);
+}
+
+.trending-section h4 {
+    color: #f8fafc;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.trending-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.trending-tag {
+    padding: 0.5rem 0.75rem;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(147, 197, 253, 0.2);
+    border-radius: 20px;
+    color: #60a5fa;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.trending-tag:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+    color: #93c5fd;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .feed-sidebar {
+        position: static;
+        margin-bottom: 2rem;
+    }
+    
+    .feed-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .feed-nav-item {
+        flex: 1;
+        min-width: 200px;
+    }
+}
+
+@media (max-width: 640px) {
+    .feed-sidebar {
+        padding: 1rem;
+    }
+    
+    .feed-nav-item {
+        padding: 0.75rem;
+    }
+    
+    .feed-description {
+        display: none;
+    }
+}

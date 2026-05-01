@@ -10,7 +10,7 @@ export default function CreatePostPage() {
     const [formData, setFormData] = useState({
         title: '',
         content: '',
-        category: 'general',
+        category: 'all',
         location: ''
     });
     const [imageFile, setImageFile] = useState(null);
@@ -19,13 +19,11 @@ export default function CreatePostPage() {
     const [error, setError] = useState('');
     
     const categories = [
-        'general',
-        'farm',
-        'market',
-        'events',
-        'jobs',
-        'services',
-        'announcements'
+        { value: 'all', label: '🏠 For You (General)' },
+        { value: 'mtaani', label: '🔔 Mtaani Alerts' },
+        { value: 'skills', label: '🤝 Skill Swaps' },
+        { value: 'farm', label: '🌱 Farm Market' },
+        { value: 'gigs', label: '💼 Gig Economy' }
     ];
     
     const handleChange = (e) => {
@@ -121,8 +119,8 @@ export default function CreatePostPage() {
                             required
                         >
                             {categories.map(cat => (
-                                <option key={cat} value={cat}>
-                                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                                <option key={cat.value} value={cat.value}>
+                                    {cat.label}
                                 </option>
                             ))}
                         </select>
