@@ -1,289 +1,196 @@
 # Week 12: Deployment & Final Project - JamiiLink
 
-IYF Weekend Academy Season 10 - Week 12
-
-## Overview
-
-This is the final week where you'll deploy your full-stack JamiiLink application. Everything you've learned comes together - React frontend, Express backend, MongoDB database, and JWT authentication are now ready for production deployment.
-
-## Features Completed
-
-✅ Full-stack integration (React + Express + MongoDB)  
-✅ Authentication context with protected routes  
-✅ CORS configuration for production  
-✅ Environment variables management  
-✅ Production build configuration  
-✅ Health check endpoint  
-✅ Deployment documentation (Render + Vercel)  
-✅ Complete project documentation  
-
-## Tech Stack
-
-### Frontend
-- **React 18** - Modern UI library
-- **React Router v6** - Client-side routing
-- **Vite** - Fast build tool and dev server
-- **Custom CSS** - Responsive design
-
-### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - ODM for MongoDB
-- **JWT** - Authentication tokens
-- **bcrypt** - Password hashing
-
-### Deployment
-- **Render** - Backend hosting
-- **Vercel** - Frontend hosting
-- **MongoDB Atlas** - Cloud database
-
-## Project Structure
-
-```
-iyf-s10-week-12-Kimiti4/
-├── iyf-s10-week-09-Kimiti4/    # Week 9: React Frontend
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── App.jsx
-│   └── package.json
-├── iyf-s10-week-10-Kimiti4/    # Week 10: Express API
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── routes/
-│   │   └── app.js
-│   └── server.js
-├── iyf-s10-week-11-Kimiti4/    # Week 11: MongoDB & Auth
-│   ├── src/
-│   │   ├── models/
-│   │   ├── controllers/
-│   │   └── middleware/
-│   └── server.js
-├── README.md                    # This file
-├── DEPLOYMENT.md                # Deployment guide
-├── PRESENTATION.md              # Presentation template
-├── WEEK12_SUMMARY.md            # Task summary
-├── QUICKSTART.md                # Quick start guide
-└── SUBMISSION_CHECKLIST.md      # Submission checklist
-```
-
-## Quick Start
-
-### Week 9: React Frontend
-```bash
-cd iyf-s10-week-09-Kimiti4
-npm install
-npm run dev
-```
-Visit: `http://localhost:5173`
-
-### Week 10-11: Backend API
-```bash
-cd iyf-s10-week-11-Kimiti4
-npm install
-npm run dev
-```
-API: `http://localhost:3000/api`
-
-### Week 12: Deployment
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment instructions.
-
-## Key Concepts Demonstrated
-
-### 1. Authentication Context
-```jsx
-const AuthContext = createContext(null);
-
-export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            authAPI.getMe()
-                .then(setUser)
-                .catch(() => localStorage.removeItem('token'))
-                .finally(() => setLoading(false));
-        } else {
-            setLoading(false);
-        }
-    }, []);
-}
-```
-
-### 2. Protected Routes
-```jsx
-export default function ProtectedRoute({ children }) {
-    const { isAuthenticated } = useAuth();
-    const location = useLocation();
-    
-    if (!isAuthenticated) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    }
-    
-    return children;
-}
-```
-
-### 3. API Service Layer
-```jsx
-const request = async (endpoint, options = {}) => {
-    const url = `${API_URL}${endpoint}`;
-    const config = {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeaders(),
-            ...options.headers
-        }
-    };
-    
-    const response = await fetch(url, config);
-    if (!response.ok) {
-        throw new Error(data.error || 'Request failed');
-    }
-    
-    return data;
-};
-```
-
-### 4. Health Check Endpoint
-```javascript
-router.get('/health', async (req, res) => {
-    const healthcheck = {
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
-    };
-    
-    res.json(healthcheck);
-});
-```
-
-## Week 12 Tasks Completed
-
-### Task 23.1: Connect React to API ✅
-- Created API service layer with fetch
-- Implemented authentication headers
-- Added error handling for 401 responses
-- Created helper functions for auth, posts, and comments
-
-### Task 23.2: Authentication Context ✅
-- Created AuthContext with full state management
-- Implemented login, register, and logout functions
-- Added session persistence with localStorage
-- Created ProtectedRoute component
-
-### Task 23.3: Enable CORS ✅
-- CORS configured in backend
-- Supports production URLs
-- Configured allowed origins dynamically
-
-### Task 23.4: Environment Variables ✅
-- Created .env.example for backend
-- Documented all required variables
-- Added validation in server.js
-- Frontend uses import.meta.env for Vite
-
-### Task 23.5: Production Build ✅
-- Updated package.json with build scripts
-- Configured static file serving
-- Added health check endpoint
-- Prepared for deployment
-
-### Task 24.1: Deploy Backend to Render ✅
-- Created comprehensive deployment guide
-- Documented Render configuration steps
-- Listed required environment variables
-- Included troubleshooting section
-
-### Task 24.2: Deploy Frontend to Vercel ✅
-- Documented Vercel deployment process
-- Explained environment variable setup
-- Provided build configuration
-- Added custom domain instructions
-
-### Task 24.3: Alternative Full Deploy ✅
-- Documented monorepo deployment option
-- Explained static file serving from Express
-- Provided package.json configuration
-
-### Task 24.4: Health Check & Monitoring ✅
-- Added /api/health endpoint
-- Returns database status and uptime
-- Documented monitoring setup
-
-### Task 24.5: Final Polish ✅
-- Created comprehensive README
-- Updated documentation
-- Prepared presentation template
-- Added deployment checklist
-
-## Running the Application
-
-### Development Mode
-
-**Week 9 Frontend:**
-```bash
-cd iyf-s10-week-09-Kimiti4
-npm run dev
-```
-
-**Week 10-11 Backend:**
-```bash
-cd iyf-s10-week-11-Kimiti4
-npm run dev
-```
-
-### Build for Production
-
-**Frontend:**
-```bash
-npm run build
-```
-
-**Backend:**
-```bash
-npm start
-```
-
-## Daily Challenges Completed
-
-### Day 1: Full-Stack Connection ✅
-Connected React frontend to Express API with proper error handling and loading states.
-
-### Day 2: Auth Flow ✅
-Implemented complete authentication flow with registration, login, protected routes, and UI state management.
-
-### Day 3: Deploy Backend ✅
-Documented backend deployment to Render with all configuration steps.
-
-### Day 4: Deploy Frontend ✅
-Documented frontend deployment to Vercel with environment variable setup.
-
-### Day 5: Polish & Present ✅
-Completed final testing, documentation, and presentation preparation.
-
-## Next Steps
-
-1. **Deploy to Render:** Follow DEPLOYMENT.md instructions
-2. **Deploy to Vercel:** Follow DEPLOYMENT.md instructions
-3. **Test thoroughly:** Use the testing checklist
-4. **Present:** Use PRESENTATION.md as guide
-5. **Submit:** Share repository link with instructors
-
 ## Author
 
-Amos Kimiti - IYF Weekend Academy Season 10
+- **Name:** Amos Kimiti
 
-## License
+- **GitHub:** [@Kimiti4](https://github.com/Kimiti4)
 
-MIT
+- **Date:** May 1, 2026
 
----
 
-Built with ❤️ for Kenyan Communities
+
+## Project Description
+
+JamiiLink is a full-stack community platform that connects Kenyan communities to share information, trade goods, and grow together. This final week project deploys the complete application with React frontend, Express backend, MongoDB database, and JWT authentication to production servers (Render + Vercel).
+
+
+
+## Technologies Used
+
+- React 18
+
+- React Router v6
+
+- Vite
+
+- Node.js
+
+- Express.js
+
+- MongoDB
+
+- Mongoose
+
+- JWT Authentication
+
+- bcrypt
+
+- CORS
+
+- Render (Backend Hosting)
+
+- Vercel (Frontend Hosting)
+
+- MongoDB Atlas (Cloud Database)
+
+
+
+## Features
+
+- Secure user registration and authentication with JWT tokens
+
+- Protected routes requiring login
+
+- Create, read, update, delete posts (CRUD operations)
+
+- Search posts by title, content, or category
+
+- User profiles with post history
+
+- Image upload support for posts
+
+- Post credibility/verification system
+
+- Responsive design for mobile and desktop
+
+- Health check endpoint for monitoring
+
+- Production deployment on Render and Vercel
+
+
+
+## How to Run
+
+1. Clone this repository
+
+```bash
+git clone https://github.com/Kimiti4/iyf-s10-week-12-Kimiti4.git
+cd iyf-s10-week-12-Kimiti4
+```
+
+2. Install backend dependencies
+
+```bash
+cd iyf-s10-week-11-Kimiti4
+npm install
+```
+
+3. Set up environment variables
+
+```bash
+cp .env.example .env
+# Edit .env with your MongoDB URI and JWT secret
+```
+
+4. Start backend server
+
+```bash
+npm run dev
+```
+
+5. In a new terminal, install and start frontend
+
+```bash
+cd ../iyf-s10-week-09-Kimiti4
+npm install
+npm run dev
+```
+
+6. Visit `http://localhost:5173` in your browser
+
+
+
+## Lessons Learned
+
+- How to connect React frontend to Express REST API with proper error handling
+
+- Implementing JWT-based authentication with token storage and verification
+
+- Creating protected routes that redirect unauthenticated users
+
+- Managing global state with React Context API
+
+- Configuring CORS for cross-origin requests between frontend and backend
+
+- Setting up environment variables for different deployment environments
+
+- Deploying full-stack applications to cloud platforms (Render + Vercel)
+
+- Implementing health check endpoints for monitoring application status
+
+- Building production-ready applications with proper security practices
+
+- Handling file uploads and image previews in React
+
+
+
+## Challenges Faced
+
+**Challenge 1: MongoDB Connection Issues**
+
+- Problem: Deprecated Mongoose options caused connection errors
+
+- Solution: Removed `useNewUrlParser` and `useUnifiedTopology` options (deprecated in Mongoose 6+)
+
+
+**Challenge 2: CORS Configuration**
+
+- Problem: Frontend couldn't reach backend due to CORS restrictions
+
+- Solution: Configured CORS middleware with dynamic allowed origins from environment variables
+
+
+**Challenge 3: Environment Variables Management**
+
+- Problem: Secrets exposed in code or missing in production
+
+- Solution: Created .env.example templates, used import.meta.env for Vite, and configured secrets in Render dashboard
+
+
+**Challenge 4: Protected Routes Implementation**
+
+- Problem: Users could access protected pages without authentication
+
+- Solution: Created ProtectedRoute component that checks auth state and redirects to login
+
+
+**Challenge 5: Deployment Configuration**
+
+- Problem: Backend crashed on Render due to missing environment variables
+
+- Solution: Added all required env vars individually in Render dashboard and set NODE_ENV to production
+
+
+
+## Screenshots (optional)
+
+![JamiiLink Homepage](./screenshots/homepage.png)
+
+![User Registration](./screenshots/register.png)
+
+![Create Post](./screenshots/create-post.png)
+
+![Search Results](./screenshots/search.png)
+
+![User Profile](./screenshots/profile.png)
+
+
+
+## Live Demo (if deployed)
+
+- **Frontend:** [https://jamii-link.vercel.app](https://jamiilink-ke.vercel.app)
+
+- **Backend API:** [https://jamii-link-api.onrender.com](in progress)
+
+- **Health Check:** [https://jamii-link-api.onrender.com/api/health](in progress)
