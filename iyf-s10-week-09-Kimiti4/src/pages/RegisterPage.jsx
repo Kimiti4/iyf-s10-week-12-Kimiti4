@@ -42,8 +42,19 @@ export default function RegisterPage() {
         
         try {
             const { name, email, password, location } = formData;
-            await register({ name, email, password, location });
-            navigate('/');
+            // Backend expects 'username' not 'name', and 'profile.location'
+            await register({ 
+                username: name, 
+                email, 
+                password, 
+                profile: { location }
+            });
+            // Redirect to login page after successful registration
+            navigate('/login', { 
+                state: { 
+                    message: 'Registration successful! Please login with your credentials.' 
+                } 
+            });
         } catch (err) {
             setError(err.message || 'Registration failed. Please try again.');
         } finally {
