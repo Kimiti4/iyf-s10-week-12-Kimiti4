@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jamii Link KE 🇰🇪</title>
+    <meta name="description" content="Unified platform for Mtaani alerts, Skill swaps, Farm markets & Gigs in Kenya">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">🔗</span>
+                <h1>Jamii Link KE</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-view="explore">Explore</button>
+                <button class="nav-btn" data-view="market">Market</button>
+                <button class="nav-btn" data-view="create">Create</button>
+                <button class="nav-btn" data-view="about">About</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- View: Explore Posts -->
+            <section id="view-explore" class="view active">
+                <div class="filters">
+                    <select id="filter-category">
+                        <option value="">All Categories</option>
+                        <option value="mtaani">Mtaani Alerts</option>
+                        <option value="skill">Skill Swaps</option>
+                        <option value="farm">Farm Market</option>
+                        <option value="gig">Gigs</option>
+                        <option value="alert">Critical Alerts</option>
+                    </select>
+                    <select id="filter-county">
+                        <option value="">All Counties</option>
+                        <option value="nairobi">Nairobi</option>
+                        <option value="kiambu">Kiambu</option>
+                        <option value="machakos">Machakos</option>
+                        <option value="kajiado">Kajiado</option>
+                        <option value="muranga">Murang'a</option>
+                    </select>
+                    <input type="text" id="search-input" placeholder="Search...">
+                    <button id="apply-filters" class="btn-primary">Search</button>
+                </div>
+                <div id="posts-container" class="posts-grid"></div>
+                <div id="loading" class="loading">Loading...</div>
+            </section>
+
+            <!-- View: Market Prices -->
+            <section id="view-market" class="view">
+                <h2>🌾 Farm Produce Prices</h2>
+                <div class="market-controls">
+                    <select id="market-crop">
+                        <option value="">All Crops</option>
+                    </select>
+                    <select id="market-county">
+                        <option value="">All Counties</option>
+                        <option value="Nairobi">Nairobi</option>
+                        <option value="Kiambu">Kiambu</option>
+                    </select>
+                    <button id="load-market" class="btn-primary">Load Prices</button>
+                </div>
+                <div id="market-container" class="market-grid"></div>
+            </section>
+
+            <!-- View: Create Post -->
+            <section id="view-create" class="view">
+                <div class="form-container">
+                    <h2>Create Post</h2>
+                    <form id="create-post-form">
+                        <div class="form-group">
+                            <label for="post-title">Title</label>
+                            <input type="text" id="post-title" required minlength="3">
+                        </div>
+                        <div class="form-group">
+                            <label for="post-content">Content</label>
+                            <textarea id="post-content" required minlength="10"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="post-author">Your Name</label>
+                            <input type="text" id="post-author" required minlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label for="post-category">Category</label>
+                            <select id="post-category" required>
+                                <option value="mtaani">Mtaani Alert</option>
+                                <option value="skill">Skill Swap</option>
+                                <option value="farm">Farm Produce</option>
+                                <option value="gig">Gig</option>
+                                <option value="alert">Critical Alert</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="post-tags">Tags (comma separated)</label>
+                            <input type="text" id="post-tags" placeholder="e.g., water, alert, urgent">
+                        </div>
+                        <div class="form-group">
+                            <label for="post-location-county">County</label>
+                            <select id="post-location-county">
+                                <option value="Nairobi">Nairobi</option>
+                                <option value="Kiambu">Kiambu</option>
+                                <option value="Machakos">Machakos</option>
+                                <option value="Kajiado">Kajiado</option>
+                                <option value="Murang'a">Murang'a</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary btn-large">Publish Post</button>
+                    </form>
+                    <div id="form-message" class="message"></div>
+                </div>
+            </section>
+
+            <!-- View: About -->
+            <section id="view-about" class="view">
+                <div class="about-container">
+                    <h2>About Jamii Link KE</h2>
+                    <p class="tagline">"A farmer in Kiambu can see tomato prices in Nairobi markets, find a carpenter for farm repairs, and get flood alerts for their settlement — all in one platform."</p>
+                    <div class="features">
+                        <div class="feature-card">
+                            <h3>📢 Mtaani Connect</h3>
+                            <p>Hyperlocal alerts for informal settlements — water cuts, power outages, security issues.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>💡 SkillSwap KE</h3>
+                            <p>Time-banking for skill exchanges. Trade your expertise without cash.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>🌾 FarmLink KE</h3>
+                            <p>Direct farm-to-buyer marketplace with price transparency to empower farmers.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>💼 Gigs Board</h3>
+                            <p>Local job opportunities and casual work for daily income.</p>
+                        </div>
+                    </div>
+                    <div class="impact">
+                        <h3>Why This Matters</h3>
+                        <ul>
+                            <li>✅ <strong>Financial Inclusion:</strong> Farmers see market prices → reduce broker exploitation</li>
+                            <li>✅ <strong>Youth Empowerment:</strong> Skill swaps create opportunities without cash</li>
+                            <li>✅ <strong>Community Resilience:</strong> Hyperlocal alerts save lives during emergencies</li>
+                            <li>✅ <strong>Digital Bridge:</strong> Connects informal settlements to formal opportunities</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Jamii Link KE — Connecting communities across Kenya 🇰🇪</p>
+            <p class="tech-stack">Built with Node.js + Express + Vanilla JS</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="/js/api.js"></script>
+    <script type="module" src="/js/app.js"></script>
+</body>
+</html>
