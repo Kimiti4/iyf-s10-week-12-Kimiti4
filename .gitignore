@@ -54,8 +54,17 @@ pnpm-lock.yaml
 # Large auto-generated files
 DIRECTORY_TREE.txt
 
-# Redundant/backup documentation (keep only essential docs)
+# Redundant/backup documentation (keep only root README.md)
 *.md.backup
 WEEK12_FEATURES_GUIDE.md
 QUICK_START_WEEK12.md
 NEXT_STEPS.md
+FIX_MONGODB_ERROR.md
+iyf-s10-week-09-Kimiti4/README.md
+iyf-s10-week-11-Kimiti4/README.md
+RAILWAY_DEPLOYMENT.md
+RENDER_QUICK_FIX.md
+RENDER_SETUP_FIX.md
+VERIFY_DEPLOYMENT.md
+WEEK12_SUMMARY.md
+PROJECT_COMPLETE.md
