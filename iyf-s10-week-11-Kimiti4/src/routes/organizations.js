@@ -20,14 +20,14 @@ const {
   transferOwnership,
   getAnalytics
 } = require('../controllers/organizationsController');
-const { protect } = require('../middleware/requireAuth');
+const requireAuth = require('../middleware/requireAuth');
 
 // Public routes
 router.get('/', getOrganizations);
 router.get('/:slug', getOrganization);
 
 // Protected routes (require authentication)
-router.use(protect);
+router.use(requireAuth);
 
 // My organizations
 router.get('/my', getMyOrganizations);
