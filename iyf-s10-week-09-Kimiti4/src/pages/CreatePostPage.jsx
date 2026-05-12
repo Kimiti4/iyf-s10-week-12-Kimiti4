@@ -75,7 +75,7 @@ export default function CreatePostPage() {
                 // formData.append('image', imageFile);
                 // formData.append('title', title);
                 // etc.
-                console.log('Image upload requires backend multer setup');
+                // Image upload feature pending backend multer configuration
             }
             
             await postsAPI.create(postData);
