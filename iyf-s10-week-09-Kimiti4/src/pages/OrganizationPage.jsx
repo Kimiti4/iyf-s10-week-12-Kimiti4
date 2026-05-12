@@ -8,6 +8,7 @@ import { useParams, Link } from 'react-router-dom';
 import { organizationsAPI, postsAPI } from '../services/api';
 import { useOrganization } from '../context/OrganizationContext';
 import PostCard from '../components/PostCard';
+import VerificationBadge from '../components/VerificationBadge';
 import './OrganizationPage.css';
 
 const OrganizationPage = () => {
@@ -110,6 +111,17 @@ const OrganizationPage = () => {
             
             <div className="org-header-info">
               <h1>{organization.name}</h1>
+              
+              {/* Verification Badge */}
+              {organization.verification && (
+                <VerificationBadge 
+                  verification={organization.verification}
+                  type="organization"
+                  size="large"
+                  showLabel={true}
+                />
+              )}
+              
               <p className="org-description">{organization.description}</p>
               
               <div className="org-meta">
@@ -242,4 +254,6 @@ const OrganizationPage = () => {
   );
 };
 
+export default OrganizationPage;
+export default OrganizationPage;
 export default OrganizationPage;
