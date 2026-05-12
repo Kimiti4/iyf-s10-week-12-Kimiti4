@@ -5,7 +5,7 @@
 const Organization = require('../models/Organization');
 const Membership = require('../models/Membership');
 const User = require('../models/User');
-const { asyncHandler } = require('../utils/asyncHandler');
+const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../middleware/errorHandler');
 
 // @desc    Create a new organization
