@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { OrganizationProvider } from './context/OrganizationContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import SearchBar from './components/SearchBar'
+import OrganizationSelector from './components/OrganizationSelector'
 import HomePage from './pages/HomePage'
 import PostListPage from './pages/PostListPage'
 import PostDetailPage from './pages/PostDetailPage'
@@ -19,6 +21,7 @@ import EnhancedRegisterPage from './enhanced/pages/EnhancedRegisterPage'
 import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
 import ReelsPage from './enhanced/pages/ReelsPage'
 import AdminDashboard from './enhanced/pages/AdminDashboard'
+import OrganizationPage from './pages/OrganizationPage'
 import './App.css'
 
 function NavBar() {
@@ -33,6 +36,9 @@ function NavBar() {
           <Link to="/">Feed</Link>
           <Link to="/original/posts">Posts</Link>
           <Link to="/original/about">About</Link>
+          
+          {/* Organization Selector */}
+          <OrganizationSelector />
           
           {isAuthenticated ? (
             <>
@@ -58,16 +64,18 @@ function NavBar() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="App">
-          <NavBar />
-          <main className="main-content">
+      <OrganizationProvider>
+        <Router>
+          <div className="App">
+            <NavBar />
+            <main className="main-content">
             <Routes>
               {/* Main Routes - Now Using Enhanced Pages */}
               <Route path="/" element={<EnhancedFeedPage />} />
               <Route path="/login" element={<EnhancedLoginPage />} />
               <Route path="/register" element={<EnhancedRegisterPage />} />
               <Route path="/reels" element={<ReelsPage />} />
+              <Route path="/org/:slug" element={<OrganizationPage />} />
               <Route 
                 path="/admin" 
                 element={
@@ -103,7 +111,8 @@ function App() {
           </footer>
         </div>
       </Router>
-    </AuthProvider>
+    </OrganizationProvider>
+  </AuthProvider>
   )
 }
 

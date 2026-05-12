@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { postsAPI } from '../services/api';
+import { useOrganization } from '../context/OrganizationContext';
 
 /**
  * CreatePostPage - Create new post with optional image upload
  */
 export default function CreatePostPage() {
     const navigate = useNavigate();
+    const { currentOrg } = useOrganization();
     const [formData, setFormData] = useState({
         title: '',
         content: '',
@@ -67,6 +69,11 @@ export default function CreatePostPage() {
         try {
             let postData = { ...formData };
             
+            // Add organization if selected
+            if (currentOrg) {
+                postData.organization = currentOrg._id;
+            }
+            
             // If there's an image, we'll need to handle it differently
             // For now, we'll send without image (backend needs multer setup)
             if (imageFile) {
@@ -79,7 +86,13 @@ export default function CreatePostPage() {
             }
             
             await postsAPI.create(postData);
-            navigate('/posts');
+            
+            // Navigate to organization page if posting to an org, otherwise to posts list
+            if (currentOrg) {
+                navigate(`/org/${currentOrg.slug}`);
+            } else {
+                navigate('/posts');
+            }
         } catch (err) {
             setError(err.message || 'Failed to create post');
         } finally {
@@ -91,6 +104,28 @@ export default function CreatePostPage() {
         <div className="create-post-page">
             <div className="container">
                 <h1>Create New Post</h1>
+                
+                {/* Organization Badge */}
+                {currentOrg && (
+                    <div className="org-badge-banner">
+                        <span className="org-badge-icon">
+                            {currentOrg.type === 'school' && '🏫'}
+                            {currentOrg.type === 'university' && '🎓'}
+                            {currentOrg.type === 'estate' && '🏘️'}
+                            {currentOrg.type === 'church' && '⛪'}
+                            {currentOrg.type === 'ngo' && '🤝'}
+                            {currentOrg.type === 'sme' && '💼'}
+                            {currentOrg.type === 'coworking' && '🏢'}
+                            {currentOrg.type === 'community' && '👥'}
+                            {currentOrg.type === 'youth_group' && '🌟'}
+                            {currentOrg.type === 'professional' && '💼'}
+                        </span>
+                        <div className="org-badge-info">
+                            <span className="org-badge-label">Posting to:</span>
+                            <span className="org-badge-name">{currentOrg.name}</span>
+                        </div>
+                    </div>
+                )}
                 
                 {error && <div className="error-message">{error}</div>}
                 
