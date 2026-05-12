@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { FaHeart, FaRegHeart, FaThumbsDown, FaRetweet, FaComment, FaShare, FaBookmark, FaRegBookmark } from 'react-icons/fa';
+import VerificationBadge from '../../components/VerificationBadge';
 import './EnhancedPostCard.css';
 
 export default function EnhancedPostCard({ post, currentUser }) {
@@ -94,11 +95,21 @@ export default function EnhancedPostCard({ post, currentUser }) {
                         className="author-avatar"
                     />
                     <div className="author-details">
-                        <h3 className="author-name">{post.author?.username}</h3>
+                        <div className="author-name-row">
+                            <h3 className="author-name">{post.author?.username}</h3>
+                            {/* Author Verification Badge */}
+                            {post.author?.verification && post.author.verification.isVerified && (
+                                <VerificationBadge 
+                                    verification={post.author.verification}
+                                    type="user"
+                                    size="small"
+                                    showLabel={false}
+                                />
+                            )}
+                        </div>
                         <span className="post-time">{formatTime(post.createdAt)}</span>
                     </div>
                 </div>
-                {post.verified && <span className="verified-badge">✓</span>}
             </div>
             
             {/* Post Content */}
@@ -191,6 +202,17 @@ export default function EnhancedPostCard({ post, currentUser }) {
 
 // Helper function to format time
 function formatTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    
+    return date.toLocaleDateString();
+}
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
