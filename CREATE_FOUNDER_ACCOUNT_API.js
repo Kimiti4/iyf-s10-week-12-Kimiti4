@@ -1,9 +1,7 @@
 /**
  *  Create Founder Account via API
- * No mongoose dependency needed - uses fetch API
+ * Uses native fetch (Node 18+)
  */
-
-const fetch = require('node-fetch');
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
 
@@ -15,8 +13,6 @@ async function createFounderAccount() {
       username: 'kimiti4',
       email: 'amos.kimiti@jamiilink.ke',
       password: 'Kimiti@2026!Founder#MFA',
-      role: 'founder',
-      isFounder: true,
       profile: {
         bio: 'Amos Kimiti - Platform Founder & Creator | Building community-powered solutions for Kenya 🇰🇪',
         location: {
@@ -25,19 +21,12 @@ async function createFounderAccount() {
         },
         skills: ['Full Stack Development', 'Community Building', 'Social Innovation'],
         avatarIcon: '👑'
-      },
-      verification: {
-        isVerified: true,
-        badgeLevel: 'diamond',
-        verificationType: 'manual',
-        verificationNotes: 'Platform founder & creator - Diamond tier (highest level)',
-        badgeColor: '#FFD700'
       }
     };
 
     console.log('📤 Sending request to create founder account...\n');
 
-    const response = await fetch(`${BACKEND_URL}/api/users/register`, {
+    const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -53,14 +42,28 @@ async function createFounderAccount() {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log(`   Username: ${data.user.username}`);
       console.log(`   Email: ${data.user.email}`);
-      console.log(`   Role: ${data.user.role}`);
-      console.log(`   Badge: ${data.user.verification.badgeLevel} 💎`);
+      console.log(`   Role: ${data.user.role || 'user'}`);
+      console.log(`   Badge: pending upgrade to diamond 💎`);
       console.log(`   Avatar Icon: ${data.user.profile.avatarIcon}`);
       console.log('');
-      console.log('🔐 MFA Status: Enabled (3-Factor Authentication)');
-      console.log('   - TOTP (Authenticator App)');
-      console.log('   - Email Verification');
-      console.log('   - SMS Verification');
+      console.log('⚠️  NEXT STEPS:');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('   Your account has been created!');
+      console.log('   To upgrade to FOUNDER status:');
+      console.log('   1. Login at: http://localhost:5173/login');
+      console.log('   2. Use MongoDB Compass or CLI to update:');
+      console.log('      db.users.updateOne(');
+      console.log('        { email: "amos.kimiti@jamiilink.ke" },');
+      console.log('        { $set: {');
+      console.log('          role: "founder",');
+      console.log('          isFounder: true,');
+      console.log('          verification: {');
+      console.log('            isVerified: true,');
+      console.log('            badgeLevel: "diamond",');
+      console.log('            badgeColor: "#FFD700"');
+      console.log('          }');
+      console.log('        } }');
+      console.log('      )');
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
       console.log('🚀 HOW TO LOGIN:');
@@ -79,9 +82,11 @@ async function createFounderAccount() {
       console.log('   - Never share credentials');
     } else {
       console.error('❌ Failed to create account');
-      console.error(`Error: ${data.message || 'Unknown error'}`);
+      console.error(`Status: ${response.status}`);
+      console.error(`Error: ${data.error || data.message || 'Unknown error'}`);
+      console.error('Response:', JSON.stringify(data, null, 2));
       
-      if (data.message && data.message.includes('already exists')) {
+      if ((data.error || data.message) && (data.error || data.message).includes('already exists')) {
         console.log('\n💡 Account already exists! Try logging in directly.');
       }
     }

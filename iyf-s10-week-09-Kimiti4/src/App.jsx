@@ -22,6 +22,10 @@ import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
 import ReelsPage from './enhanced/pages/ReelsPage'
 import AdminDashboard from './enhanced/pages/AdminDashboard'
 import OrganizationPage from './pages/OrganizationPage'
+// New Unique Features
+import TiannaraAssistant from './components/TiannaraAssistant'
+import CommunityEvents from './components/CommunityEvents'
+import EmergencyAlerts from './components/EmergencyAlerts'
 import './App.css'
 
 function NavBar() {
@@ -34,6 +38,9 @@ function NavBar() {
         <SearchBar />
         <div className="nav-links">
           <Link to="/">Feed</Link>
+          <Link to="/tiannara" className="nav-feature">🤖 Tiannara</Link>
+          <Link to="/events" className="nav-feature">🎉 Events</Link>
+          <Link to="/alerts" className="nav-feature">🚨 Alerts</Link>
           <Link to="/original/posts">Posts</Link>
           <Link to="/original/about">About</Link>
           
@@ -76,6 +83,12 @@ function App() {
               <Route path="/register" element={<EnhancedRegisterPage />} />
               <Route path="/reels" element={<ReelsPage />} />
               <Route path="/org/:slug" element={<OrganizationPage />} />
+              
+              {/* New Unique Feature Routes */}
+              <Route path="/tiannara" element={<TiannaraAssistant currentUser={user} />} />
+              <Route path="/events" element={<CommunityEvents currentUser={user} />} />
+              <Route path="/alerts" element={<EmergencyAlerts currentUser={user} />} />
+              
               <Route 
                 path="/admin" 
                 element={
