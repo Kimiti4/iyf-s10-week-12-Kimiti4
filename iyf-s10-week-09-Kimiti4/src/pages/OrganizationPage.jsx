@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { organizationsAPI, postsAPI } from '../services/api';
 import { useOrganization } from '../context/OrganizationContext';
-import PostCard from '../components/PostCard';
+import EnhancedPostCard from '../enhanced/components/EnhancedPostCard';
 import VerificationBadge from '../components/VerificationBadge';
 import './OrganizationPage.css';
 
@@ -180,7 +180,7 @@ const OrganizationPage = () => {
           ) : (
             <div className="posts-grid">
               {posts.map(post => (
-                <PostCard key={post._id} post={post} />
+                <EnhancedPostCard key={post._id} post={post} />
               ))}
             </div>
           )}
@@ -254,6 +254,4 @@ const OrganizationPage = () => {
   );
 };
 
-export default OrganizationPage;
-export default OrganizationPage;
 export default OrganizationPage;
