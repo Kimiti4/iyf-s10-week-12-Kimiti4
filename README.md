@@ -240,6 +240,6 @@ npm run dev
 
 - **Frontend:** [JamiiLink](https://jamii-link-ke.vercel.app/)
 
-- **Backend API:** [Railway Deployment](https://iyf-s10-week-12-kimiti4.up.railway.app)
+- **Backend API:** [Railway Deployment](https://iyf-s10-week-12-kimiti4-production.up.railway.app/)
 
 
