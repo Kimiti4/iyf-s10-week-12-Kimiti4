@@ -772,3 +772,36 @@ mark {
     flex-wrap: wrap;
   }
 }
+
+/* 🔹 Organization Badge Banner */
+.org-badge-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.org-badge-icon {
+  font-size: 32px;
+}
+
+.org-badge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.org-badge-label {
+  font-size: 12px;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.org-badge-name {
+  font-size: 18px;
+  font-weight: 700;
+}

@@ -236,6 +236,90 @@ export const commentsAPI = {
     })
 };
 
+// ===== ORGANIZATIONS API =====
+export const organizationsAPI = {
+    /**
+     * Get all organizations
+     * @param {Object} params - { type, search, page, limit }
+     */
+    getAll: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return request(`/organizations${query ? `?${query}` : ''}`);
+    },
+    
+    /**
+     * Get organization by slug
+     * @param {string} slug - Organization slug
+     */
+    getBySlug: (slug) => request(`/organizations/${slug}`),
+    
+    /**
+     * Get organization by ID
+     * @param {string} id - Organization ID
+     */
+    getById: (id) => request(`/organizations/${id}`),
+    
+    /**
+     * Get current user's organizations
+     */
+    getMyOrganizations: () => request('/organizations/my'),
+    
+    /**
+     * Create a new organization
+     * @param {Object} orgData - { name, slug, type, description, contact }
+     */
+    create: (orgData) => request('/organizations', {
+        method: 'POST',
+        body: JSON.stringify(orgData)
+    }),
+    
+    /**
+     * Update organization
+     * @param {string} id - Organization ID
+     * @param {Object} orgData - Updated organization data
+     */
+    update: (id, orgData) => request(`/organizations/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(orgData)
+    }),
+    
+    /**
+     * Delete organization
+     * @param {string} id - Organization ID
+     */
+    delete: (id) => request(`/organizations/${id}`, {
+        method: 'DELETE'
+    }),
+    
+    /**
+     * Join an organization
+     * @param {string} id - Organization ID
+     */
+    join: (id) => request(`/organizations/${id}/join`, {
+        method: 'POST'
+    }),
+    
+    /**
+     * Leave an organization
+     * @param {string} id - Organization ID
+     */
+    leave: (id) => request(`/organizations/${id}/leave`, {
+        method: 'POST'
+    }),
+    
+    /**
+     * Get organization members
+     * @param {string} id - Organization ID
+     */
+    getMembers: (id) => request(`/organizations/${id}/members`),
+    
+    /**
+     * Get organization analytics
+     * @param {string} id - Organization ID
+     */
+    getAnalytics: (id) => request(`/organizations/${id}/analytics`)
+};
+
 // ===== USER PROFILES API =====
 export const usersAPI = {
     /**
@@ -304,6 +388,7 @@ export default {
     posts: postsAPI,
     comments: commentsAPI,
     users: usersAPI,
+    organizations: organizationsAPI,
     isAuthenticated,
     getCurrentUser,
     logout
