@@ -21,18 +21,20 @@ const corsOptions = {
         const allowedOrigins = [
             'http://localhost:5173',  // Vite dev server
             'http://localhost:3000',  // Local
-            process.env.FRONTEND_URL  // Production frontend (Vercel, etc.)
+            'https://jamii-link-ke.vercel.app',  // Production frontend (Vercel)
+            process.env.FRONTEND_URL  // Additional production frontend URL
         ].filter(Boolean);
         
         // Allow requests with no origin (mobile apps, curl, etc.)
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.log(`CORS blocked origin: ${origin}`);
             callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 };
 
