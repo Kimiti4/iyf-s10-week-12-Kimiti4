@@ -54,8 +54,6 @@ export function AuthProvider({ children }) {
             
             const response = await authAPI.login(credentials);
             
-            console.log('Login response:', response);
-            
             // Store token and user info
             if (response.token) {
                 localStorage.setItem('token', response.token);
@@ -84,11 +82,7 @@ export function AuthProvider({ children }) {
             setError(null);
             setLoading(true);
             
-            console.log('Registering with data:', userData);
-            
             const response = await authAPI.register(userData);
-            
-            console.log('Register response:', response);
             
             // Store token and user info
             if (response.token) {
