@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { FaHeart, FaRegHeart, FaThumbsDown, FaRetweet, FaComment, FaShare, FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import VerificationBadge from '../../components/VerificationBadge';
+import AvatarIcon from '../../components/AvatarIcon';
 import './EnhancedPostCard.css';
 
 export default function EnhancedPostCard({ post, currentUser }) {
@@ -89,10 +90,9 @@ export default function EnhancedPostCard({ post, currentUser }) {
             {/* Post Header */}
             <div className="post-header">
                 <div className="author-info">
-                    <img 
-                        src={post.author?.avatar || '/default-avatar.png'} 
-                        alt={post.author?.username}
-                        className="author-avatar"
+                    <AvatarIcon 
+                        user={post.author || { _id: 'unknown', username: 'Anonymous', profile: {} }}
+                        size="small"
                     />
                     <div className="author-details">
                         <div className="author-name-row">
