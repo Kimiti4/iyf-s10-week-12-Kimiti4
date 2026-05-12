@@ -32,9 +32,12 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin', 'moderator'],
+    enum: ['user', 'admin', 'moderator', 'founder'],
     default: 'user'
   },
+  
+  // 🔹 Founder/Creator Account Flag
+  isFounder: { type: Boolean, default: false, index: true },
   
   // 🔹 Verification System (Unique to JamiiLink)
   verification: {
@@ -81,8 +84,40 @@ const userSchema = new mongoose.Schema({
       ward: String
     },
     skills: [String],
-    avatar: String  // URL to profile image
-  }
+    avatar: String,  // URL to profile image
+    avatarIcon: {  // Fun icon for blank avatars
+      type: String,
+      enum: [
+        '🦁', '🐘', '🦒', '🦓', '🐃', '🦏', '🐆', '🐪',
+        '🌍', '🌟', '🔥', '💎', '🚀', '⚡', '🌈', '🎯',
+        '🎨', '🎭', '🎪', '🎬', '🎸', '🎺', '🎻', '🎲',
+        '👑', '🛡️', '⚔️', '🏆', '🎖️', '🌺', '🌸', '🍀'
+      ],
+      default: '🦁'  // Default lion for founder
+    }
+  },
+  
+  // 🔹 Heavy MFA for Founder Account
+  mfa: {
+    enabled: { type: Boolean, default: false },
+    methods: [{
+      type: {
+        type: String,
+        enum: ['totp', 'sms', 'email', 'hardware_key', 'biometric']
+      },
+      verified: { type: Boolean, default: false },
+      primary: { type: Boolean, default: false },
+      secret: String,  // TOTP secret
+      backupCodes: [String],  // One-time backup codes
+      phoneNumber: String,
+      email: String,
+      addedAt: Date
+    }],
+    requireAllMethods: { type: Boolean, default: false },  // Founder requires all methods
+    lastVerified: Date,
+    failedAttempts: { type: Number, default: 0 },
+    lockedUntil: Date  // Temporary lock after failed attempts
+  },
 }, {
   timestamps: true,  // Adds createdAt, updatedAt
   toJSON: { virtuals: true },

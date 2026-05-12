@@ -1,0 +1,99 @@
+/* 🔹 Avatar Icon Styles */
+
+.avatar-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.avatar-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Avatar Sizes */
+.avatar-small {
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+}
+
+.avatar-medium {
+  width: 48px;
+  height: 48px;
+  font-size: 1.5rem;
+}
+
+.avatar-large {
+  width: 64px;
+  height: 64px;
+  font-size: 2rem;
+}
+
+.avatar-xlarge {
+  width: 96px;
+  height: 96px;
+  font-size: 3rem;
+}
+
+/* Avatar Image (for users with custom avatars) */
+.avatar-image {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-image.avatar-small {
+  width: 32px;
+  height: 32px;
+}
+
+.avatar-image.avatar-medium {
+  width: 48px;
+  height: 48px;
+}
+
+.avatar-image.avatar-large {
+  width: 64px;
+  height: 64px;
+}
+
+.avatar-image.avatar-xlarge {
+  width: 96px;
+  height: 96px;
+}
+
+/* Avatar Name */
+.avatar-name {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 0.9rem;
+}
+
+/* Founder Badge on Avatar */
+.avatar-container.founder .avatar-icon {
+  border: 3px solid #FFD700;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+  animation: founder-glow 2s ease-in-out infinite;
+}
+
+@keyframes founder-glow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+}

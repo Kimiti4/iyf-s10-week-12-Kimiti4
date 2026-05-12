@@ -9,6 +9,7 @@ const locationsRoutes = require('./locations');
 const marketRoutes = require('./market');
 const organizationsRoutes = require('./organizations');
 const verificationRoutes = require('./verification');
+const metricsRoutes = require('./metrics');
 
 // Health check
 router.get('/health', (req, res) => {
@@ -33,6 +34,9 @@ router.use('/organizations', organizationsRoutes);
 
 // Mount verification routes (unique badge system)
 router.use('/verification', verificationRoutes);
+
+// Mount metrics routes (realistic analytics)
+router.use('/metrics', metricsRoutes);
 
 // Mount posts routes
 router.use('/posts', postsRoutes);
