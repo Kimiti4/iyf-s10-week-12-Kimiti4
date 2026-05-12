@@ -43,13 +43,13 @@ If you prefer to use the API directly:
 curl -X POST https://your-backend-url/api/users/register \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "kimiti4",
-    "email": "your-email@example.com",
-    "password": "your-strong-password",
+    "username": "snooz3",
+    "email": "kimiti.kariuki75@gmail.com",
+    "password": "#gunzNroz3z_6G1GWY#",
     "role": "founder",
     "isFounder": true,
     "profile": {
-      "bio": "Amos Kimiti - Platform Founder",
+      "bio": "snooz3 - Platform Founder",
       "avatarIcon": "👑"
     }
   }'

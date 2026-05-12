@@ -16,13 +16,13 @@ const pool = new Pool({
 
 // Founder account details
 const FOUNDER_DATA = {
-  username: 'kimiti4',
-  email: 'amos.kimiti@jamiilink.ke',
-  password: 'Kimiti@2026!Founder#MFA',
+  username: 'Snooz3',
+  email: 'kimiti.kariuki75@gmail.com',
+  password: '#gunzNroz3z_6G1GWY#',
   role: 'founder',
   isFounder: true,
   profile: {
-    bio: 'Amos Kimiti - Platform Founder & Creator | Building community-powered solutions for Kenya 🇰🇪',
+    bio: 'Snoz# - Platform Founder & Creator | Building community-powered solutions for Kenya 🇰🇪',
     location: {
       county: 'Nairobi',
       settlement: 'Westlands'
