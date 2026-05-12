@@ -18,6 +18,7 @@ import EnhancedLoginPage from './enhanced/pages/EnhancedLoginPage'
 import EnhancedRegisterPage from './enhanced/pages/EnhancedRegisterPage'
 import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
 import ReelsPage from './enhanced/pages/ReelsPage'
+import AdminDashboard from './enhanced/pages/AdminDashboard'
 import './App.css'
 
 function NavBar() {
@@ -35,6 +36,7 @@ function NavBar() {
           
           {isAuthenticated ? (
             <>
+              <Link to="/admin" className="btn-admin">Admin</Link>
               <Link to="/original/posts/create" className="btn-create">+ Create Post</Link>
               <Link to={`/original/profile/${user._id}`} className="nav-user">
                 {user.name}
@@ -66,6 +68,14 @@ function App() {
               <Route path="/login" element={<EnhancedLoginPage />} />
               <Route path="/register" element={<EnhancedRegisterPage />} />
               <Route path="/reels" element={<ReelsPage />} />
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
               
               {/* Original Pages (Backup for Debugging) */}
               <Route path="/original/home" element={<HomePage />} />
