@@ -1,187 +1,169 @@
-# 🔄 Enhanced Features - Quick Reference
+# 🚀 JamiiLink Admin Dashboard - Quick Reference
 
-## ✅ **Current Setup (As Requested)**
-
-The enhanced social media features are now the **DEFAULT** pages, with original pages kept as backup for debugging.
-
----
-
-## 📍 **Route Structure**
-
-### **Main App (Enhanced - What Users See)**
-
-| Page | URL | Description |
-|------|-----|-------------|
-| **Homepage/Feed** | `/` | Enhanced social media feed with constellation background |
-| **Login** | `/login` | Enhanced login with email/phone toggle, social login |
-| **Register** | `/register` | Enhanced registration with 2-step verification |
-
-### **Backup Routes (Original - For Debugging)**
-
-| Page | URL | Description |
-|------|-----|-------------|
-| Original Home | `/original/home` | Original homepage |
-| Original Login | `/original/login` | Original login page |
-| Original Register | `/original/register` | Original registration page |
-| Original Posts | `/original/posts` | Original post list |
-| Original Post Detail | `/original/posts/:id` | Original single post view |
-| Original Profile | `/original/profile/:id` | Original user profile |
-| Original Create Post | `/original/posts/create` | Original create post form |
-| Original About | `/original/about` | Original about page |
-| Original Search | `/original/search` | Original search results |
+## Live Links
+- **Frontend**: https://jamii-link-ke.vercel.app
+- **Admin Dashboard**: https://jamii-link-ke.vercel.app/admin
+- **Backend API**: (Deploy to Railway/Render)
 
 ---
 
-## 🎯 **Why This Structure?**
+## Quick Start (3 Steps)
 
-### **Benefits:**
-1. ✅ **Enhanced pages are default** - Users get the best experience
-2. ✅ **Original pages preserved** - Easy debugging if issues arise
-3. ✅ **Code isolated in `src/enhanced/`** - Clean separation
-4. ✅ **Quick rollback** - Just swap routes in App.jsx
-5. ✅ **No code duplication** - Original files untouched
-
-### **Debugging Workflow:**
-```
-Issue found? 
-  → Visit /original/[page] to compare
-  → Check if issue is in enhanced code or backend
-  → Fix in src/enhanced/ folder
-  → Test again at main route
-```
-
----
-
-##  **File Organization**
-
-```
-iyf-s10-week-09-Kimiti4/src/
-├── pages/                    # Original pages (BACKUP)
-│   ├── LoginPage.jsx
-│   ├── RegisterPage.jsx
-│   ├── HomePage.jsx
-│   └── ...
-── enhanced/                 # Enhanced features (ACTIVE)
-│   ├── pages/
-│   │   ├── EnhancedLoginPage.jsx
-│   │   ├── EnhancedRegisterPage.jsx
-│   │   └── EnhancedFeedPage.jsx
-│   ├── components/
-│   │   ├── ConstellationBackground.jsx
-│   │   └── EnhancedPostCard.jsx
-│   ── index.js
-└── App.jsx                   # Routes configured here
-```
-
----
-
-##  **How to Rollback (If Needed)**
-
-If you need to temporarily switch back to original pages:
-
-1. Open `src/App.jsx`
-2. Swap the route configurations:
-   ```jsx
-   // Change FROM:
-   <Route path="/" element={<EnhancedFeedPage />} />
-   
-   // Change TO:
-   <Route path="/" element={<HomePage />} />
-   ```
-3. Save and the original pages are active again
-4. No code changes needed in the enhanced folder!
-
----
-
-##  **Testing Both Versions**
-
-### **Test Enhanced (Default):**
+### 1. Start Backend
 ```bash
-# Just visit the main URLs
-http://localhost:5173/
-http://localhost:5173/login
-http://localhost:5173/register
+cd iyf-s10-week-11-Kimiti4
+npm run dev
+# Server runs on http://localhost:3000
 ```
 
-### **Test Original (Debug):**
+### 2. Start Frontend
 ```bash
-# Add /original/ prefix
-http://localhost:5173/original/home
-http://localhost:5173/original/login
-http://localhost:5173/original/register
-http://localhost:5173/original/posts
-```
-
----
-
-## 🎨 **Enhanced Features Summary**
-
-### **What's Different from Original:**
-
-| Feature | Original | Enhanced |
-|---------|----------|----------|
-| **Homepage** | Static welcome page | Social media feed with posts |
-| **Login** | Basic email form | Email/Phone toggle + Social login |
-| **Register** | Single step | 2-step with verification |
-| **Background** | Plain/light | Animated constellation (dark) |
-| **Theme** | Light mode | Dark mode with gradients |
-| **Post Interactions** | Basic | Like, downvote, reblog, bookmark |
-| **Animations** | None | Framer Motion + Confetti |
-| **Design** | Simple | Glassmorphism, modern UI |
-| **Icons** | None | Font Awesome throughout |
-
----
-
-##  **Quick Start**
-
-```bash
-# Start dev server
 cd iyf-s10-week-09-Kimiti4
 npm run dev
+# App runs on http://localhost:5173
+```
 
-# Enhanced pages are at:
-http://localhost:5173/          # Feed (homepage)
-http://localhost:5173/login     # Login
-http://localhost:5173/register  # Register
+### 3. Access Dashboard
+1. Open http://localhost:5173
+2. Login with your credentials
+3. Click "Admin" button in navbar
+4. Or go directly to http://localhost:5173/admin
 
-# Original pages for debugging:
-http://localhost:5173/original/home
-http://localhost:5173/original/login
-http://localhost:5173/original/posts
+---
+
+## Key Features
+
+✅ Create organizations  
+✅ Manage members & roles  
+✅ View analytics stats  
+✅ Update branding/colors  
+✅ Archive organizations  
+
+---
+
+## API Endpoints
+
+| Action | Method | Endpoint |
+|--------|--------|----------|
+| Get my orgs | GET | `/api/organizations/my` |
+| Create org | POST | `/api/organizations` |
+| Update org | PUT | `/api/organizations/:id` |
+| Delete org | DELETE | `/api/organizations/:id` |
+| Get members | GET | `/api/organizations/:id/members` |
+| Update role | PUT | `/api/organizations/memberships/:id/role` |
+
+---
+
+## File Locations
+
+**Frontend:**
+- Component: `iyf-s10-week-09-Kimiti4/src/enhanced/pages/AdminDashboard.jsx`
+- Styles: `iyf-s10-week-09-Kimiti4/src/enhanced/pages/AdminDashboard.css`
+- Route: `iyf-s10-week-09-Kimiti4/src/App.jsx` (line ~70)
+
+**Backend:**
+- Models: `iyf-s10-week-11-Kimiti4/src/models/Organization.js`
+- Controller: `iyf-s10-week-11-Kimiti4/src/controllers/organizationsController.js`
+- Routes: `iyf-s10-week-11-Kimiti4/src/routes/organizations.js`
+
+---
+
+## Environment Variables
+
+**Frontend (.env):**
+```env
+VITE_API_URL=http://localhost:3000/api
+```
+
+**Backend (.env):**
+```env
+PORT=3000
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/jamiilink
+JWT_SECRET=your_secret_key
 ```
 
 ---
 
-## 📝 **Key Files to Know**
+## Common Tasks
 
-### **Main Configuration:**
-- `src/App.jsx` - Route definitions (swap enhanced/original here)
-- `src/enhanced/index.js` - Export all enhanced components
+### Create First Organization
+1. Go to `/admin`
+2. Click "Create Organization"
+3. Fill form:
+   - Name: Your Community Name
+   - Slug: your-community-name
+   - Type: Select type
+   - Description: Brief description
+4. Click "Create Organization"
 
-### **Enhanced Pages:**
-- `src/enhanced/pages/EnhancedLoginPage.jsx` - Login with email/phone
-- `src/enhanced/pages/EnhancedRegisterPage.jsx` - Registration with verification
-- `src/enhanced/pages/EnhancedFeedPage.jsx` - Social media feed
+### Add Members
+Members join via invitation or approval workflow (future feature).
 
-### **Enhanced Components:**
-- `src/enhanced/components/ConstellationBackground.jsx` - Animated stars
-- `src/enhanced/components/EnhancedPostCard.jsx` - Post with like/downvote/reblog
+### Change Member Role
+1. Go to "Members" tab
+2. Find member in table
+3. Change role dropdown
+4. Auto-saves immediately
 
-### **Original Pages (Backup):**
-- `src/pages/LoginPage.jsx` - Original login
-- `src/pages/RegisterPage.jsx` - Original register
-- `src/pages/HomePage.jsx` - Original homepage
-
----
-
-##  **Pro Tips**
-
-1. **Compare versions:** Open enhanced and original in different tabs
-2. **Debug easily:** If enhanced has issues, check original at `/original/*`
-3. **Safe experiments:** Modify files in `src/enhanced/` without breaking original
-4. **Quick switch:** Edit App.jsx routes to toggle between versions
-5. **Clean code:** Enhanced folder is self-contained, easy to maintain
+### Update Branding
+1. Click organization card
+2. Goes to "Settings" tab
+3. Change colors with pickers
+4. Click "Save Changes"
 
 ---
 
-**Created for easy debugging and maintenance!** ️
+## Troubleshooting
+
+**Problem**: Can't see Admin button  
+**Solution**: Must be logged in first
+
+**Problem**: "Failed to fetch organizations"  
+**Solution**: Check backend is running on port 3000
+
+**Problem**: CORS error  
+**Solution**: Add frontend URL to backend CORS whitelist
+
+**Problem**: Token expired  
+**Solution**: Logout and login again
+
+---
+
+## Documentation
+
+- **Full Guide**: [ADMIN_DASHBOARD_GUIDE.md](ADMIN_DASHBOARD_GUIDE.md)
+- **Deployment**: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+- **Summary**: [ADMIN_DASHBOARD_SUMMARY.md](ADMIN_DASHBOARD_SUMMARY.md)
+- **API Reference**: `iyf-s10-week-11-Kimiti4/ORGANIZATIONS_API.md`
+
+---
+
+## Tech Stack
+
+**Frontend:**
+- React 18
+- React Router v6
+- Framer Motion (animations)
+- React Icons
+- Vite (build tool)
+
+**Backend:**
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT Authentication
+- REST API
+
+---
+
+## Next Steps
+
+1. ✅ Build Admin Dashboard UI ← YOU ARE HERE
+2. ⏳ Deploy backend to Railway/Render
+3. ⏳ Configure production environment
+4. ⏳ Test on live deployment
+5. ⏳ Add advanced features (charts, search, etc.)
+
+---
+
+**Need Help?** Check the full documentation or review browser console for errors.
