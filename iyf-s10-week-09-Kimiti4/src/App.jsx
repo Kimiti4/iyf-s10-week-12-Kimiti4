@@ -29,6 +29,61 @@ import CommunityEvents from './components/CommunityEvents'
 import EmergencyAlerts from './components/EmergencyAlerts'
 import './App.css'
 
+function AppRoutes() {
+  const { user } = useAuth();
+  
+  return (
+    <Routes>
+      {/* Main Routes - Now Using Enhanced Pages */}
+      <Route path="/" element={<EnhancedFeedPage />} />
+      <Route path="/login" element={<EnhancedLoginPage />} />
+      <Route path="/register" element={<EnhancedRegisterPage />} />
+      <Route path="/reels" element={<ReelsPage />} />
+      <Route path="/org/:slug" element={<OrganizationPage />} />
+      
+      {/* New Unique Feature Routes */}
+      <Route path="/tiannara" element={<TiannaraAssistant currentUser={user} />} />
+      <Route path="/events" element={<CommunityEvents currentUser={user} />} />
+      <Route path="/alerts" element={<EmergencyAlerts currentUser={user} />} />
+      
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/founder" 
+        element={
+          <ProtectedRoute>
+            <FounderDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Original Pages (Backup for Debugging) */}
+      <Route path="/original/home" element={<HomePage />} />
+      <Route path="/original/login" element={<OriginalLoginPage />} />
+      <Route path="/original/register" element={<OriginalRegisterPage />} />
+      <Route path="/original/posts" element={<PostListPage />} />
+      <Route path="/original/posts/:id" element={<PostDetailPage />} />
+      <Route path="/original/search" element={<SearchResultsPage />} />
+      <Route path="/original/profile/:id?" element={<ProfilePage />} />
+      <Route 
+        path="/original/posts/create" 
+        element={
+          <ProtectedRoute>
+            <CreatePostPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route path="/original/about" element={<AboutPage />} />
+    </Routes>
+  );
+}
+
 function NavBar() {
   const { user, isAuthenticated, logout } = useAuth();
   
@@ -81,54 +136,7 @@ function App() {
           <div className="App">
             <NavBar />
             <main className="main-content">
-            <Routes>
-              {/* Main Routes - Now Using Enhanced Pages */}
-              <Route path="/" element={<EnhancedFeedPage />} />
-              <Route path="/login" element={<EnhancedLoginPage />} />
-              <Route path="/register" element={<EnhancedRegisterPage />} />
-              <Route path="/reels" element={<ReelsPage />} />
-              <Route path="/org/:slug" element={<OrganizationPage />} />
-              
-              {/* New Unique Feature Routes */}
-              <Route path="/tiannara" element={<TiannaraAssistant currentUser={user} />} />
-              <Route path="/events" element={<CommunityEvents currentUser={user} />} />
-              <Route path="/alerts" element={<EmergencyAlerts currentUser={user} />} />
-              
-              <Route 
-                path="/admin" 
-                element={
-                  <ProtectedRoute>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/admin/founder" 
-                element={
-                  <ProtectedRoute>
-                    <FounderDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Original Pages (Backup for Debugging) */}
-              <Route path="/original/home" element={<HomePage />} />
-              <Route path="/original/login" element={<OriginalLoginPage />} />
-              <Route path="/original/register" element={<OriginalRegisterPage />} />
-              <Route path="/original/posts" element={<PostListPage />} />
-              <Route path="/original/posts/:id" element={<PostDetailPage />} />
-              <Route path="/original/search" element={<SearchResultsPage />} />
-              <Route path="/original/profile/:id?" element={<ProfilePage />} />
-              <Route 
-                path="/original/posts/create" 
-                element={
-                  <ProtectedRoute>
-                    <CreatePostPage />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route path="/original/about" element={<AboutPage />} />
-            </Routes>
+            <AppRoutes />
           </main>
           <footer className="footer">
             <div className="container">
