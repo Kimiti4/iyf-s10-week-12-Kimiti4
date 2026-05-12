@@ -7,6 +7,7 @@ const postsRoutes = require('./posts');
 const usersRoutes = require('./users');
 const locationsRoutes = require('./locations');
 const marketRoutes = require('./market');
+const organizationsRoutes = require('./organizations');
 
 // Health check
 router.get('/health', (req, res) => {
@@ -25,6 +26,9 @@ router.use('/market', marketRoutes);
 
 // Locations endpoint (for geo-filtering)
 router.use('/locations', locationsRoutes);
+
+// Mount organizations routes
+router.use('/organizations', organizationsRoutes);
 
 // Mount posts routes
 router.use('/posts', postsRoutes);

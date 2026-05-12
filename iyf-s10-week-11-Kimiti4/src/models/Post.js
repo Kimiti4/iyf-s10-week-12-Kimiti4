@@ -29,6 +29,13 @@ const postSchema = new mongoose.Schema({
     index: true
   },
   
+  // Organization (multi-tenant support)
+  organization: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    index: true
+  },
+  
   // Category (unified platform)
   category: {
     type: String,

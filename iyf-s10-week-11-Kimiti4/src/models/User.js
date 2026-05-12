@@ -35,6 +35,18 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin', 'moderator'],
     default: 'user'
   },
+  
+  // Organization memberships
+  organizations: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization'
+  }],
+  
+  // Current/active organization context
+  currentOrganization: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization'
+  },
   profile: {
     bio: { type: String, maxlength: 500 },
     location: {
