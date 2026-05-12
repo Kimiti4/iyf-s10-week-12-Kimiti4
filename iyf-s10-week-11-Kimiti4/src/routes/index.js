@@ -8,6 +8,7 @@ const usersRoutes = require('./users');
 const locationsRoutes = require('./locations');
 const marketRoutes = require('./market');
 const organizationsRoutes = require('./organizations');
+const verificationRoutes = require('./verification');
 
 // Health check
 router.get('/health', (req, res) => {
@@ -29,6 +30,9 @@ router.use('/locations', locationsRoutes);
 
 // Mount organizations routes
 router.use('/organizations', organizationsRoutes);
+
+// Mount verification routes (unique badge system)
+router.use('/verification', verificationRoutes);
 
 // Mount posts routes
 router.use('/posts', postsRoutes);

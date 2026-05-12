@@ -36,6 +36,32 @@ const userSchema = new mongoose.Schema({
     default: 'user'
   },
   
+  // 🔹 Verification System (Unique to JamiiLink)
+  verification: {
+    isVerified: { type: Boolean, default: false },
+    verifiedAt: Date,
+    verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },  // Admin who verified
+    verificationType: {
+      type: String,
+      enum: ['manual', 'document', 'email', 'phone', 'social', 'organization_admin'],
+      default: 'manual'
+    },
+    badgeLevel: {
+      type: String,
+      enum: ['bronze', 'silver', 'gold', 'platinum', 'diamond'],
+      default: 'bronze'
+    },
+    badgeColor: { type: String, default: '#CD7F32' },  // Bronze color
+    verificationNotes: String,  // Internal notes about verification
+    expiresAt: Date,  // Optional: verification expiry for temporary badges
+    documents: [{  // Uploaded verification documents
+      type: String,
+      url: String,
+      uploadedAt: Date,
+      verified: Boolean
+    }]
+  },
+  
   // Organization memberships
   organizations: [{
     type: mongoose.Schema.Types.ObjectId,

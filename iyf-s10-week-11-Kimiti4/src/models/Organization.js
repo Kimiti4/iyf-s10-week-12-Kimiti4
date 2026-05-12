@@ -79,6 +79,42 @@ const organizationSchema = new mongoose.Schema({
     index: true
   },
   
+  // 🔹 Verification System (Unique to JamiiLink)
+  verification: {
+    isVerified: { type: Boolean, default: false },
+    verifiedAt: Date,
+    verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    verificationType: {
+      type: String,
+      enum: ['official_document', 'government_registration', 'educational_institution', 'business_license', 'manual'],
+      default: 'manual'
+    },
+    badgeLevel: {
+      type: String,
+      enum: ['verified', 'premium', 'partner', 'official'],
+      default: 'verified'
+    },
+    badgeIcon: { type: String, default: '✓' },  // Default checkmark
+    badgeColor: { type: String, default: '#3b82f6' },  // Blue for verified
+    badgeGradient: {  // Unique gradient badges
+      start: { type: String, default: '#3b82f6' },
+      end: { type: String, default: '#8b5cf6' }
+    },
+    verificationNotes: String,
+    documents: [{
+      type: {
+        type: String,
+        enum: ['registration_certificate', 'license', 'letterhead', 'id', 'other']
+      },
+      url: String,
+      uploadedAt: Date,
+      verified: Boolean,
+      verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      verifiedAt: Date
+    }],
+    expiresAt: Date  // For temporary verifications
+  },
+  
   // Subscription Details
   subscription: {
     status: {
