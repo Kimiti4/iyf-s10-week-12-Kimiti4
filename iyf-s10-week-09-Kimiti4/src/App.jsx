@@ -21,6 +21,7 @@ import EnhancedRegisterPage from './enhanced/pages/EnhancedRegisterPage'
 import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
 import ReelsPage from './enhanced/pages/ReelsPage'
 import AdminDashboard from './enhanced/pages/AdminDashboard'
+import FounderDashboard from './pages/FounderDashboard'
 import OrganizationPage from './pages/OrganizationPage'
 // New Unique Features
 import TiannaraAssistant from './components/TiannaraAssistant'
@@ -49,7 +50,11 @@ function NavBar() {
           
           {isAuthenticated ? (
             <>
-              <Link to="/admin" className="btn-admin">Admin</Link>
+              {user?.role === 'founder' || user?.isFounder ? (
+                <Link to="/admin/founder" className="btn-founder">👑 Founder</Link>
+              ) : (
+                <Link to="/admin" className="btn-admin">Admin</Link>
+              )}
               <Link to="/original/posts/create" className="btn-create">+ Create Post</Link>
               <Link to={`/original/profile/${user._id}`} className="nav-user">
                 {user.name}
@@ -94,6 +99,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/founder" 
+                element={
+                  <ProtectedRoute>
+                    <FounderDashboard />
                   </ProtectedRoute>
                 } 
               />
