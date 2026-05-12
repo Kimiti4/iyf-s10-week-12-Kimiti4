@@ -9,8 +9,25 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 // Connect to default postgres database to create our database
+// Try different connection strings based on PostgreSQL configuration
+const getConnectionString = () => {
+  // If DATABASE_URL is set, use it for admin connection
+  if (process.env.DATABASE_URL) {
+    return process.env.DATABASE_URL.replace('/jamiilink_db', '/postgres');
+  }
+  
+  // Try common configurations
+  const configs = [
+    'postgresql://postgres:@localhost:5432/postgres',  // No password
+    'postgresql://postgres:postgres@localhost:5432/postgres',  // Default password
+    'postgresql://postgres:password@localhost:5432/postgres',  // Common password
+  ];
+  
+  return configs[0]; // Default to no password
+};
+
 const adminPool = new Pool({
-  connectionString: 'postgresql://postgres:@localhost:5432/postgres'
+  connectionString: getConnectionString()
 });
 
 async function setupDatabase() {
