@@ -238,12 +238,8 @@ npm run dev
 
 ## Live Demo (if deployed)
 
-<<<<<<< HEAD
-- **Frontend:** [https://jamii-link.vercel.app](https://jamii-link-ke.vercel.app/)
+- **Frontend:** [JamiiLink](https://jamii-link-ke.vercel.app/)
 
-- **Backend API:** [https://jamii-link-api.onrender.com](in progress)
+- **Backend API:** [Railway Deployment](iyf-s10-week-12-kimiti4-production.up.railway.app)
 
-- **Health Check:** [https://jamii-link-api.onrender.com/api/health](in progress)
-=======
-- 
 
