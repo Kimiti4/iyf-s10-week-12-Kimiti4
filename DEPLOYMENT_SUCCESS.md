@@ -25,7 +25,7 @@ const asyncHandler = require('../utils/asyncHandler');
 **File**: `src/routes/organizations.js`
 
 ```javascript
-// ❌ WRONG (caused crash)
+//  WRONG (caused crash)
 const { protect } = require('../middleware/requireAuth');
 router.use(protect);
 
@@ -187,7 +187,7 @@ All deployment troubleshooting guides are available in the repository:
 └──────────────┬──────────────────────────────┘
                │
                ▼
-┌─────────────────────────────────────────────┐
+┌─────────────────────────────────────────────
 │       Database (MongoDB Atlas)              │
 │  - Organization-scoped data                  │
 │  - Role-based access control                 │
