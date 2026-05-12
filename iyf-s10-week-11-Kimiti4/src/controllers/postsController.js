@@ -2,11 +2,13 @@
  * 🔹 Posts Controller - Unified for Mtaani/Skills/Farm/Gigs
  * Handles CRUD + filtering + validation + nested comments
  * Uses MongoDB with Mongoose models
+ * Integrated with Tiannara AI for content moderation
  */
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const asyncHandler = require('../utils/asyncHandler');
 const { ApiError } = require('../middleware/errorHandler');
+const tiannaraService = require('../services/tiannaraService');
 
 // GET all posts with advanced filtering
 const getAllPosts = asyncHandler(async (req, res) => {
@@ -132,7 +134,7 @@ const getPostById = asyncHandler(async (req, res) => {
   res.json({ success: true, data: post });
 });
 
-// POST create new post (with validation)
+// POST create new post (with validation and AI moderation)
 const createPost = asyncHandler(async (req, res) => {
   const { title, content, category, location, tags, metadata, organization } = req.body;
 
@@ -147,6 +149,27 @@ const createPost = asyncHandler(async (req, res) => {
     throw new ApiError('Valid category required: mtaani|skill|farm|gig|alert', 400);
   }
 
+  // 🔹 STEP 1: Moderate content BEFORE saving (Tiannara AI)
+  const moderationResult = await tiannaraService.moderateContent(content);
+
+  // 🔹 STEP 2: Check if content is safe
+  if (!tiannaraService.isContentSafe(moderationResult)) {
+    throw new ApiError(
+      'Content violates community guidelines',
+      400,
+      {
+        reason: tiannaraService.getFlagReason(moderationResult),
+        details: {
+          toxicity: moderationResult.toxicity_score,
+          spam: moderationResult.spam_probability,
+          scam: moderationResult.scam_probability,
+          categories: moderationResult.categories_flagged
+        }
+      }
+    );
+  }
+
+  // 🔹 STEP 3: Content is safe, proceed with creation
   // Create post with authenticated user as author
   const postData = {
     title: title.trim(),
@@ -156,7 +179,19 @@ const createPost = asyncHandler(async (req, res) => {
     location: location || { county: 'Unknown' },
     tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : []),
     metadata: metadata || {},
-    published: true
+    published: true,
+    // Store moderation metadata for analytics
+    moderation: {
+      checked: true,
+      timestamp: new Date(),
+      scores: {
+        toxicity: moderationResult.toxicity_score,
+        spam: moderationResult.spam_probability,
+        scam: moderationResult.scam_probability
+      },
+      flagged: false,
+      categories: moderationResult.categories_flagged
+    }
   };
 
   // Add organization if provided
@@ -276,7 +311,7 @@ const getComments = asyncHandler(async (req, res) => {
   });
 });
 
-// POST new comment
+// POST new comment (with AI moderation)
 const addComment = asyncHandler(async (req, res) => {
   const { content } = req.body;
 
@@ -288,11 +323,41 @@ const addComment = asyncHandler(async (req, res) => {
     throw new ApiError('Comment content is required', 400);
   }
 
-  // Create comment with authenticated user
+  // 🔹 Moderate comment content (Tiannara AI)
+  const moderationResult = await tiannaraService.moderateContent(content);
+
+  // 🔹 Check if comment is safe
+  if (!tiannaraService.isContentSafe(moderationResult)) {
+    throw new ApiError(
+      'Comment violates community guidelines',
+      400,
+      {
+        reason: tiannaraService.getFlagReason(moderationResult),
+        details: {
+          toxicity: moderationResult.toxicity_score,
+          spam: moderationResult.spam_probability,
+          scam: moderationResult.scam_probability
+        }
+      }
+    );
+  }
+
+  // 🔹 Create comment with moderation metadata
   const newComment = await Comment.create({
     content: content.trim(),
     author: req.user._id,
-    post: post._id
+    post: post._id,
+    moderation: {
+      checked: true,
+      timestamp: new Date(),
+      scores: {
+        toxicity: moderationResult.toxicity_score,
+        spam: moderationResult.spam_probability,
+        scam: moderationResult.scam_probability
+      },
+      flagged: false,
+      categories: moderationResult.categories_flagged
+    }
   });
 
   // Add comment to post's comments array

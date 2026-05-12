@@ -100,6 +100,19 @@ const postSchema = new mongoose.Schema({
   published: { type: Boolean, default: true },
   flagged: { type: Boolean, default: false },  // For moderation
   
+  // AI Moderation metadata (Tiannara integration)
+  moderation: {
+    checked: { type: Boolean, default: false },
+    timestamp: Date,
+    scores: {
+      toxicity: { type: Number, default: 0, min: 0, max: 1 },
+      spam: { type: Number, default: 0, min: 0, max: 1 },
+      scam: { type: Number, default: 0, min: 0, max: 1 }
+    },
+    flagged: { type: Boolean, default: false },
+    categories: [String]  // Categories that were flagged
+  },
+  
   // Relationships
   comments: [{
     type: mongoose.Schema.Types.ObjectId,

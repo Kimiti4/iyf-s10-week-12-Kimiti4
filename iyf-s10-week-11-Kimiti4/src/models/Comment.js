@@ -28,7 +28,20 @@ const commentSchema = new mongoose.Schema({
     ref: 'Comment',
     default: null
   },
-  likes: { type: Number, default: 0 }
+  likes: { type: Number, default: 0 },
+  
+  // AI Moderation metadata (Tiannara integration)
+  moderation: {
+    checked: { type: Boolean, default: false },
+    timestamp: Date,
+    scores: {
+      toxicity: { type: Number, default: 0, min: 0, max: 1 },
+      spam: { type: Number, default: 0, min: 0, max: 1 },
+      scam: { type: Number, default: 0, min: 0, max: 1 }
+    },
+    flagged: { type: Boolean, default: false },
+    categories: [String]
+  }
 }, {
   timestamps: true,
   toJSON: { virtuals: true }
