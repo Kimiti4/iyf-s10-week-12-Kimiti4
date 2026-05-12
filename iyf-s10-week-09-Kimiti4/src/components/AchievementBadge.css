@@ -1,0 +1,143 @@
+/**
+ *  Achievement Badge Styles
+ */
+
+.achievement-badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.achievement-badge:hover:not(.locked) {
+  transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.achievement-badge.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.achievement-badge.earned {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+/* Badge Sizes */
+.badge-small {
+  padding: 12px;
+}
+
+.badge-small .badge-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+}
+
+.badge-medium {
+  padding: 16px;
+}
+
+.badge-medium .badge-icon {
+  width: 56px;
+  height: 56px;
+  font-size: 28px;
+}
+
+.badge-large {
+  padding: 20px;
+}
+
+.badge-large .badge-icon {
+  width: 72px;
+  height: 72px;
+  font-size: 36px;
+}
+
+/* Badge Icon */
+.badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+/* Badge Info */
+.badge-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.badge-name {
+  color: #e2e8f0;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.badge-description {
+  color: #94a3b8;
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Earned Indicator */
+.badge-earned-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #22c55e;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 50%;
+}
+
+/* Glow Effect */
+.badge-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 16px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Badge Grid */
+.badge-grid {
+  display: grid;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .achievement-badge {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .badge-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}

@@ -1,0 +1,160 @@
+/**
+ *  Mood Indicator Styles
+ */
+
+.mood-indicator-container {
+  padding: 16px;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 16px;
+  margin: 12px 0;
+}
+
+.mood-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mood-label {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mood-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 2px solid;
+  border-radius: 20px;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.mood-emoji {
+  font-size: 20px;
+}
+
+.mood-name {
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mood-placeholder {
+  color: #64748b;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.mood-change-btn {
+  padding: 6px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  color: #60a5fa;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mood-change-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
+.mood-picker {
+  overflow: hidden;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.mood-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mood-option:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.mood-option.selected {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.mood-option-emoji {
+  font-size: 28px;
+}
+
+.mood-option-name {
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.mood-celebration {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 40px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.celebration-emoji {
+  font-size: 64px;
+  animation: bounce 0.5s ease-in-out;
+}
+
+.celebration-text {
+  color: #e2e8f0;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mood-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .mood-option-emoji {
+    font-size: 24px;
+  }
+
+  .celebration-emoji {
+    font-size: 48px;
+  }
+}
