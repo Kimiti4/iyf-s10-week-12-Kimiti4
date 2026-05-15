@@ -1,0 +1,17 @@
+{
+  "builds": [
+    {
+      "src": "iyf-s10-week-09-Kimiti4/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "iyf-s10-week-09-Kimiti4/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/iyf-s10-week-09-Kimiti4/dist/$1"
+    }
+  ]
+}
