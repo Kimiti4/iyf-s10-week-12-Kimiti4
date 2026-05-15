@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import logger from '../utils/logger';
 import './TrendingHashtags.css';
 
 export default function TrendingHashtags({ limit = 10 }) {
@@ -38,7 +39,7 @@ export default function TrendingHashtags({ limit = 10 }) {
       setHashtags(mockHashtags.slice(0, limit));
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching trending hashtags:', error);
+      logger.error('Error fetching trending hashtags:', error);
       setLoading(false);
     }
   };

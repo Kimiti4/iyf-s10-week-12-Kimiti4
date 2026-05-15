@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { postsAPI } from '../services/api';
 import { useOrganization } from '../context/OrganizationContext';
+import { validatePost, sanitizeInput } from '../utils/validation';
 
 /**
  * CreatePostPage - Create new post with optional image upload
@@ -15,6 +16,7 @@ export default function CreatePostPage() {
         category: 'all',
         location: ''
     });
+    const [formErrors, setFormErrors] = useState({});
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
     const [loading, setLoading] = useState(false);
@@ -29,10 +31,19 @@ export default function CreatePostPage() {
     ];
     
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value
         });
+        
+        // Clear error for this field when user starts typing
+        if (formErrors[name]) {
+            setFormErrors({
+                ...formErrors,
+                [name]: ''
+            });
+        }
     };
     
     const handleImageChange = (e) => {
@@ -64,10 +75,29 @@ export default function CreatePostPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setFormErrors({});
         setLoading(true);
         
         try {
-            let postData = { ...formData };
+            // Sanitize inputs
+            const sanitizedData = {
+                ...formData,
+                title: sanitizeInput(formData.title.trim()),
+                content: sanitizeInput(formData.content.trim()),
+                location: formData.location ? sanitizeInput(formData.location.trim()) : ''
+            };
+            
+            // Validate form
+            const validation = validatePost(sanitizedData);
+            
+            if (!validation.valid) {
+                setFormErrors(validation.errors);
+                setError('Please fix the errors below');
+                setLoading(false);
+                return;
+            }
+            
+            let postData = { ...sanitizedData };
             
             // Add organization if selected
             if (currentOrg) {
@@ -139,9 +169,13 @@ export default function CreatePostPage() {
                             value={formData.title}
                             onChange={handleChange}
                             required
-                            placeholder="What's on your mind?"
-                            maxLength="100"
+                            placeholder="What's on your mind? (5-200 characters)"
+                            maxLength="200"
+                            className={formErrors.title ? 'input-error' : ''}
                         />
+                        {formErrors.title && (
+                            <span className="field-error">{formErrors.title}</span>
+                        )}
                     </div>
                     
                     <div className="form-group">
@@ -182,10 +216,14 @@ export default function CreatePostPage() {
                             onChange={handleChange}
                             required
                             rows="8"
-                            placeholder="Share details with your community..."
-                            maxLength="2000"
+                            placeholder="Share details with your community... (min 10 characters)"
+                            maxLength="5000"
+                            className={formErrors.content ? 'input-error' : ''}
                         />
-                        <small>{formData.content.length}/2000 characters</small>
+                        <small>{formData.content.length}/5000 characters</small>
+                        {formErrors.content && (
+                            <span className="field-error">{formErrors.content}</span>
+                        )}
                     </div>
                     
                     <div className="form-group">

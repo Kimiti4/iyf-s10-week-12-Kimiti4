@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUsers, FaChartLine, FaCog, FaPlus, FaEdit, FaTrash, FaCheck, FaTimes, FaArrowLeft } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import logger from '../../utils/logger';
 import './AdminDashboard.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -37,7 +38,7 @@ export default function AdminDashboard() {
       setError(null);
     } catch (err) {
       setError(err.message);
-      console.error('Error fetching organizations:', err);
+      logger.error('Error fetching organizations:', err);
     } finally {
       setLoading(false);
     }
@@ -276,7 +277,7 @@ function MembersTab({ organizations }) {
       const data = await response.json();
       setMembers(data.data || []);
     } catch (err) {
-      console.error('Error fetching members:', err);
+      logger.error('Error fetching members:', err);
     } finally {
       setLoading(false);
     }

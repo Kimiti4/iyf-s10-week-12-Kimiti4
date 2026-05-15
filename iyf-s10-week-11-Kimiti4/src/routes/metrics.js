@@ -10,7 +10,7 @@ const {
   getUserMetrics,
   getOrgMetrics,
   getUserAvatarIcon
-} = require('../controllers/metricsController');
+} = require('../controllers/metricsControllerPG'); // PostgreSQL version
 
 // Public routes - Platform stats
 router.get('/platform', getPlatformMetrics);

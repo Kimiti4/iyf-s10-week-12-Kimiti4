@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import logger from '../utils/logger';
 import './FounderDashboard.css';
 
 /**
@@ -42,7 +43,7 @@ export default function FounderDashboard() {
       setSystemHealth(healthData);
 
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      logger.error('Error fetching dashboard data:', error);
     } finally {
       setIsLoading(false);
     }

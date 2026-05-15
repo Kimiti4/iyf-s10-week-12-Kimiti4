@@ -29,3 +29,25 @@ coverage/
 
 # Misc
 package-lock.json
+
+# Seed scripts (contains credentials)
+src/seeds/
+*.js
+!server.js
+!test-postgres-migration.js
+!src/
+!src/config/
+!src/config/*.js
+!src/controllers/
+!src/controllers/*.js
+!src/middleware/
+!src/middleware/*.js
+!src/models/
+!src/routes/
+!src/routes/*.js
+!src/services/
+!src/utils/
+!src/database/
+!src/database/*.js
+!src/database/repositories/
+!src/database/repositories/*.js

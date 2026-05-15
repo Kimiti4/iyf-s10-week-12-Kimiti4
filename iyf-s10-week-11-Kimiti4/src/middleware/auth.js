@@ -1,9 +1,9 @@
 /**
- * 🔹 Authentication & Authorization Middleware
+ * 🔹 Authentication & Authorization Middleware - PostgreSQL Version
  * JWT verification, role-based access control
  */
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { UserRepository } = require('../database');
 
 /**
  * Protect routes: Verify JWT and attach user to request
@@ -28,8 +28,8 @@ const protect = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Get user (exclude password)
-    const user = await User.findById(decoded.id).select('-password');
+    // Get user from database
+    const user = await UserRepository.findById(decoded.id);
     
     if (!user) {
       return res.status(401).json({
@@ -61,7 +61,7 @@ const optionalAuth = async (req, res, next) => {
     if (req.headers.authorization?.startsWith('Bearer ')) {
       const token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select('-password');
+      req.user = await UserRepository.findById(decoded.id);
     }
     next();
   } catch {
@@ -98,7 +98,7 @@ const isOwner = (Model, idParam = 'id') => {
       }
       
       // Allow admins or owners
-      if (req.user.role === 'admin' || resource.author?.toString() === req.user._id.toString()) {
+      if (req.user.role === 'admin' || resource.authorId === req.user.id) {
         req.resource = resource;
         return next();
       }

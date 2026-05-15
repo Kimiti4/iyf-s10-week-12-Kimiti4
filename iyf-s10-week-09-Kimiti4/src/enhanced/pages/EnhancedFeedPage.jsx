@@ -5,21 +5,25 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import { FaArrowUp } from 'react-icons/fa';
 import ConstellationBackground from '../components/ConstellationBackground';
 import EnhancedPostCard from '../components/EnhancedPostCard';
-import FeedSidebar from '../components/FeedSidebar';
 import ReelsSection from '../components/ReelsSection';
+import { FeedSkeleton } from '../../components/SkeletonLoader';
 import './EnhancedFeedPage.css';
 
 export default function EnhancedFeedPage() {
-    const [activeFeed, setActiveFeed] = useState('all');
+    const [searchParams, setSearchParams] = useSearchParams();
     const [posts, setPosts] = useState([]);
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showHeader, setShowHeader] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [showBackToTop, setShowBackToTop] = useState(false);
+    
+    // Get active feed from URL query params
+    const activeFeed = searchParams.get('feed') || 'all';
     
     // Mock data for demonstration with categories
     useEffect(() => {
@@ -256,7 +260,11 @@ export default function EnhancedFeedPage() {
     };
     
     const handleFeedChange = (feedId) => {
-        setActiveFeed(feedId);
+        if (feedId === 'all') {
+            setSearchParams({});
+        } else {
+            setSearchParams({ feed: feedId });
+        }
     };
     
     return (
@@ -274,13 +282,8 @@ export default function EnhancedFeedPage() {
                 <p>Discover what's happening in your community</p>
             </motion.header>
             
-            {/* Main Content with Sidebar */}
-            <div className="feed-layout">
-                {/* Sidebar Navigation */}
-                <FeedSidebar activeFeed={activeFeed} onFeedChange={handleFeedChange} />
-                
-                {/* Posts Feed */}
-                <main className="feed-content">
+            {/* Main Content - No Sidebar */}
+            <main className="feed-content-full">
                     {/* Reels Section - Only show on "For You" feed */}
                     {activeFeed === 'all' && (
                         <ReelsSection />
@@ -306,10 +309,7 @@ export default function EnhancedFeedPage() {
                     </motion.div>
                     
                     {loading ? (
-                        <div className="loading-posts">
-                            <div className="loading-spinner"></div>
-                            <p>Loading posts...</p>
-                        </div>
+                        <FeedSkeleton count={3} />
                     ) : filteredPosts.length === 0 ? (
                         <motion.div 
                             className="empty-feed"
@@ -335,8 +335,7 @@ export default function EnhancedFeedPage() {
                             </AnimatePresence>
                         </div>
                     )}
-                </main>
-            </div>
+            </main>
             
             {/* Back to Top Button */}
             <AnimatePresence>

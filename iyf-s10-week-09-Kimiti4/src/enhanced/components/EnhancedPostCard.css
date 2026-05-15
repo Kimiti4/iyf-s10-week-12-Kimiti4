@@ -1,17 +1,18 @@
 .enhanced-post-card {
-    background: rgba(30, 41, 59, 0.8);
+    background: white;
     backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid rgba(147, 197, 253, 0.2);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6);
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--color-zinc-200);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
 }
 
 .enhanced-post-card:hover {
-    border-color: rgba(147, 197, 253, 0.4);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    border-color: var(--color-zinc-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 /* Post Header */
@@ -19,21 +20,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .author-info {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
 }
 
 .author-avatar {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
-    border: 2px solid rgba(147, 197, 253, 0.3);
+    border: 2px solid var(--color-zinc-200);
 }
 
 .author-details {
@@ -42,53 +43,59 @@
 }
 
 .author-name {
-    color: #f8fafc;
-    font-size: 1rem;
-    font-weight: 600;
+    color: var(--color-zinc-900);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
     margin: 0;
+    letter-spacing: -0.01em;
 }
 
 .post-time {
-    color: #64748b;
-    font-size: 0.85rem;
+    color: var(--color-zinc-500);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
 }
 
 .verified-badge {
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
     color: white;
     width: 24px;
     height: 24px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
-    font-weight: bold;
+    font-size: var(--text-xs);
+    font-weight: var(--font-bold);
+    box-shadow: var(--shadow-sm);
 }
 
 /* Post Content */
 .post-content {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .post-title {
-    color: #f8fafc;
-    font-size: 1.3rem;
-    margin-bottom: 0.75rem;
+    color: var(--color-zinc-900);
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    margin-bottom: var(--space-3);
     line-height: 1.4;
+    letter-spacing: -0.01em;
 }
 
 .post-text {
-    color: #cbd5e1;
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 1rem;
+    color: var(--color-zinc-700);
+    font-size: var(--text-base);
+    line-height: 1.7;
+    margin-bottom: var(--space-4);
 }
 
 .post-image {
-    margin: 1rem 0;
-    border-radius: 12px;
+    margin: var(--space-4) 0;
+    border-radius: var(--radius-xl);
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
 }
 
 .post-image img {
@@ -100,38 +107,40 @@
 .post-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
 }
 
 .tag {
-    color: #60a5fa;
-    font-size: 0.9rem;
+    color: var(--color-primary-600);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: color var(--transition-fast);
 }
 
 .tag:hover {
-    color: #93c5fd;
+    color: var(--color-primary-700);
 }
 
 /* Engagement Stats */
 .engagement-stats {
     display: flex;
-    gap: 1.5rem;
-    padding: 0.75rem 0;
-    border-top: 1px solid rgba(147, 197, 253, 0.1);
-    border-bottom: 1px solid rgba(147, 197, 253, 0.1);
-    margin-bottom: 1rem;
-    color: #94a3b8;
-    font-size: 0.9rem;
+    gap: var(--space-6);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--color-zinc-100);
+    border-bottom: 1px solid var(--color-zinc-100);
+    margin-bottom: var(--space-4);
+    color: var(--color-zinc-500);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
 }
 
 /* Action Buttons */
 .post-actions {
     display: flex;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 .action-btn {
@@ -139,91 +148,99 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    background: rgba(15, 23, 42, 0.5);
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--color-zinc-50);
     border: 2px solid transparent;
-    border-radius: 12px;
-    color: #94a3b8;
-    font-size: 1.1rem;
+    border-radius: var(--radius-lg);
+    color: var(--color-zinc-600);
+    font-size: var(--text-lg);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
+    font-weight: var(--font-medium);
 }
 
 .action-btn span {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
 }
 
 .action-btn:hover {
-    background: rgba(15, 23, 42, 0.8);
-    transform: translateY(-2px);
+    background: var(--color-zinc-100);
+    transform: translateY(-1px);
 }
 
 /* Like Button */
 .like-btn.active {
     border-color: #ec4899;
     color: #ec4899;
-    background: rgba(236, 72, 153, 0.1);
+    background: rgba(236, 72, 153, 0.08);
 }
 
 .like-btn:hover {
     color: #ec4899;
+    background: rgba(236, 72, 153, 0.05);
 }
 
 /* Downvote Button */
 .downvote-btn.active {
     border-color: #ef4444;
     color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(239, 68, 68, 0.08);
 }
 
 .downvote-btn:hover {
     color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
 }
 
 /* Comment Button */
 .comment-btn:hover {
-    color: #3b82f6;
-    border-color: rgba(59, 130, 246, 0.3);
+    color: var(--color-primary-600);
+    border-color: rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.05);
 }
 
 /* Reblog Button */
 .reblog-btn.active {
-    border-color: #10b981;
-    color: #10b981;
-    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--color-primary-600);
+    color: var(--color-primary-600);
+    background: rgba(16, 185, 129, 0.08);
 }
 
 .reblog-btn:hover {
-    color: #10b981;
+    color: var(--color-primary-600);
+    background: rgba(16, 185, 129, 0.05);
 }
 
 /* Share Button */
 .share-btn:hover {
     color: #8b5cf6;
-    border-color: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.2);
+    background: rgba(139, 92, 246, 0.05);
 }
 
 /* Bookmark Button */
 .bookmark-btn.active {
     border-color: #f59e0b;
     color: #f59e0b;
-    background: rgba(245, 158, 11, 0.1);
+    background: rgba(245, 158, 11, 0.08);
 }
 
 .bookmark-btn:hover {
     color: #f59e0b;
+    background: rgba(245, 158, 11, 0.05);
 }
 
 /* Responsive */
 @media (max-width: 640px) {
     .enhanced-post-card {
-        padding: 1rem;
+        padding: var(--space-4);
+        border-radius: var(--radius-xl);
     }
     
     .post-title {
-        font-size: 1.1rem;
+        font-size: var(--text-lg);
     }
     
     .action-btn span {

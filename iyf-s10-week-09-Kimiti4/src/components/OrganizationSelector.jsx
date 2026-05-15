@@ -3,7 +3,7 @@
  * Dropdown to switch between user's organizations
  */
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useOrganization } from '../context/OrganizationContext';
 import { useAuth } from '../context/AuthContext';
 import './OrganizationSelector.css';
@@ -11,6 +11,7 @@ import './OrganizationSelector.css';
 const OrganizationSelector = () => {
   const { currentOrg, userOrganizations, fetchUserOrganizations, clearOrganization } = useOrganization();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -36,13 +37,13 @@ const OrganizationSelector = () => {
   const handleSelect = (org) => {
     setShowDropdown(false);
     // Navigate to organization page
-    window.location.href = `/org/${org.slug}`;
+    navigate(`/org/${org.slug}`);
   };
 
   const handleViewAll = () => {
     clearOrganization();
     setShowDropdown(false);
-    window.location.href = '/';
+    navigate('/');
   };
 
   if (!isAuthenticated) return null;

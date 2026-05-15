@@ -3,8 +3,8 @@
  */
 const express = require('express');
 const router = express.Router({ mergeParams: true }); // ✅ Merge postId from parent
-const commentsController = require('../controllers/commentsController');
-const { protect } = require('../middleware/auth');
+const commentsController = require('../controllers/commentsControllerPG'); // PostgreSQL version
+const { protect } = require('../middleware/authPG'); // PostgreSQL version
 
 // Public: Get comments
 router.get('/', commentsController.getComments);

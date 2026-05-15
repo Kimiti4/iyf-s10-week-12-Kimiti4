@@ -12,8 +12,8 @@ const {
   unverifyOrganization,
   getOrganizationBadge,
   getBadgeConfigs
-} = require('../controllers/verificationController');
-const { protect, restrictTo } = require('../middleware/auth');
+} = require('../controllers/verificationControllerPG'); // PostgreSQL version
+const { protect, restrictTo } = require('../middleware/authPG'); // PostgreSQL version
 
 // Public routes - Get badge information
 router.get('/badges/config', getBadgeConfigs);

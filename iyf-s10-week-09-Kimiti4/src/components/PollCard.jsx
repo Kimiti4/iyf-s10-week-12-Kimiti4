@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import logger from '../utils/logger';
 import './PollCard.css';
 
 export default function PollCard({ poll, postId, currentUser }) {
@@ -34,7 +35,7 @@ export default function PollCard({ poll, postId, currentUser }) {
         throw new Error('Vote failed');
       }
     } catch (error) {
-      console.error('Error voting:', error);
+      logger.error('Error voting:', error);
       setSelectedOption(null);
       setHasVoted(false);
     }

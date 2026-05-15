@@ -3,8 +3,8 @@
  */
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
-const { protect } = require('../middleware/auth');
+const authController = require('../controllers/authControllerPG'); // PostgreSQL version
+const { protect } = require('../middleware/authPG'); // PostgreSQL version
 
 // Public routes
 router.post('/register', authController.register);
