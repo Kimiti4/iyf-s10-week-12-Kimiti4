@@ -41,6 +41,7 @@ import CollaborativeQuests from './pages/CollaborativeQuests'
 import TiannaraAssistant from './components/TiannaraAssistant'
 import CommunityEvents from './components/CommunityEvents'
 import EnhancedEmergencyAlerts from './components/EnhancedEmergencyAlerts'
+import AlertFeedPage from './pages/AlertFeedPage'
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -72,7 +73,8 @@ function AppRoutes() {
       {/* New Unique Feature Routes */}
       <Route path="/tiannara" element={<TiannaraAssistant currentUser={user} />} />
       <Route path="/events" element={<CommunityEvents currentUser={user} />} />
-      <Route path="/alerts" element={<EnhancedEmergencyAlerts currentUser={user} />} />
+      <Route path="/alerts" element={<AlertFeedPage />} />
+      <Route path="/emergency-alerts" element={<EnhancedEmergencyAlerts currentUser={user} />} />
       
       {/* User Profile Route */}
       <Route path="/profile/:userId?" element={<UserProfilePage />} />
