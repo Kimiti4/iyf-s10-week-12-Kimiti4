@@ -9,7 +9,7 @@ import { useToast } from '../components/Toast';
 import AlertCard from '../components/AlertCard';
 import CreateAlertForm from '../components/CreateAlertForm';
 import { initializeSocket, onNewAlert, onAlertUpdate, onAlertDelete, disconnectSocket } from '../services/socketClient';
-import api from '../services/api';
+import api, { alertsAPI } from '../services/api';
 import './AlertFeedPage.css';
 
 // Alert categories for filter
@@ -66,7 +66,7 @@ export default function AlertFeedPage() {
         params.severity = filters.severity;
       }
 
-      const response = await api.get('/alerts', { params });
+      const response = await alertsAPI.getAll(params);
       setAlerts(response.data.data || []);
     } catch (error) {
       console.error('Error fetching alerts:', error);

@@ -390,6 +390,51 @@ export const logout = () => {
     }
 };
 
+// ===== ALERTS API =====
+export const alertsAPI = {
+    /**
+     * Get all alerts with filtering
+     * @param {Object} params - { search, county, category, severity, verificationLevel, page, limit }
+     */
+    getAll: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return request(`/alerts${query ? `?${query}` : ''}`);
+    },
+    
+    /**
+     * Get alert by ID
+     * @param {string} id - Alert ID
+     */
+    getById: (id) => request(`/alerts/${id}`),
+    
+    /**
+     * Create a new alert
+     * @param {Object} alertData - { title, description, severity, category, location }
+     */
+    create: (alertData) => request('/alerts', {
+        method: 'POST',
+        body: JSON.stringify(alertData)
+    }),
+    
+    /**
+     * Update alert
+     * @param {string} id - Alert ID
+     * @param {Object} alertData - Updated alert data
+     */
+    update: (id, alertData) => request(`/alerts/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(alertData)
+    }),
+    
+    /**
+     * Delete alert
+     * @param {string} id - Alert ID
+     */
+    delete: (id) => request(`/alerts/${id}`, {
+        method: 'DELETE'
+    })
+};
+
 // Export default object for convenience
 export default {
     auth: authAPI,
@@ -397,6 +442,7 @@ export default {
     comments: commentsAPI,
     users: usersAPI,
     organizations: organizationsAPI,
+    alerts: alertsAPI,
     isAuthenticated,
     getCurrentUser,
     logout
