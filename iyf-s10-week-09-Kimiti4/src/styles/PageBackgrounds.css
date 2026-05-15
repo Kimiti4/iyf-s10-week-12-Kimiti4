@@ -1,0 +1,31 @@
+/* ==========================================
+   Global Page Background Consistency
+   Applies #fafafa background to all pages
+   Matches Instagram-like light gray aesthetic
+   ========================================== */
+
+/* Base page container styling */
+.emergency-alerts,
+.enhanced-feed-page,
+.marketplace-page,
+.settings-page,
+.creator-dashboard,
+.reputation-system,
+.community-governance,
+.collaborative-quests,
+.user-profile-page,
+.chat-page,
+.activity-history {
+  background: #fafafa;
+  min-height: calc(100vh - 80px);
+}
+
+/* Ensure all main content areas have consistent background */
+.App {
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+.main-content {
+  background: #fafafa;
+}

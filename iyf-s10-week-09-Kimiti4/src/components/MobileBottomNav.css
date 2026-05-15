@@ -1,0 +1,130 @@
+/**
+ * 🔹 Mobile Bottom Navigation Styles
+ * Modern, app-like navigation with smooth animations
+ */
+
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--color-zinc-200);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    padding: var(--space-2);
+    text-decoration: none;
+    color: var(--color-zinc-500);
+    transition: all var(--transition-fast);
+    position: relative;
+    min-height: 48px;
+}
+
+.nav-item:hover {
+    color: var(--color-primary-600);
+}
+
+.nav-item.active {
+    color: var(--color-primary-600);
+}
+
+.nav-icon {
+    font-size: var(--text-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-label {
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    letter-spacing: 0.01em;
+}
+
+/* Active indicator dot */
+.active-indicator {
+    position: absolute;
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    background: var(--color-primary-500);
+    border-radius: var(--radius-full);
+}
+
+/* Highlighted Create Button */
+.nav-item.highlight {
+    margin-top: -20px;
+}
+
+.nav-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-icon-circle {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: var(--text-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 4px solid white;
+    transition: all var(--transition-base);
+}
+
+.nav-item.highlight:hover .nav-icon-circle {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-xl);
+}
+
+.nav-item.highlight:active .nav-icon-circle {
+    transform: scale(0.95);
+}
+
+/* Hide on desktop */
+@media (min-width: 769px) {
+    .mobile-bottom-nav {
+        display: none;
+    }
+}
+
+/* Show only on mobile */
+@media (max-width: 768px) {
+    .mobile-bottom-nav {
+        display: flex;
+    }
+    
+    /* Add padding to main content to prevent overlap */
+    body {
+        padding-bottom: 80px;
+    }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .nav-icon,
+    .active-indicator,
+    .nav-icon-circle {
+        transition: none;
+        animation: none;
+    }
+}
