@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd iyf-s10-week-09-Kimiti4 && npm install && npm run build",
+  "buildCommand": "cd iyf-s10-week-09-Kimiti4 && npm run build",
   "outputDirectory": "iyf-s10-week-09-Kimiti4/dist",
   "installCommand": "cd iyf-s10-week-09-Kimiti4 && npm install"
 }
