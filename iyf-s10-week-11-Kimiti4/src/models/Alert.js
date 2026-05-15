@@ -1,297 +1,194 @@
 /**
  * 🔹 Alert Model
- * Realtime verified community alerts with multi-level verification
+ * Schema for community alerts system
  */
 
 const mongoose = require('mongoose');
 
 const alertSchema = new mongoose.Schema({
-  // Basic Information
+  // Alert content
   title: {
     type: String,
-    required: [true, 'Alert title is required'],
+    required: [true, 'Please provide a title'],
     trim: true,
     maxlength: [200, 'Title cannot exceed 200 characters']
   },
-  
   description: {
     type: String,
-    required: [true, 'Alert description is required'],
-    trim: true,
+    required: [true, 'Please provide a description'],
     maxlength: [2000, 'Description cannot exceed 2000 characters']
   },
   
-  // Alert Category (from alerts.md)
+  // Alert classification
   category: {
     type: String,
     required: true,
-    enum: {
-      values: [
-        'emergency',
-        'security',
-        'scam_warning',
-        'lost_found',
-        'traffic_transport',
-        'event',
-        'utility_outage',
-        'campus_notice',
-        'marketplace_fraud',
-        'weather'
-      ],
-      message: 'Invalid alert category'
-    }
+    enum: [
+      'emergency',
+      'security',
+      'scam_warning',
+      'lost_found',
+      'traffic_transport',
+      'event',
+      'utility_outage',
+      'campus_notice',
+      'marketplace_fraud',
+      'weather',
+      'other'
+    ]
   },
-  
-  // Severity Level
   severity: {
     type: String,
     required: true,
-    enum: {
-      values: ['info', 'warning', 'critical', 'official'],
-      message: 'Invalid severity level'
-    },
-    default: 'info'
+    enum: ['low', 'medium', 'high', 'critical'],
+    default: 'medium'
   },
   
-  // Verification System (4 levels from alerts.md)
-  verificationLevel: {
-    type: String,
-    enum: {
-      values: ['unverified', 'community_verified', 'mod_verified', 'official'],
-      message: 'Invalid verification level'
-    },
-    default: 'unverified'
-  },
-  
-  // Author Information
-  author: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  
-  // Organization/Community Context
-  organization: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Organization',
-    required: false
-  },
-  
-  // Location Information
+  // Location information
   location: {
-    address: {
-      type: String,
-      trim: true
-    },
-    coordinates: {
-      latitude: {
-        type: Number,
-        min: -90,
-        max: 90
-      },
-      longitude: {
-        type: Number,
-        min: -180,
-        max: 180
-      }
-    },
-    radius: {
-      type: Number,
-      default: 5000, // 5km default radius
-      min: 100,
-      max: 50000
-    }
-  },
-  
-  // Community Confirmation System
-  confirmations: [{
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    timestamp: {
-      type: Date,
-      default: Date.now
-    }
-  }],
-  
-  confirmationCount: {
-    type: Number,
-    default: 0
-  },
-  
-  // Moderator/Admin Actions
-  reviewedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  
-  reviewedAt: Date,
-  
-  reviewNotes: {
     type: String,
     trim: true,
-    maxlength: 500
+    maxlength: [300, 'Location cannot exceed 300 characters']
   },
-  
-  // Status
-  status: {
-    type: String,
-    enum: {
-      values: ['pending', 'active', 'resolved', 'expired', 'rejected'],
-      message: 'Invalid alert status'
+  coordinates: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point'
     },
-    default: 'pending'
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      validate: {
+        validator: function(v) {
+          return v.length === 2 && 
+                 v[0] >= -180 && v[0] <= 180 && 
+                 v[1] >= -90 && v[1] <= 90;
+        },
+        message: 'Invalid coordinates'
+      }
+    }
   },
   
-  // Expiration
-  expiresAt: {
-    type: Date,
-    index: true
-  },
-  
-  // Metadata
-  views: {
-    type: Number,
-    default: 0
-  },
-  
-  shares: {
-    type: Number,
-    default: 0
-  },
-  
-  // Images/Media (optional)
+  // Media
   images: [{
     url: String,
-    caption: String
+    publicId: String
   }],
   
-  // Tags for better search/filtering
+  // Tags for searchability
   tags: [{
     type: String,
     trim: true
   }],
   
-  // AI Analysis (Tiannara integration - future)
-  aiAnalysis: {
-    credible: Boolean,
-    confidence: {
-      type: Number,
-      min: 0,
-      max: 1
+  // Author and organization
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  organization: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization'
+  },
+  
+  // Status and verification
+  status: {
+    type: String,
+    enum: ['active', 'resolved', 'expired', 'archived'],
+    default: 'active'
+  },
+  verificationLevel: {
+    type: String,
+    enum: ['unverified', 'community_verified', 'mod_verified', 'official'],
+    default: 'unverified'
+  },
+  
+  // Community confirmations
+  confirmations: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
     },
-    spamProbability: {
-      type: Number,
-      min: 0,
-      max: 1
-    },
-    analyzedAt: Date
+    confirmedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  
+  // Review information (for moderators)
+  reviewedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  reviewedAt: Date,
+  reviewNotes: String,
+  
+  // Statistics
+  views: {
+    type: Number,
+    default: 0
+  },
+  
+  // Timestamps
+  expiresAt: {
+    type: Date,
+    index: { expireAfterSeconds: 0 } // MongoDB TTL index
   }
 }, {
-  timestamps: true, // Adds createdAt and updatedAt
+  timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
 
-// Indexes for performance
-alertSchema.index({ category: 1, status: 1 });
-alertSchema.index({ severity: 1, status: 1 });
-alertSchema.index({ verificationLevel: 1 });
-alertSchema.index({ 'location.coordinates': '2dsphere' }); // Geo-spatial index
-alertSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // Auto-expire
-alertSchema.index({ createdAt: -1 }); // Sort by newest
+// Index for geospatial queries
+alertSchema.index({ coordinates: '2dsphere' });
 
-// Virtual for checking if alert is expired
-alertSchema.virtual('isExpired').get(function() {
-  if (!this.expiresAt) return false;
-  return new Date() > this.expiresAt;
-});
+// Index for searching
+alertSchema.index({ title: 'text', description: 'text', tags: 'text' });
 
-// Virtual for checking if community verified (5+ confirmations)
-alertSchema.virtual('isCommunityVerified').get(function() {
-  return this.confirmationCount >= 5;
+// Index for filtering
+alertSchema.index({ category: 1, severity: 1, status: 1, createdAt: -1 });
+
+// Virtual for confirmation count
+alertSchema.virtual('confirmationCount').get(function() {
+  return this.confirmations.length;
 });
 
 // Method to add confirmation
-alertSchema.methods.addConfirmation = function(userId) {
-  // Check if user already confirmed
-  const existingConfirmation = this.confirmations.find(
-    conf => conf.user.toString() === userId.toString()
+alertSchema.methods.addConfirmation = async function(userId) {
+  const alreadyConfirmed = this.confirmations.some(
+    c => c.user.toString() === userId.toString()
   );
   
-  if (existingConfirmation) {
-    throw new Error('User has already confirmed this alert');
+  if (alreadyConfirmed) {
+    throw new Error('You have already confirmed this alert');
   }
   
   this.confirmations.push({ user: userId });
-  this.confirmationCount = this.confirmations.length;
   
-  // Auto-upgrade to community verified if 5+ confirmations
-  if (this.confirmationCount >= 5 && this.verificationLevel === 'unverified') {
+  // Auto-verify if enough confirmations
+  if (this.confirmations.length >= 5 && this.verificationLevel === 'unverified') {
     this.verificationLevel = 'community_verified';
   }
   
-  return this.save();
+  await this.save();
+  return this;
 };
 
 // Method to remove confirmation
-alertSchema.methods.removeConfirmation = function(userId) {
+alertSchema.methods.removeConfirmation = async function(userId) {
   this.confirmations = this.confirmations.filter(
-    conf => conf.user.toString() !== userId.toString()
+    c => c.user.toString() !== userId.toString()
   );
-  this.confirmationCount = this.confirmations.length;
   
-  // Downgrade if below threshold
-  if (this.confirmationCount < 5 && this.verificationLevel === 'community_verified') {
+  // Downgrade verification if needed
+  if (this.verificationLevel === 'community_verified' && this.confirmations.length < 5) {
     this.verificationLevel = 'unverified';
   }
   
-  return this.save();
+  await this.save();
+  return this;
 };
-
-// Static method to get active alerts by category
-alertSchema.statics.getActiveAlerts = function(category, options = {}) {
-  const query = {
-    status: 'active',
-    ...(category && category !== 'all' && { category })
-  };
-  
-  // Filter by verification level if specified
-  if (options.minVerificationLevel) {
-    const levels = ['unverified', 'community_verified', 'mod_verified', 'official'];
-    const minIndex = levels.indexOf(options.minVerificationLevel);
-    query.verificationLevel = { $in: levels.slice(minIndex) };
-  }
-  
-  return this.find(query)
-    .populate('author', 'username avatar profile.verified')
-    .populate('organization', 'name slug')
-    .sort({ createdAt: -1 })
-    .limit(options.limit || 50);
-};
-
-// Pre-save middleware to set default expiration
-alertSchema.pre('save', function(next) {
-  // Set default expiration based on severity
-  if (!this.expiresAt) {
-    const now = new Date();
-    switch (this.severity) {
-      case 'critical':
-        now.setHours(now.getHours() + 24); // 24 hours
-        break;
-      case 'warning':
-        now.setHours(now.getHours() + 48); // 48 hours
-        break;
-      case 'info':
-      default:
-        now.setDate(now.getDate() + 7); // 7 days
-        break;
-    }
-    this.expiresAt = now;
-  }
-  
-  next();
-});
 
 module.exports = mongoose.model('Alert', alertSchema);
