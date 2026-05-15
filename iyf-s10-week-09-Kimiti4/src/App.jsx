@@ -1,21 +1,27 @@
-import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { OrganizationProvider } from './context/OrganizationContext'
+import { SidebarProvider, useSidebar } from './context/SidebarContext'
+import { ToastProvider } from './components/Toast'
 import ProtectedRoute from './components/ProtectedRoute'
-import SearchBar from './components/SearchBar'
-import OrganizationSelector from './components/OrganizationSelector'
+import FeedbackForm from './components/FeedbackForm'
+import './App.css'
+import './styles/DesignSystem.css'
+import './styles/InstagramUI.css'
+import './styles/PageBackgrounds.css'
+import Sidebar from './components/Sidebar'
+import NavBar from './components/NavBar'
+import MobileBottomNav from './components/MobileBottomNav'
 import HomePage from './pages/HomePage'
 import PostListPage from './pages/PostListPage'
 import PostDetailPage from './pages/PostDetailPage'
 import AboutPage from './pages/AboutPage'
-// Original pages (backup for debugging)
 import OriginalLoginPage from './pages/LoginPage'
 import OriginalRegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import CreatePostPage from './pages/CreatePostPage'
 import SearchResultsPage from './pages/SearchResultsPage'
-// Enhanced Social Media Pages (now the main pages)
 import EnhancedLoginPage from './enhanced/pages/EnhancedLoginPage'
 import EnhancedRegisterPage from './enhanced/pages/EnhancedRegisterPage'
 import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
@@ -23,14 +29,36 @@ import ReelsPage from './enhanced/pages/ReelsPage'
 import AdminDashboard from './enhanced/pages/AdminDashboard'
 import FounderDashboard from './pages/FounderDashboard'
 import OrganizationPage from './pages/OrganizationPage'
-// New Unique Features
+import SettingsPage from './pages/SettingsPage'
+import MarketplacePage from './pages/MarketplacePage'
+import UserProfilePage from './pages/UserProfilePage'
+import ChatPage from './pages/ChatPage'
+import ActivityHistory from './pages/ActivityHistory'
+import CreatorDashboard from './pages/CreatorDashboard'
+import ReputationSystem from './pages/ReputationSystem'
+import CommunityGovernance from './pages/CommunityGovernance'
+import CollaborativeQuests from './pages/CollaborativeQuests'
 import TiannaraAssistant from './components/TiannaraAssistant'
 import CommunityEvents from './components/CommunityEvents'
-import EmergencyAlerts from './components/EmergencyAlerts'
-import './App.css'
+import EnhancedEmergencyAlerts from './components/EnhancedEmergencyAlerts'
 
 function AppRoutes() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Listen for auth events
+  useEffect(() => {
+    const handleAuthExpired = () => navigate('/login');
+    const handleLogout = () => navigate('/login');
+    
+    window.addEventListener('auth:expired', handleAuthExpired);
+    window.addEventListener('auth:logout', handleLogout);
+    
+    return () => {
+      window.removeEventListener('auth:expired', handleAuthExpired);
+      window.removeEventListener('auth:logout', handleLogout);
+    };
+  }, [navigate]);
   
   return (
     <Routes>
@@ -44,7 +72,90 @@ function AppRoutes() {
       {/* New Unique Feature Routes */}
       <Route path="/tiannara" element={<TiannaraAssistant currentUser={user} />} />
       <Route path="/events" element={<CommunityEvents currentUser={user} />} />
-      <Route path="/alerts" element={<EmergencyAlerts currentUser={user} />} />
+      <Route path="/alerts" element={<EnhancedEmergencyAlerts currentUser={user} />} />
+      
+      {/* User Profile Route */}
+      <Route path="/profile/:userId?" element={<UserProfilePage />} />
+      
+      {/* Chat Route */}
+      <Route 
+        path="/chat" 
+        element={
+          <ProtectedRoute>
+            <ChatPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Activity History Route */}
+      <Route 
+        path="/activity" 
+        element={
+          <ProtectedRoute>
+            <ActivityHistory />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Creator Dashboard Route */}
+      <Route 
+        path="/creator" 
+        element={
+          <ProtectedRoute>
+            <CreatorDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Reputation System Route */}
+      <Route 
+        path="/reputation" 
+        element={
+          <ProtectedRoute>
+            <ReputationSystem />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Community Governance Route */}
+      <Route 
+        path="/governance" 
+        element={
+          <ProtectedRoute>
+            <CommunityGovernance />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Collaborative Quests Route */}
+      <Route 
+        path="/quests" 
+        element={
+          <ProtectedRoute>
+            <CollaborativeQuests />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Marketplace Route */}
+      <Route 
+        path="/marketplace" 
+        element={
+          <ProtectedRoute>
+            <MarketplacePage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Settings Route */}
+      <Route 
+        path="/settings" 
+        element={
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        } 
+      />
       
       <Route 
         path="/admin" 
@@ -84,69 +195,56 @@ function AppRoutes() {
   );
 }
 
-function NavBar() {
-  const { user, isAuthenticated, logout } = useAuth();
+function MainLayout() {
+  const { isCollapsed } = useSidebar();
   
   return (
-    <nav className="navbar">
-      <div className="container">
-        <Link to="/" className="logo">JamiiLink</Link>
-        <SearchBar />
-        <div className="nav-links">
-          <Link to="/">Feed</Link>
-          <Link to="/tiannara" className="nav-feature">🤖 Tiannara</Link>
-          <Link to="/events" className="nav-feature">🎉 Events</Link>
-          <Link to="/alerts" className="nav-feature">🚨 Alerts</Link>
-          <Link to="/original/posts">Posts</Link>
-          <Link to="/original/about">About</Link>
-          
-          {/* Organization Selector */}
-          <OrganizationSelector />
-          
-          {isAuthenticated ? (
-            <>
-              {user?.role === 'founder' || user?.isFounder ? (
-                <Link to="/admin/founder" className="btn-founder">👑 Founder</Link>
-              ) : (
-                <Link to="/admin" className="btn-admin">Admin</Link>
-              )}
-              <Link to="/original/posts/create" className="btn-create">+ Create Post</Link>
-              <Link to={`/original/profile/${user._id}`} className="nav-user">
-                {user.name}
-              </Link>
-              <button onClick={logout} className="btn-logout">Logout</button>
-            </>
-          ) : (
-            <>
-              <Link to="/login">Login</Link>
-              <Link to="/register" className="btn-primary">Sign Up</Link>
-            </>
-          )}
-        </div>
-      </div>
-    </nav>
-  )
+    <main className={`main-content with-sidebar ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <AppRoutes />
+    </main>
+  );
 }
 
 function App() {
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  
   return (
-    <AuthProvider>
-      <OrganizationProvider>
-        <Router>
-          <div className="App">
-            <NavBar />
-            <main className="main-content">
-            <AppRoutes />
-          </main>
-          <footer className="footer">
-            <div className="container">
-              <p>&copy; 2026 JamiiLink powered by <a href='https://github.com/Kimiti4'>Kimiti4</a></p>
+    <Router>
+      <AuthProvider>
+        <OrganizationProvider>
+          <SidebarProvider>
+            <ToastProvider>
+            <div className="App">
+              <Sidebar />
+              <NavBar />
+              <MainLayout />
+              <MobileBottomNav />
+              <footer className="footer">
+                <div className="container">
+                  <p>&copy; 2026 JamiiLink powered by <a href='https://github.com/Kimiti4'>Kimiti4</a></p>
+                </div>
+              </footer>
+              
+              {/* Floating Feedback Button */}
+              <button 
+                className="floating-feedback-btn"
+                onClick={() => setFeedbackOpen(true)}
+                title="Share Feedback"
+              >
+                💬
+              </button>
+              
+              {/* Feedback Form Modal */}
+              <FeedbackForm 
+                isOpen={feedbackOpen} 
+                onClose={() => setFeedbackOpen(false)} 
+              />
             </div>
-          </footer>
-        </div>
-      </Router>
-    </OrganizationProvider>
-  </AuthProvider>
+            </ToastProvider>
+          </SidebarProvider>
+        </OrganizationProvider>
+      </AuthProvider>
+    </Router>
   )
 }
 

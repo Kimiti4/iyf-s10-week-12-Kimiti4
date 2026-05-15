@@ -12,6 +12,7 @@ const verificationRoutes = require('./verification');
 const metricsRoutes = require('./metrics');
 const tiannaraRoutes = require('./tiannara');
 const authRoutes = require('./auth');
+const alertsRoutes = require('./alerts');
 
 // Health check
 router.get('/health', (req, res) => {
@@ -42,6 +43,9 @@ router.use('/metrics', metricsRoutes);
 
 // Mount Tiannara AI routes (mental health, fact-checking, moderation)
 router.use('/tiannara', tiannaraRoutes);
+
+// Mount alerts routes (realtime verified community alerts)
+router.use('/alerts', alertsRoutes);
 
 // Mount auth routes (registration, login)
 router.use('/auth', authRoutes);
