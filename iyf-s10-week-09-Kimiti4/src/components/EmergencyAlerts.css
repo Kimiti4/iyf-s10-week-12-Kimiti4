@@ -2,6 +2,9 @@
   max-width: 1200px;
   margin: 2rem auto;
   padding: 2rem;
+  background: #fafafa;
+  min-height: calc(100vh - 80px);
+  border-radius: 16px;
 }
 
 /* Header */
