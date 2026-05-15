@@ -8,6 +8,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaPhone, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaTwitter } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import { validateLogin, sanitizeInput } from '../../utils/validation';
 import ConstellationBackground from '../components/ConstellationBackground';
 import './EnhancedLoginPage.css';
 
@@ -18,6 +19,7 @@ export default function EnhancedLoginPage() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [formErrors, setFormErrors] = useState({});
     const [loading, setLoading] = useState(false);
     
     const { login } = useAuth();
@@ -26,12 +28,27 @@ export default function EnhancedLoginPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setFormErrors({});
         setLoading(true);
         
         try {
+            // Sanitize inputs
+            const sanitizedEmail = sanitizeInput(email.trim().toLowerCase());
+            const sanitizedPhone = sanitizeInput(phone.trim());
+            
+            // Validate form
             const credentials = loginMethod === 'email' 
-                ? { email, password }
-                : { phone, password };
+                ? { email: sanitizedEmail, password }
+                : { phone: sanitizedPhone, password };
+            
+            const validation = validateLogin(credentials);
+            
+            if (!validation.valid) {
+                setFormErrors(validation.errors);
+                setError('Please fix the errors below');
+                setLoading(false);
+                return;
+            }
             
             await login(credentials);
             navigate('/', { replace: true });

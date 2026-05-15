@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import logger from '../utils/logger';
 import './TiannaraAssistant.css';
 
 /**
@@ -65,7 +66,7 @@ export default function TiannaraAssistant({ currentUser }) {
       const data = await res.json();
       setResponse(data);
     } catch (error) {
-      console.error('Tiannara error:', error);
+      logger.error('Tiannara error:', error);
       setResponse({
         success: false,
         message: 'Unable to connect. Please try again.'

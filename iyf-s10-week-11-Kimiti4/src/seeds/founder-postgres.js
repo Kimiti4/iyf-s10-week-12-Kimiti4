@@ -42,7 +42,7 @@ const FOUNDER_DATA = {
     enabled: true,
     methods: [
       { type: 'totp', verified: true, primary: true },
-      { type: 'email', verified: true, primary: false, email: 'amos.kimiti@jamiilink.ke' },
+      { type: 'email', verified: true, primary: false, email: 'kimiti.kariuki75@gmail.com' },
       { type: 'sms', verified: false, primary: false }
     ],
     requireAllMethods: true,

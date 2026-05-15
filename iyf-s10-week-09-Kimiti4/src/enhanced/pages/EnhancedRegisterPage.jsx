@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { FaEnvelope, FaPhone, FaLock, FaUser, FaMapMarkerAlt, FaEye, FaEyeSlash, FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import { validateRegistration, sanitizeInput } from '../../utils/validation';
 import ConstellationBackground from '../components/ConstellationBackground';
 import './EnhancedRegisterPage.css';
 
@@ -22,6 +23,7 @@ export default function EnhancedRegisterPage() {
         confirmPassword: '',
         location: ''
     });
+    const [formErrors, setFormErrors] = useState({});
     const [verificationMethod, setVerificationMethod] = useState('email');
     const [verificationCode, setVerificationCode] = useState('');
     const [codeSent, setCodeSent] = useState(false);
@@ -33,10 +35,19 @@ export default function EnhancedRegisterPage() {
     const navigate = useNavigate();
     
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value
         });
+        
+        // Clear error for this field when user starts typing
+        if (formErrors[name]) {
+            setFormErrors({
+                ...formErrors,
+                [name]: ''
+            });
+        }
     };
     
     const sendVerificationCode = async () => {
@@ -87,15 +98,27 @@ export default function EnhancedRegisterPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setFormErrors({});
         
-        // Validation
-        if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match');
-            return;
-        }
+        // Sanitize inputs
+        const sanitizedData = {
+            ...formData,
+            name: sanitizeInput(formData.name),
+            email: formData.email.trim().toLowerCase(),
+            location: sanitizeInput(formData.location)
+        };
         
-        if (formData.password.length < 6) {
-            setError('Password must be at least 6 characters');
+        // Validate form using utility
+        const validation = validateRegistration({
+            username: sanitizedData.name,
+            email: sanitizedData.email,
+            password: sanitizedData.password,
+            confirmPassword: sanitizedData.confirmPassword
+        });
+        
+        if (!validation.valid) {
+            setFormErrors(validation.errors);
+            setError('Please fix the errors below');
             return;
         }
         
@@ -195,7 +218,11 @@ export default function EnhancedRegisterPage() {
                                 onChange={handleChange}
                                 placeholder="Full Name"
                                 required
+                                className={formErrors.username ? 'input-error' : ''}
                             />
+                            {formErrors.username && (
+                                <span className="field-error">{formErrors.username}</span>
+                            )}
                         </div>
                         
                         <div className="input-group">
@@ -207,7 +234,11 @@ export default function EnhancedRegisterPage() {
                                 onChange={handleChange}
                                 placeholder="Email Address"
                                 required
+                                className={formErrors.email ? 'input-error' : ''}
                             />
+                            {formErrors.email && (
+                                <span className="field-error">{formErrors.email}</span>
+                            )}
                         </div>
                         
                         <div className="input-group">
@@ -239,9 +270,10 @@ export default function EnhancedRegisterPage() {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                placeholder="Password (min 6 characters)"
+                                placeholder="Password (min 8 characters, uppercase, lowercase, number)"
                                 required
-                                minLength="6"
+                                minLength="8"
+                                className={formErrors.password ? 'input-error' : ''}
                             />
                             <button
                                 type="button"
@@ -250,6 +282,9 @@ export default function EnhancedRegisterPage() {
                             >
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </button>
+                            {formErrors.password && (
+                                <span className="field-error">{formErrors.password}</span>
+                            )}
                         </div>
                         
                         <div className="input-group">
@@ -261,7 +296,11 @@ export default function EnhancedRegisterPage() {
                                 onChange={handleChange}
                                 placeholder="Confirm Password"
                                 required
+                                className={formErrors.confirmPassword ? 'input-error' : ''}
                             />
+                            {formErrors.confirmPassword && (
+                                <span className="field-error">{formErrors.confirmPassword}</span>
+                            )}
                         </div>
                         
                         <motion.button 

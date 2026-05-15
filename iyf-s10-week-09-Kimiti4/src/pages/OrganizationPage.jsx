@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { organizationsAPI, postsAPI } from '../services/api';
 import { useOrganization } from '../context/OrganizationContext';
+import logger from '../utils/logger';
 import EnhancedPostCard from '../enhanced/components/EnhancedPostCard';
 import VerificationBadge from '../components/VerificationBadge';
 import './OrganizationPage.css';
@@ -51,7 +52,7 @@ const OrganizationPage = () => {
       }
       
     } catch (err) {
-      console.error('Failed to fetch organization data:', err);
+      logger.error('Failed to fetch organization data:', err);
       setError(err.message || 'Failed to load organization');
     } finally {
       setLoading(false);
@@ -66,7 +67,7 @@ const OrganizationPage = () => {
       const orgResponse = await organizationsAPI.getBySlug(slug);
       setOrganization(orgResponse.data);
     } catch (err) {
-      console.error('Failed to join organization:', err);
+      logger.error('Failed to join organization:', err);
       alert('Failed to join organization. Please try again.');
     }
   };

@@ -5,7 +5,9 @@
  */
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import logger from '../utils/logger';
 
 const AuthContext = createContext(null);
 
@@ -13,6 +15,7 @@ const AuthContext = createContext(null);
  * AuthProvider - Wraps app to provide auth context
  */
 export function AuthProvider({ children }) {
+    const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -31,7 +34,7 @@ export function AuthProvider({ children }) {
                     localStorage.setItem('user', JSON.stringify(response.user || response));
                 } catch (err) {
                     // Token invalid or expired
-                    console.error('Auth initialization error:', err);
+                    logger.auth('initialization_error', err.message);
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                     setUser(null);
@@ -66,7 +69,7 @@ export function AuthProvider({ children }) {
             
             return userData;
         } catch (err) {
-            console.error('Login error:', err);
+            logger.auth('login_error', err.message);
             setError(err.message || 'Login failed');
             throw err;
         } finally {
@@ -95,7 +98,7 @@ export function AuthProvider({ children }) {
             
             return newUser;
         } catch (err) {
-            console.error('Registration error:', err);
+            logger.auth('registration_error', err.message);
             setError(err.message || 'Registration failed');
             throw err;
         } finally {
@@ -111,7 +114,7 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('user');
         setUser(null);
         setError(null);
-        window.location.href = '/login';
+        navigate('/login');
     };
     
     /**

@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import logger from '../utils/logger';
 import './MoodIndicator.css';
 
 const MOODS = [
@@ -38,7 +39,7 @@ export default function MoodIndicator({ currentUser, mood: initialMood }) {
         body: JSON.stringify({ mood: selectedMood.name })
       });
     } catch (error) {
-      console.error('Error updating mood:', error);
+      logger.error('Error updating mood:', error);
     }
   };
 

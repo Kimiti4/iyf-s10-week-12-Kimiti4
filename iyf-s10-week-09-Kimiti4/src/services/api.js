@@ -4,6 +4,8 @@
  * Handles authentication, posts, comments, and user profiles
  */
 
+import logger from '../utils/logger';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 // Helper for auth headers
@@ -32,7 +34,11 @@ const request = async (endpoint, options = {}) => {
         if (response.status === 401) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = '/login';
+            // Use window.location as fallback since this is a service layer
+            // In production, consider using a custom event or callback
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('auth:expired'));
+            }
             throw new Error('Session expired. Please login again.');
         }
         
@@ -54,7 +60,7 @@ const request = async (endpoint, options = {}) => {
         
         return data;
     } catch (error) {
-        console.error('API Error:', error);
+        logger.apiError(endpoint, error);
         throw error;
     }
 };
@@ -379,7 +385,9 @@ export const getCurrentUser = () => {
 export const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login';
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:logout'));
+    }
 };
 
 // Export default object for convenience

@@ -20,6 +20,7 @@ const corsOptions = {
     origin: function (origin, callback) {
         const allowedOrigins = [
             'http://localhost:5173',  // Vite dev server
+            'http://localhost:5174',  // Vite dev server (port 5174)
             'http://localhost:3000',  // Local
             'https://jamii-link-ke.vercel.app',  // Production frontend (Vercel)
             process.env.FRONTEND_URL  // Additional production frontend URL

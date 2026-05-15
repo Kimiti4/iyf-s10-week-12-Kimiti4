@@ -19,15 +19,15 @@ const {
   removeMember,
   transferOwnership,
   getAnalytics
-} = require('../controllers/organizationsController');
-const requireAuth = require('../middleware/requireAuth');
+} = require('../controllers/organizationsControllerPG'); // PostgreSQL version
+const { protect } = require('../middleware/authPG'); // PostgreSQL version
 
 // Public routes
 router.get('/', getOrganizations);
 router.get('/:slug', getOrganization);
 
 // Protected routes (require authentication)
-router.use(requireAuth);
+router.use(protect);
 
 // My organizations
 router.get('/my', getMyOrganizations);

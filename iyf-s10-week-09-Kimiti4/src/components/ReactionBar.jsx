@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import logger from '../utils/logger';
 import './ReactionBar.css';
 
 const REACTIONS = [
@@ -79,7 +80,7 @@ export default function ReactionBar({ post, currentUser }) {
         throw new Error('Failed to add reaction');
       }
     } catch (error) {
-      console.error('Error adding reaction:', error);
+      logger.error('Error adding reaction:', error);
       // Revert on error
       setReactionCounts(prev => ({
         ...prev,
@@ -111,7 +112,7 @@ export default function ReactionBar({ post, currentUser }) {
         throw new Error('Failed to remove reaction');
       }
     } catch (error) {
-      console.error('Error removing reaction:', error);
+      logger.error('Error removing reaction:', error);
     }
   };
 

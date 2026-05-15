@@ -5,6 +5,7 @@
  */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { organizationsAPI } from '../services/api';
+import logger from '../utils/logger';
 
 const OrganizationContext = createContext();
 
@@ -31,7 +32,7 @@ export const OrganizationProvider = ({ children }) => {
           setCurrentOrg(JSON.parse(savedOrg));
         }
       } catch (err) {
-        console.error('Failed to load saved organization:', err);
+        logger.error('Failed to load saved organization:', err);
       } finally {
         setLoading(false);
       }
@@ -49,7 +50,7 @@ export const OrganizationProvider = ({ children }) => {
       return response.data || [];
     } catch (err) {
       setError(err.message || 'Failed to fetch organizations');
-      console.error('Error fetching organizations:', err);
+      logger.error('Error fetching organizations:', err);
       return [];
     }
   };

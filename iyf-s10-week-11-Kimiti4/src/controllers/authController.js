@@ -2,7 +2,7 @@
  * 🔹 Authentication Controller
  * Register, login, get current user
  */
-const User = require('../models/User');
+const { UserRepository } = require('../database');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('../utils/asyncHandler');
 
