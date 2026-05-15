@@ -4,18 +4,23 @@
  */
 require('dotenv').config();
 const http = require('http');
-const { connectMongoDB } = require('./src/config/mongodb');
+const { connectDB } = require('./src/config/postgres');
+const { createTables } = require('./src/database/schema');
 const app = require('./src/app');
 const { initializeSocketIO } = require('./src/services/socketService');
 
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Connect to MongoDB first, then start server
+// Connect to PostgreSQL first, then start server
 const startServer = async () => {
   try {
-    await connectMongoDB();
+    await connectDB();
     console.log('✅ Database connected successfully\n');
+    
+    // Create tables if they don't exist (idempotent)
+    await createTables();
+    console.log('✅ Database schema initialized\n');
     
     // Create HTTP server
     const server = http.createServer(app);
