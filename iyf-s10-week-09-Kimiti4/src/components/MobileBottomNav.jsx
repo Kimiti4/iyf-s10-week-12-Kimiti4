@@ -6,6 +6,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaHome, FaCompass, FaPlusCircle, FaBell, FaUser } from 'react-icons/fa';
+import { triggerHaptic } from '../utils/hapticFeedback';
 import './MobileBottomNav.css';
 
 export default function MobileBottomNav() {
@@ -29,6 +30,7 @@ export default function MobileBottomNav() {
                         key={item.path}
                         to={item.path}
                         className={`nav-item ${isActive ? 'active' : ''} ${item.highlight ? 'highlight' : ''}`}
+                        onClick={() => triggerHaptic('click')}
                     >
                         {item.highlight ? (
                             <motion.div

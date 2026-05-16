@@ -1,0 +1,52 @@
+/* 🔄 Pull to Refresh Indicator Styles */
+
+.ptr-indicator {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(16, 185, 129, 0.95);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  pointer-events: none;
+}
+
+.ptr-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ptr-icon {
+  font-size: var(--text-lg);
+  transition: transform 0.2s ease-out;
+}
+
+.ptr-text {
+  white-space: nowrap;
+}
+
+/* Hide on desktop */
+@media (min-width: 769px) {
+  .ptr-indicator {
+    display: none;
+  }
+}

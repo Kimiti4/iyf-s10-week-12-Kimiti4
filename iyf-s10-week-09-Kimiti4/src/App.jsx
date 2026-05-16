@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { OrganizationProvider } from './context/OrganizationContext'
 import { SidebarProvider, useSidebar } from './context/SidebarContext'
@@ -8,6 +8,9 @@ import ProtectedRoute from './components/ProtectedRoute'
 import FeedbackForm from './components/FeedbackForm'
 import TrendingChip from './components/TrendingChip'
 import JamiiModeToggle from './components/JamiiModeToggle'
+import PullToRefreshIndicator from './components/PullToRefresh'
+import { usePullToRefresh } from './hooks/usePullToRefresh'
+import { useSwipeGestures } from './hooks/useSwipeGestures'
 import './App.css'
 import './index.css' // Import mobile-first responsive styles
 import './styles/DesignSystem.css'
@@ -216,6 +219,18 @@ function App() {
   
   // Close sidebar when clicking overlay
   const closeSidebar = () => setSidebarOpen(false);
+  const openSidebar = () => setSidebarOpen(true);
+  
+  // Pull to refresh handler
+  const handleRefresh = useCallback(async () => {
+    // Trigger a page reload or data refetch
+    window.location.reload();
+  }, []);
+  
+  const { isRefreshing, progress } = usePullToRefresh(handleRefresh, 100);
+  
+  // Swipe gestures for sidebar
+  useSwipeGestures(openSidebar, closeSidebar, 100);
   
   return (
     <Router>
@@ -224,6 +239,9 @@ function App() {
           <SidebarProvider>
             <ToastProvider>
             <div className="App">
+              {/* Pull to Refresh Indicator */}
+              <PullToRefreshIndicator isRefreshing={isRefreshing} progress={progress} />
+              
               {/* Sidebar Overlay Backdrop */}
               <div 
                 className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
