@@ -43,7 +43,10 @@ function NavBar() {
         <div className="navbar-left">
           <button 
             className="mobile-menu-btn"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => {
+              console.log('Menu toggle clicked, current state:', mobileMenuOpen);
+              setMobileMenuOpen(!mobileMenuOpen);
+            }}
             aria-label="Toggle menu"
           >
             <span className={`hamburger ${mobileMenuOpen ? 'open' : ''}`}>
@@ -66,7 +69,13 @@ function NavBar() {
         </div>
 
         {/* Right: Navigation Links */}
-        <div className={`navbar-right ${mobileMenuOpen ? 'active' : ''}`}>
+        <div 
+          className={`navbar-right ${mobileMenuOpen ? 'active' : ''}`}
+          style={{
+            transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
+            transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+        >
           {/* Primary Navigation */}
           <div className="nav-group primary-nav">
             <Link 
