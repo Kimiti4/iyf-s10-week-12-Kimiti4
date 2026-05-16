@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SearchBar from './SearchBar'
@@ -14,8 +14,30 @@ function NavBar() {
 
   const isActive = (path) => location.pathname === path
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   return (
-    <nav className="enhanced-navbar">
+    <>
+      {/* Mobile Menu Backdrop Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="mobile-menu-backdrop"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+      
+      <nav className="enhanced-navbar">
       <div className="navbar-container">
         {/* Left: Logo & Brand */}
         <div className="navbar-left">
@@ -234,6 +256,7 @@ function NavBar() {
         </div>
       </div>
     </nav>
+    </>
   )
 }
 

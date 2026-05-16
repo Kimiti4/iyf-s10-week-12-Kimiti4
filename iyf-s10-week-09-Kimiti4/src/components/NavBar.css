@@ -606,6 +606,22 @@
 /* ==========================================
    Mobile Responsiveness (< 768px)
    ========================================== */
+
+/* Mobile Menu Backdrop Overlay */
+.mobile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @media (max-width: 768px) {
   .mobile-menu-btn {
     display: block;
@@ -621,11 +637,11 @@
 
   .navbar-right {
     position: fixed;
-    top: 64px;
+    top: 64px; /* Height of navbar */
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(180deg, var(--color-primary-600) 0%, var(--color-primary-700) 100%);
     flex-direction: column;
     align-items: stretch;
     gap: 0;
@@ -634,6 +650,7 @@
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 999;
+    box-shadow: 4px 0 25px rgba(0,0,0,0.3);
   }
 
   .navbar-right.active {
