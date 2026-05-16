@@ -1,12 +1,295 @@
+/* ========================================
+   📱 Mobile-First Responsive Foundation
+   ======================================== */
+
 /* Reset and base styles */
 :root {
+  /* Typography */
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  
+  /* 🎨 Design Tokens - Mobile First */
+  --sidebar-width: 100%;
+  --nav-height: 60px;
+  --content-padding: 1rem;
+  --transition-speed: 0.3s ease;
+  
+  /* Colors */
+  --primary-color: #4a90e2;
+  --accent-color: #ee5a24;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6c757d;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Tablet Breakpoint */
+@media (min-width: 768px) {
+  :root {
+    --sidebar-width: 240px;
+    --content-padding: 2rem;
+  }
+}
+
+/* ✅ Desktop Breakpoint */
+@media (min-width: 1024px) {
+  :root {
+    --sidebar-width: 280px;
+  }
+}
+
+/* ✅ Large Desktop */
+@media (min-width: 1200px) {
+  :root {
+    --content-padding: 3rem;
+  }
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* ========================================
+   🎯 Touch-Friendly Targets (Mobile HIG)
+   ======================================== */
+button,
+.nav-item,
+.post-action,
+.clickable {
+  min-height: 44px; /* Apple Human Interface Guidelines */
+  min-width: 44px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: all var(--transition-speed);
+}
+
+button:active,
+.clickable:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* ========================================
+   🖼️ Fluid Images & Media
+   ======================================== */
+img,
+video,
+.reel-card img,
+.post-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Vertical video optimization for Reels */
+.reel-card img,
+.post-image {
+  width: 100%;
+  aspect-ratio: 9/16;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+}
+
+/* ========================================
+   📐 Responsive Grid System
+   ======================================== */
+.feed-grid,
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobile: single column */
+  gap: var(--spacing-md);
+  padding: var(--content-padding);
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) {
+  .feed-grid,
+  .content-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 1200px) {
+  .feed-grid,
+  .content-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ========================================
+   🎬 Swipeable Carousel (Reels)
+   ======================================== */
+.reels-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+.reels-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+.reel-card {
+  flex: 0 0 85%; /* Show partial next card for affordance */
+  scroll-snap-align: start;
+  transition: transform 0.2s ease;
+}
+
+.reel-card:active {
+  transform: scale(0.98);
+}
+
+/* ========================================
+   ✨ Animations & Micro-interactions
+   ======================================== */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(74, 144, 226, 0); }
+}
+
+.post-card.active {
+  animation: pulse-glow 2s infinite;
+  border: 2px solid var(--primary-color);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* ========================================
+   🌙 Jamii Mode Toggle Support
+   ======================================== */
+[data-jamii-mode="focus"] {
+  --sidebar-width: 0px;
+  --content-padding: 1rem;
+}
+
+[data-jamii-mode="community"] {
+  --sidebar-width: 280px;
+  --content-padding: 2rem;
+}
+
+[data-jamii-mode="discovery"] {
+  --sidebar-width: 320px;
+  --content-padding: 3rem;
+}
+
+/* ========================================
+   🔥 Trending Floating Chip
+   ======================================== */
+.trending-chip {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #ff6b6b, var(--accent-color));
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(238, 90, 36, 0.4);
+  z-index: 900;
+  cursor: grab;
+  transition: transform 0.2s, box-shadow 0.2s;
+  user-select: none;
+}
+
+.trending-chip:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.trending-chip:hover {
+  box-shadow: 0 6px 25px rgba(238, 90, 36, 0.6);
+}
+
+/* ========================================
+   📱 Mobile-Specific Optimizations
+   ======================================== */
+@media (max-width: 767px) {
+  /* Hide desktop-only elements */
+  .desktop-only {
+    display: none !important;
+  }
+  
+  /* Optimize text for mobile readability */
+  body {
+    font-size: 16px; /* Prevents iOS zoom on input focus */
+  }
+  
+  /* Better spacing for mobile cards */
+  .post-card,
+  .card {
+    margin-bottom: var(--spacing-md);
+    border-radius: var(--radius-md);
+  }
+}
+
+/* ========================================
+   ♿ Accessibility Enhancements
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus indicators for keyboard navigation */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   🚀 Performance Optimizations
+   ======================================== */
+/* Lazy loading support */
+img[loading="lazy"] {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
 }

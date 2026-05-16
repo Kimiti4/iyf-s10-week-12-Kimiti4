@@ -1,0 +1,91 @@
+/* 🌙 Jamii Mode Toggle Styles */
+
+.jamii-mode-toggle {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.mode-toggle-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.toggle-icon {
+  font-size: 1.25rem;
+}
+
+.toggle-label {
+  font-size: 0.875rem;
+}
+
+.mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.mode-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  position: relative;
+  min-height: 44px; /* Touch-friendly */
+}
+
+.mode-option:hover {
+  background: var(--bg-secondary);
+  transform: translateX(4px);
+}
+
+.mode-option.active {
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(74, 144, 226, 0.05));
+  border-color: var(--primary-color);
+}
+
+.mode-icon {
+  font-size: 1.25rem;
+}
+
+.mode-text {
+  flex: 1;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.mode-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  animation: pulse-glow 2s infinite;
+}
+
+/* Mobile Optimization */
+@media (max-width: 767px) {
+  .jamii-mode-toggle {
+    padding: var(--spacing-sm);
+  }
+  
+  .mode-option {
+    padding: var(--spacing-sm);
+  }
+  
+  .mode-text {
+    font-size: 0.8125rem;
+  }
+}
