@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SearchBar from './SearchBar'
 import OrganizationSelector from './OrganizationSelector'
+import DarkModeToggle from './DarkModeToggle'
 import './NavBar.css'
 
 function NavBar() {
@@ -148,6 +149,9 @@ function NavBar() {
 
           {/* User Actions */}
           <div className="nav-group user-nav">
+            {/* Dark Mode Toggle */}
+            <DarkModeToggle />
+            
             {isAuthenticated ? (
               <>
                 <OrganizationSelector />

@@ -1,0 +1,101 @@
+/* 🌙 Dark Mode Toggle Styles */
+
+.dark-mode-toggle {
+  position: relative;
+  background: transparent;
+  border: 2px solid var(--zinc-300);
+  border-radius: var(--radius-full);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.dark-mode-toggle:hover {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.toggle-icon {
+  position: relative;
+  z-index: 2;
+  font-size: 1.25rem;
+  color: var(--zinc-700);
+  transition: color 0.3s ease;
+}
+
+.icon-sun {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+}
+
+.icon-moon {
+  color: var(--primary-600);
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+}
+
+/* Constellation Background Animation */
+.constellation-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.particle:nth-child(1) {
+  margin-left: -15px;
+  margin-top: -10px;
+}
+
+.particle:nth-child(2) {
+  margin-left: 10px;
+  margin-top: -15px;
+}
+
+.particle:nth-child(3) {
+  margin-left: 15px;
+  margin-top: 5px;
+}
+
+.particle:nth-child(4) {
+  margin-left: -10px;
+  margin-top: 15px;
+}
+
+.particle:nth-child(5) {
+  margin-left: 0px;
+  margin-top: 0px;
+}
+
+/* Dark mode active state */
+.dark-mode .dark-mode-toggle {
+  border-color: var(--primary-500);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .dark-mode-toggle {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .toggle-icon {
+    font-size: 1.125rem;
+  }
+}
