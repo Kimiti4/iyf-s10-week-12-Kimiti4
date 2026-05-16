@@ -11,7 +11,54 @@
   flex-direction: column;
   z-index: 1000;
   box-shadow: var(--shadow-md);
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Mobile: hide by default */
+  transform: translateX(-100%);
+}
+
+/* Desktop: always visible */
+@media (min-width: 1024px) {
+  .sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile: show when active */
+.sidebar.mobile-open {
+  transform: translateX(0);
+}
+
+/* Sidebar Overlay Backdrop */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  z-index: 999;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Main content should NOT shift on mobile */
+.main-content {
+  margin-left: 0 !important;
+  width: 100%;
+  transition: filter 0.3s;
+}
+
+/* Dim content when sidebar open on mobile */
+@media (max-width: 1023px) {
+  .sidebar.mobile-open ~ .main-content,
+  .sidebar.mobile-open ~ .navbar,
+  .sidebar.mobile-open ~ .footer {
+    filter: blur(2px) brightness(0.7);
+  }
 }
 
 /* Collapsed State */
