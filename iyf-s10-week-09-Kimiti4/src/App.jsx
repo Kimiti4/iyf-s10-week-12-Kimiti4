@@ -6,7 +6,10 @@ import { SidebarProvider, useSidebar } from './context/SidebarContext'
 import { ToastProvider } from './components/Toast'
 import ProtectedRoute from './components/ProtectedRoute'
 import FeedbackForm from './components/FeedbackForm'
+import TrendingChip from './components/TrendingChip'
+import JamiiModeToggle from './components/JamiiModeToggle'
 import './App.css'
+import './index.css' // Import mobile-first responsive styles
 import './styles/DesignSystem.css'
 import './styles/InstagramUI.css'
 import './styles/PageBackgrounds.css'
@@ -221,6 +224,15 @@ function App() {
               <NavBar />
               <MainLayout />
               <MobileBottomNav />
+              
+              {/* 🌙 Jamii Mode Toggle - Add to sidebar or as floating widget */}
+              <div className="jamii-mode-widget">
+                <JamiiModeToggle />
+              </div>
+              
+              {/* 🔥 Trending Floating Chip */}
+              <TrendingChip topic="#JamiiLink" count={42} />
+              
               <footer className="footer">
                 <div className="container">
                   <p>&copy; 2026 JamiiLink powered by <a href='https://github.com/Kimiti4'>Kimiti4</a></p>
