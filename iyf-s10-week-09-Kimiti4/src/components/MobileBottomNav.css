@@ -42,6 +42,31 @@
     color: var(--color-primary-600);
 }
 
+/* Enhanced active state with animated dot */
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--color-primary-500);
+    border-radius: var(--radius-full);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+    50% { 
+        opacity: 0.5;
+        transform: translateX(-50%) scale(1.2);
+    }
+}
+
 .nav-icon {
     font-size: var(--text-xl);
     display: flex;
