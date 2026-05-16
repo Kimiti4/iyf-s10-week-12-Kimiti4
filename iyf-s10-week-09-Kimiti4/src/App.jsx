@@ -212,6 +212,10 @@ function MainLayout() {
 
 function App() {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Close sidebar when clicking overlay
+  const closeSidebar = () => setSidebarOpen(false);
   
   return (
     <Router>
@@ -220,8 +224,14 @@ function App() {
           <SidebarProvider>
             <ToastProvider>
             <div className="App">
-              <Sidebar />
-              <NavBar />
+              {/* Sidebar Overlay Backdrop */}
+              <div 
+                className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
+                onClick={closeSidebar}
+              />
+              
+              <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+              <NavBar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
               <MainLayout />
               <MobileBottomNav />
               

@@ -10,6 +10,10 @@ export default defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true
       }
+    },
+    // Force HMR for CSS updates
+    hmr: {
+      overlay: true
     }
   },
   build: {
@@ -26,6 +30,13 @@ export default defineConfig({
           'socket-io': ['socket.io-client']
         }
       }
-    }
+    },
+    // Add timestamp to assets for cache busting
+    assetsDir: 'assets',
+    cssCodeSplit: true
+  },
+  // Clear cache on each dev restart
+  optimizeDeps: {
+    force: true
   }
 })

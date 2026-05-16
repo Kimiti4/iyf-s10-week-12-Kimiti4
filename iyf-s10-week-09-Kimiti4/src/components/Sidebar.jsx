@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useSidebar } from '../context/SidebarContext'
 import './Sidebar.css'
 
-function Sidebar() {
+function Sidebar({ isOpen = false, onClose = () => {} }) {
   const { user, isAuthenticated, logout } = useAuth()
   const location = useLocation()
   const { isCollapsed, setIsCollapsed } = useSidebar()
@@ -13,7 +13,7 @@ function Sidebar() {
   if (!isAuthenticated) return null
 
   return (
-    <aside className={`sidebar ${isCollapsed ? 'collapsed' : 'expanded'}`}>
+    <aside className={`sidebar ${isCollapsed ? 'collapsed' : 'expanded'} ${isOpen ? 'mobile-open' : ''}`}>
       {/* Collapse Toggle Button */}
       <button 
         className="sidebar-collapse-btn" 
