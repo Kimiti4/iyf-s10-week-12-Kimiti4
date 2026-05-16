@@ -1218,3 +1218,34 @@ select:focus {
     font-size: 1.5rem;
   }
 }
+
+/* ========================================
+   🌙 Jamii Mode Widget Positioning
+   ======================================== */
+.jamii-mode-widget {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  z-index: 800;
+  max-width: 280px;
+  opacity: 0.95;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.jamii-mode-widget:hover {
+  opacity: 1;
+}
+
+/* Hide on mobile by default, show on desktop */
+@media (max-width: 1023px) {
+  .jamii-mode-widget {
+    display: none;
+  }
+}
+
+/* Show in sidebar on desktop */
+@media (min-width: 1024px) {
+  .jamii-mode-widget {
+    display: block;
+  }
+}
