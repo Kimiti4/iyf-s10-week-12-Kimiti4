@@ -5,6 +5,6 @@
     "buildPath": "iyf-s10-week-11-Kimiti4"
   },
   "deploy": {
-    "startCommand": "cd iyf-s10-week-11-Kimiti4 && node server.js"
+    "startCommand": "node server.js"
   }
 }
