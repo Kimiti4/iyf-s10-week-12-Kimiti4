@@ -15,6 +15,12 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // Connect to PostgreSQL first, then start server
 const startServer = async () => {
   try {
+    console.log('🔧 Starting Jamii Link KE API...');
+    console.log(`📍 Working directory: ${process.cwd()}`);
+    console.log(`🌍 NODE_ENV: ${NODE_ENV}`);
+    console.log(`🔑 PORT: ${PORT}`);
+    console.log(`💾 DATABASE_URL: ${process.env.DATABASE_URL ? 'Set' : 'NOT SET'}`);
+    
     await connectDB();
     console.log('✅ Database connected successfully\n');
     
@@ -43,6 +49,12 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);
+    console.error('Stack trace:', error.stack);
+    console.error('\n💡 Common issues:');
+    console.error('   1. DATABASE_URL not set in Railway environment variables');
+    console.error('   2. PostgreSQL service not connected to this service');
+    console.error('   3. Invalid connection string format');
+    console.error('   4. Database service is down or unreachable');
     process.exit(1);
   }
 };
