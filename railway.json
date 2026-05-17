@@ -1,11 +1,10 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "RAILPACK",
-    "buildPath": "iyf-s10-week-11-Kimiti4",
-    "installCommand": "cd iyf-s10-week-11-Kimiti4 && npm install"
+    "builder": "NIXPACKS",
+    "buildPath": "iyf-s10-week-11-Kimiti4"
   },
   "deploy": {
-    "startCommand": "cd /app/iyf-s10-week-11-Kimiti4 && node server.js"
+    "startCommand": "node server.js"
   }
 }
