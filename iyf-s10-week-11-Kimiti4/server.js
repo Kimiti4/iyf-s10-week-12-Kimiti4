@@ -35,7 +35,7 @@ const startServer = async () => {
     initializeSocketIO(server);
     console.log('🔌 Realtime system ready\n');
     
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Jamii Link KE API running in ${NODE_ENV} mode`);
       console.log(`🌐 Server: http://localhost:${PORT}`);
       console.log(`📊 Health: http://localhost:${PORT}/api/health`);
