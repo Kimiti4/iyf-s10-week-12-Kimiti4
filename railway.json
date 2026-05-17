@@ -5,6 +5,6 @@
     "buildPath": "iyf-s10-week-11-Kimiti4"
   },
   "deploy": {
-    "startCommand": "node /app/iyf-s10-week-11-Kimiti4/server.js"
+    "startCommand": "bash start.sh"
   }
 }
