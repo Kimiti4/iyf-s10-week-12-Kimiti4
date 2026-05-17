@@ -16,7 +16,7 @@ const {
   verifyAlert,
   getAlertStats
 } = require('../controllers/alertsController');
-const { protect } = require('../middleware/requireAuth');
+const requireAuth = require('../middleware/requireAuth');
 
 // Public routes
 router.get('/', getAlerts);
@@ -24,15 +24,15 @@ router.get('/stats', getAlertStats);
 router.get('/:id', getAlertById);
 
 // Protected routes (require authentication)
-router.post('/', protect, createAlert);
-router.put('/:id', protect, updateAlert);
-router.delete('/:id', protect, deleteAlert);
+router.post('/', requireAuth, createAlert);
+router.put('/:id', requireAuth, updateAlert);
+router.delete('/:id', requireAuth, deleteAlert);
 
 // Community confirmation routes
-router.post('/:id/confirm', protect, confirmAlert);
-router.delete('/:id/confirm', protect, unconfirmAlert);
+router.post('/:id/confirm', requireAuth, confirmAlert);
+router.delete('/:id/confirm', requireAuth, unconfirmAlert);
 
 // Admin/Moderator verification route
-router.put('/:id/verify', protect, verifyAlert);
+router.put('/:id/verify', requireAuth, verifyAlert);
 
 module.exports = router;
