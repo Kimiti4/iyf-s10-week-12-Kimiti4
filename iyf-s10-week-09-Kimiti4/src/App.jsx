@@ -9,6 +9,7 @@ import FeedbackForm from './components/FeedbackForm'
 import TrendingChip from './components/TrendingChip'
 import JamiiModeToggle from './components/JamiiModeToggle'
 import PullToRefreshIndicator from './components/PullToRefresh'
+import ConstellationBackground from './enhanced/components/ConstellationBackground'
 import { usePullToRefresh } from './hooks/usePullToRefresh'
 import { useSwipeGestures } from './hooks/useSwipeGestures'
 import './App.css'
@@ -239,6 +240,9 @@ function App() {
           <SidebarProvider>
             <ToastProvider>
             <div className="App">
+              {/* 🔹 Constellation Background */}
+              <ConstellationBackground />
+              
               {/* Pull to Refresh Indicator */}
               <PullToRefreshIndicator isRefreshing={isRefreshing} progress={progress} />
               

@@ -242,7 +242,8 @@
 }
 
 .primary-nav .nav-item:nth-child(2) .nav-icon::before {
-  content: '🛒';
+  content: '\\e800'; /* Shopping cart icon using Unicode */
+  font-family: 'FontAwesome';
 }
 
 .primary-nav .nav-item:nth-child(3) .nav-icon::before {
@@ -254,14 +255,15 @@
 }
 
 .feature-nav .nav-item:nth-child(2) .nav-icon::before {
-  content: '🚨';
+  content: '\\e801'; /* Alert bell icon */
+  font-family: 'FontAwesome';
 }
 
 .nav-text {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white !important; /* Force white text on mobile menu */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Chat Icon with Badge */
@@ -270,18 +272,21 @@
 }
 
 .chat-icon::before {
-  content: '💬';
+  content: '\\e802'; /* Chat bubble */
+  font-family: 'FontAwesome';
   font-size: 1.4rem;
   animation: chatBounce 2s ease-in-out infinite;
 }
 
 .activity-icon::before {
-  content: '📊';
+  content: '\\e803'; /* Activity chart */
+  font-family: 'FontAwesome';
   font-size: 1.3rem;
 }
 
 .creator-icon::before {
-  content: '🎨';
+  content: '\\e804'; /* Creator palette */
+  font-family: 'FontAwesome';
   font-size: 1.3rem;
   animation: creatorPulse 2s ease-in-out infinite;
 }
@@ -292,7 +297,8 @@
 }
 
 .reputation-icon::before {
-  content: '🏆';
+  content: '\\e805'; /* Trophy */
+  font-family: 'FontAwesome';
   font-size: 1.3rem;
   animation: trophyShine 2.5s ease-in-out infinite;
 }
@@ -309,7 +315,8 @@
 }
 
 .governance-icon::before {
-  content: '🗳️';
+  content: '\\e806'; /* Governance ballot */
+  font-family: 'FontAwesome';
   font-size: 1.3rem;
   animation: ballotBox 2s ease-in-out infinite;
 }
@@ -320,7 +327,8 @@
 }
 
 .quests-icon::before {
-  content: '🎯';
+  content: '\\e807'; /* Quest target */
+  font-family: 'FontAwesome';
   font-size: 1.3rem;
   animation: targetPulse 2s ease-in-out infinite;
 }
@@ -684,11 +692,14 @@
 
   .nav-item {
     display: flex !important;
+    align-items: center;
+    gap: 0.75rem;
     width: 100%;
     padding: 1rem;
     justify-content: flex-start;
     font-size: 1.1rem;
     border-radius: 12px;
+    color: white !important; /* Force white text */
   }
 
   .nav-item:hover {
