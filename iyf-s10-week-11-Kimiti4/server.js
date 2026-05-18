@@ -42,16 +42,37 @@ const startServer = async () => {
     }
     
     server.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Jamii Link KE API running in ${NODE_ENV} mode`);
-      console.log(`🌐 Server: http://localhost:${PORT}`);
-      console.log(`📊 Health: http://localhost:${PORT}/api/health`);
-      console.log(`🏢 Organizations: http://localhost:${PORT}/api/organizations`);
-      console.log(` Posts: http://localhost:${PORT}/api/posts`);
-      console.log(`👥 Users: http://localhost:${PORT}/api/users`);
-      console.log(`🌾 Farm Prices: http://localhost:${PORT}/api/market/prices`);
-      console.log(`🚨 Alerts: http://localhost:${PORT}/api/alerts`);
-      console.log(`💡 Tip: Use category=mtaani|skill|farm|gig to filter posts`);
-      console.log(`🔑 Create org: POST /api/organizations with auth token`);
+      console.log('='.repeat(60));
+      console.log(' Jamii Link KE API running in ${NODE_ENV} mode');
+      console.log(' Server listening on 0.0.0.0:${PORT}');
+      console.log(' Railway can now route to this service');
+      console.log(' Health endpoint: http://0.0.0.0:${PORT}/api/health');
+      console.log('='.repeat(60));
+      console.log(' Organizations: http://0.0.0.0:${PORT}/api/organizations');
+      console.log(' Posts: http://0.0.0.0:${PORT}/api/posts');
+      console.log(' Users: http://0.0.0.0:${PORT}/api/users');
+      console.log(' Farm Prices: http://0.0.0.0:${PORT}/api/market/prices');
+      console.log('🚨 Alerts: http://0.0.0.0:${PORT}/api/alerts');
+      console.log('='.repeat(60));
+      console.log('💡 Tip: Use category=mtaani|skill|farm|gig to filter posts');
+      console.log('🔑 Create org: POST /api/organizations with auth token');
+      console.log('='.repeat(60));
+      console.log('✅ SERVER IS READY - Railway should be able to connect!\n');
+    });
+
+    // Handle server errors (critical for debugging)
+    server.on('error', (error) => {
+      console.error('❌ SERVER ERROR:', error.message);
+      console.error('Error code:', error.code);
+      console.error('Error address:', error.address);
+      console.error('Error port:', error.port);
+      console.error('Full error:', JSON.stringify(error, null, 2));
+    });
+
+    // Verify server is actually listening
+    server.on('listening', () => {
+      const addr = server.address();
+      console.log('✅ Server confirmed listening on:', addr);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);
