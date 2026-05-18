@@ -54,10 +54,17 @@ const query = async (text, params) => {
   try {
     const result = await pool.query(text, params);
     const duration = Date.now() - start;
-    console.log('Executed query', { text, duration, rows: result.rowCount });
+    
+    // Only log query details in development, or log summary in production
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Executed query', { text, duration, rows: result.rowCount });
+    } else {
+      console.log(`✅ Query executed in ${duration}ms (rows: ${result.rowCount})`);
+    }
+    
     return result;
   } catch (error) {
-    console.error('Query error:', error);
+    console.error('❌ Query error:', error.message);
     throw error;
   }
 };

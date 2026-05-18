@@ -228,8 +228,7 @@ const createTables = async () => {
     `);
 
     // Create indexes for performance
-    console.log('📊 Creating indexes...');
-    
+    console.log(' Creating indexes...');
     await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)`);
     
@@ -283,8 +282,10 @@ const createTables = async () => {
     await query(`CREATE INDEX IF NOT EXISTS idx_mfa_user ON mfa_methods(user_id)`);
 
     console.log('✅ All tables and indexes created successfully!');
+    return true;
   } catch (error) {
-    console.error('❌ Error creating tables:', error);
+    console.error('❌ Error creating tables:', error.message);
+    console.error('Stack trace:', error.stack);
     throw error;
   }
 };

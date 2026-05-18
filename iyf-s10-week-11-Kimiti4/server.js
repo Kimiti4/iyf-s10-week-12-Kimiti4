@@ -30,10 +30,16 @@ const startServer = async () => {
     
     // Create HTTP server
     const server = http.createServer(app);
+    console.log('✅ HTTP server created\n');
     
     // Initialize Socket.IO for realtime features
-    initializeSocketIO(server);
-    console.log('🔌 Realtime system ready\n');
+    try {
+      initializeSocketIO(server);
+      console.log('🔌 Realtime system ready\n');
+    } catch (error) {
+      console.error('⚠️  Socket.IO initialization failed (non-critical):', error.message);
+      console.error('   Server will continue without realtime features\n');
+    }
     
     server.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Jamii Link KE API running in ${NODE_ENV} mode`);
