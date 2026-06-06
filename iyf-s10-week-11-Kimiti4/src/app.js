@@ -1,18 +1,24 @@
 /**
  * 🔹 Express App Configuration
- * Centralized middleware and routing
+ * Centralized middleware and routing with security hardening
  */
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const logger = require('./middleware/logger');
 const { errorHandler } = require('./middleware/errorHandler');
+const securityHeaders = require('./middleware/securityHeaders');
+const { generalLimiter, authLimiter, alertLimiter } = require('./middleware/rateLimiter');
 const routes = require('./routes');
 
 const app = express();
 
 // Trust proxy for deployment
 app.set('trust proxy', 1);
+
+// Middleware - Order matters!
+// Security headers should be early
+app.use(securityHeaders);
 
 // Middleware
 // CORS configuration for full-stack deployment
@@ -40,15 +46,30 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(logger);
+
+// Rate limiting - Apply to main routes
+app.use('/api/', generalLimiter);
+app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/login', authLimiter);
+app.use('/api/alerts', alertLimiter);
 
 // 🌐 Serve static frontend files from /public
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // API Routes
 app.use('/api', routes);
+
+// Health check endpoint (not rate limited)
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 // SPA Fallback: Send index.html for any non-API routes
 // (Allows frontend routing without 404 on refresh)
@@ -60,3 +81,4 @@ app.get('*', (req, res) => {
 app.use(errorHandler);
 
 module.exports = app;
+

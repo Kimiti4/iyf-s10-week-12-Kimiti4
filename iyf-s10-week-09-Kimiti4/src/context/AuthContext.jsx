@@ -1,7 +1,7 @@
 /**
  * 🔹 Authentication Context
  * Manages user authentication state across the application
- * Provides login, register, logout functionality
+ * Provides login, register, logout, password change functionality
  */
 
 import { createContext, useContext, useState, useEffect } from 'react';
@@ -46,6 +46,32 @@ export function AuthProvider({ children }) {
         
         initializeAuth();
     }, []);
+
+    // Listen for auth events from other tabs/windows
+    useEffect(() => {
+        const handleStorageChange = (e) => {
+            if (e.key === 'token') {
+                if (!e.newValue) {
+                    // Token was removed in another tab
+                    setUser(null);
+                    navigate('/login');
+                }
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        
+        // Also listen for custom logout event
+        window.addEventListener('auth:logout', () => {
+            setUser(null);
+            setError(null);
+        });
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('auth:logout', () => {});
+        };
+    }, [navigate]);
     
     /**
      * Login user with email and password
@@ -107,14 +133,63 @@ export function AuthProvider({ children }) {
     };
     
     /**
-     * Logout user
+     * Logout user with proper cleanup
      */
-    const logout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-        setError(null);
-        navigate('/login');
+    const logout = async () => {
+        try {
+            setLoading(true);
+            
+            // Call logout endpoint (backend can do cleanup if needed)
+            try {
+                await authAPI.logout();
+            } catch (err) {
+                logger.auth('logout_api_error', err.message);
+                // Continue with client-side logout even if API fails
+            }
+            
+            // Clear all stored data
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('preferences');
+            
+            // Clear state
+            setUser(null);
+            setError(null);
+            
+            // Dispatch logout event
+            window.dispatchEvent(new CustomEvent('auth:logout'));
+            
+            // Navigate to login
+            navigate('/login', { replace: true });
+            
+            logger.auth('logout_success', 'User logged out');
+        } catch (err) {
+            logger.auth('logout_error', err.message);
+            setError('Logout failed, but clearing local data');
+            // Force local logout anyway
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setUser(null);
+            navigate('/login', { replace: true });
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    /**
+     * Change user password
+     */
+    const changePassword = async (passwordData) => {
+        try {
+            setError(null);
+            const response = await authAPI.changePassword(passwordData);
+            logger.auth('password_changed', 'Password changed successfully');
+            return response;
+        } catch (err) {
+            logger.auth('password_change_error', err.message);
+            setError(err.message || 'Password change failed');
+            throw err;
+        }
     };
     
     /**
@@ -150,6 +225,7 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
+        changePassword,
         updateProfile,
         clearError
     };

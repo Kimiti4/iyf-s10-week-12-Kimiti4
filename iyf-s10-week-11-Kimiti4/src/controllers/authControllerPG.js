@@ -1,6 +1,6 @@
 /**
  * 🔹 Authentication Controller - PostgreSQL Version
- * Register, login, get current user
+ * Register, login, get current user, logout
  */
 const { UserRepository } = require('../database');
 const jwt = require('jsonwebtoken');
@@ -18,7 +18,7 @@ const generateToken = (userId) => {
 };
 
 /**
- * Register new user
+ * Register new user with enhanced validation
  */
 const register = asyncHandler(async (req, res) => {
   const { username, email, password, profile } = req.body;
@@ -30,15 +30,39 @@ const register = asyncHandler(async (req, res) => {
       error: 'Username, email, and password are required'
     });
   }
+
+  // Validate password strength
+  if (password.length < 6) {
+    return res.status(400).json({
+      success: false,
+      error: 'Password must be at least 6 characters long'
+    });
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Please provide a valid email address'
+    });
+  }
   
   // Check for existing user
   const existingByEmail = await UserRepository.findByEmail(email.toLowerCase());
   const existingByUsername = await UserRepository.findByUsername(username.trim());
   
-  if (existingByEmail || existingByUsername) {
+  if (existingByEmail) {
     return res.status(400).json({
       success: false,
-      error: 'User with this email or username already exists'
+      error: 'Email is already registered'
+    });
+  }
+
+  if (existingByUsername) {
+    return res.status(400).json({
+      success: false,
+      error: 'Username is already taken'
     });
   }
   
@@ -70,7 +94,7 @@ const register = asyncHandler(async (req, res) => {
 });
 
 /**
- * Login user
+ * Login user with enhanced security
  */
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -129,6 +153,16 @@ const login = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Logout user (token is invalidated on client side)
+ */
+const logout = asyncHandler(async (req, res) => {
+  res.json({
+    success: true,
+    message: 'Logout successful. Token has been invalidated on client side.'
+  });
+});
+
+/**
  * Get current user profile
  */
 const getMe = asyncHandler(async (req, res) => {
@@ -179,4 +213,69 @@ const updateProfile = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { register, login, getMe, updateProfile };
+/**
+ * Change password
+ */
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  // Validate input
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({
+      success: false,
+      error: 'Please provide current password and new password'
+    });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({
+      success: false,
+      error: 'New passwords do not match'
+    });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({
+      success: false,
+      error: 'New password must be at least 6 characters long'
+    });
+  }
+
+  // Get user with password
+  const { query } = require('../config/postgres');
+  const result = await query('SELECT * FROM users WHERE id = $1', [req.user.id]);
+  const user = result.rows[0];
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: 'User not found'
+    });
+  }
+
+  // Verify current password
+  const isMatch = await UserRepository.comparePassword(user, currentPassword);
+
+  if (!isMatch) {
+    return res.status(401).json({
+      success: false,
+      error: 'Current password is incorrect'
+    });
+  }
+
+  // Update password (UserRepository handles hashing)
+  const bcryptjs = require('bcryptjs');
+  const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+  const updateResult = await query(
+    'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2 RETURNING id, username, email',
+    [hashedPassword, req.user.id]
+  );
+
+  res.json({
+    success: true,
+    message: 'Password changed successfully'
+  });
+});
+
+module.exports = { register, login, logout, getMe, updateProfile, changePassword };

@@ -39,7 +39,9 @@ const VERIFICATION_LEVELS = [
 export default function AlertFeedPage() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
   const [filters, setFilters] = useState({
     category: 'all',
     verificationLevel: 'all',
@@ -52,6 +54,7 @@ export default function AlertFeedPage() {
   const fetchAlerts = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const params = {};
       
       if (filters.category !== 'all') {
@@ -67,9 +70,10 @@ export default function AlertFeedPage() {
       }
 
       const response = await alertsAPI.getAll(params);
-      setAlerts(response.data.data || []);
+      setAlerts(response.data || []);
     } catch (error) {
       console.error('Error fetching alerts:', error);
+      setError('Failed to load alerts. Please try again.');
       toast.error('Failed to load alerts');
     } finally {
       setLoading(false);
@@ -78,40 +82,74 @@ export default function AlertFeedPage() {
 
   // Initialize Socket.IO and fetch alerts
   useEffect(() => {
-    // Initialize socket connection
-    const socket = initializeSocket();
+    try {
+      // Initialize socket connection
+      const socket = initializeSocket();
+      
+      // Set connection status
+      if (socket.connected) {
+        setSocketConnected(true);
+      }
 
-    // Listen for realtime updates
-    const cleanupNewAlert = onNewAlert((newAlert) => {
-      console.log('🔔 New alert received:', newAlert);
-      setAlerts(prev => [newAlert, ...prev]);
-      toast.info(`New ${newAlert.category.replace('_', ' ')} alert!`);
-    });
+      // Listen for connection events
+      socket.on('connect', () => {
+        setSocketConnected(true);
+        console.log('✅ Connected to real-time alerts');
+      });
 
-    const cleanupUpdate = onAlertUpdate((updatedAlert) => {
-      console.log('🔄 Alert updated:', updatedAlert);
-      setAlerts(prev => 
-        prev.map(alert => 
-          alert._id === updatedAlert._id ? updatedAlert : alert
-        )
-      );
-    });
+      socket.on('disconnect', () => {
+        setSocketConnected(false);
+        console.log('❌ Disconnected from real-time alerts');
+      });
 
-    const cleanupDelete = onAlertDelete(({ alertId }) => {
-      console.log('🗑️ Alert deleted:', alertId);
-      setAlerts(prev => prev.filter(alert => alert._id !== alertId));
-    });
+      // Listen for realtime updates
+      const cleanupNewAlert = onNewAlert((newAlert) => {
+        console.log('🔔 New alert received:', newAlert);
+        setAlerts(prev => {
+          // Avoid duplicates
+          const exists = prev.some(a => a._id === newAlert._id || a.id === newAlert.id);
+          if (exists) return prev;
+          return [newAlert.data || newAlert, ...prev];
+        });
+        toast.info(`New ${(newAlert.category || 'alert').replace('_', ' ')} alert!`);
+      });
 
-    // Initial fetch
-    fetchAlerts();
+      const cleanupUpdate = onAlertUpdate((updatedAlert) => {
+        console.log('🔄 Alert updated:', updatedAlert);
+        setAlerts(prev => 
+          prev.map(alert => {
+            const alertData = updatedAlert.data || updatedAlert;
+            if (alert._id === alertData._id || alert.id === alertData.id) {
+              return alertData;
+            }
+            return alert;
+          })
+        );
+      });
 
-    // Cleanup on unmount
-    return () => {
-      cleanupNewAlert();
-      cleanupUpdate();
-      cleanupDelete();
-      disconnectSocket();
-    };
+      const cleanupDelete = onAlertDelete(({ alertId }) => {
+        console.log('🗑️ Alert deleted:', alertId);
+        setAlerts(prev => prev.filter(alert => alert._id !== alertId && alert.id !== alertId));
+      });
+
+      // Initial fetch
+      fetchAlerts();
+
+      // Cleanup on unmount
+      return () => {
+        cleanupNewAlert();
+        cleanupUpdate();
+        cleanupDelete();
+        socket.off('connect');
+        socket.off('disconnect');
+        disconnectSocket();
+      };
+    } catch (err) {
+      console.error('Socket.IO initialization error:', err);
+      setError('Real-time updates unavailable. Alerts will load normally.');
+      // Still fetch alerts even if socket fails
+      fetchAlerts();
+    }
   }, [fetchAlerts, toast]);
 
   // Handle creating a new alert
@@ -127,7 +165,7 @@ export default function AlertFeedPage() {
       }
     } catch (error) {
       console.error('Error creating alert:', error);
-      toast.error(error.response?.data?.message || 'Failed to create alert');
+      toast.error(error.response?.data?.error || 'Failed to create alert');
       throw error;
     }
   };
@@ -155,6 +193,7 @@ export default function AlertFeedPage() {
         <div className="header-content">
           <h1>Community Alerts</h1>
           <p>Stay informed with verified community alerts</p>
+          {socketConnected && <span className="socket-status">🟢 Live</span>}
         </div>
         <motion.button
           className="btn-create-alert"
@@ -165,6 +204,17 @@ export default function AlertFeedPage() {
           {showCreateForm ? 'Cancel' : '+ Create Alert'}
         </motion.button>
       </div>
+
+      {/* Error state */}
+      {error && (
+        <motion.div
+          className="error-banner"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {error}
+        </motion.div>
+      )}
 
       {/* Create Alert Form */}
       <AnimatePresence>
@@ -247,7 +297,7 @@ export default function AlertFeedPage() {
           <AnimatePresence>
             {alerts.map((alert) => (
               <motion.div
-                key={alert._id}
+                key={alert._id || alert.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -255,7 +305,7 @@ export default function AlertFeedPage() {
               >
                 <AlertCard
                   alert={alert}
-                  onConfirm={() => handleConfirmAlert(alert._id)}
+                  onConfirm={() => handleConfirmAlert(alert._id || alert.id)}
                 />
               </motion.div>
             ))}

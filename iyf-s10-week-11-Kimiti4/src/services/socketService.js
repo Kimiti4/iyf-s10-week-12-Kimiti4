@@ -14,17 +14,26 @@ let io = null;
 function initializeSocketIO(httpServer) {
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+      origin: process.env.FRONTEND_URL || [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://localhost:5174'
+      ],
       methods: ['GET', 'POST'],
       credentials: true
     },
     pingTimeout: 60000,
-    pingInterval: 25000
+    pingInterval: 25000,
+    transports: ['websocket', 'polling']
   });
 
   // Connection handler
   io.on('connection', (socket) => {
     console.log(`✅ Client connected: ${socket.id}`);
+    
+    // Auto-join global alert room on connection
+    socket.join('global');
+    socket.join('alerts');
 
     // Join organization/room
     socket.on('join-room', (roomId) => {
