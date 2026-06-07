@@ -5,42 +5,38 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  FaCheckCircle, 
-  FaExclamationTriangle, 
-  FaShieldAlt, 
-  FaUsers,
-  FaMapMarkerAlt,
-  FaClock,
-  FaThumbsUp,
-  FaShare,
-  FaFlag
-} from 'react-icons/fa';
+import {
+  VerifiedIcon,
+  AlertIcon,
+  TrafficIcon,
+  CommunityIcon,
+  LoadingIcon
+} from './SVGIcons';
 import './AlertCard.css';
 
 // Verification level configurations
 const VERIFICATION_CONFIG = {
   unverified: {
     label: 'Unverified',
-    icon: <FaExclamationTriangle />,
+    icon: <AlertIcon size={16} />,
     color: '#9ca3af',
     bgColor: '#f3f4f6'
   },
   community_verified: {
     label: 'Community Verified',
-    icon: <FaUsers />,
+    icon: <CommunityIcon size={16} />,
     color: '#10b981',
     bgColor: '#d1fae5'
   },
   mod_verified: {
     label: 'Moderator Verified',
-    icon: <FaShieldAlt />,
+    icon: <TrafficIcon size={16} />,
     color: '#3b82f6',
     bgColor: '#dbeafe'
   },
   official: {
     label: 'Official',
-    icon: <FaCheckCircle />,
+    icon: <VerifiedIcon size={16} />,
     color: '#8b5cf6',
     bgColor: '#ede9fe'
   }
@@ -48,10 +44,10 @@ const VERIFICATION_CONFIG = {
 
 // Severity configurations
 const SEVERITY_CONFIG = {
-  info: { color: '#3b82f6', label: 'Info' },
-  warning: { color: '#f59e0b', label: 'Warning' },
-  critical: { color: '#ef4444', label: 'Critical' },
-  official: { color: '#8b5cf6', label: 'Official' }
+  info: { color: '#3b82f6', label: 'Info', icon: <AlertIcon size={16} /> },
+  warning: { color: '#f59e0b', label: 'Warning', icon: <AlertIcon size={16} /> },
+  critical: { color: '#ef4444', label: 'Critical', icon: <AlertIcon size={16} /> },
+  official: { color: '#8b5cf6', label: 'Official', icon: <VerifiedIcon size={16} /> }
 };
 
 export default function AlertCard({ alert, onConfirm, currentUser }) {
@@ -126,7 +122,7 @@ export default function AlertCard({ alert, onConfirm, currentUser }) {
         </div>
         
         <div className="alert-timestamp">
-          <FaClock />
+          <LoadingIcon size={14} />
           <span>{formatDate(alert.createdAt)}</span>
         </div>
       </div>
@@ -140,7 +136,7 @@ export default function AlertCard({ alert, onConfirm, currentUser }) {
       {/* Location (if available) */}
       {alert.location?.address && (
         <div className="alert-location">
-          <FaMapMarkerAlt />
+          <TrafficIcon size={16} />
           <span>{alert.location.address}</span>
         </div>
       )}
@@ -158,7 +154,7 @@ export default function AlertCard({ alert, onConfirm, currentUser }) {
       <div className="alert-footer">
         <div className="alert-stats">
           <div className="stat-item">
-            <FaThumbsUp />
+            <CommunityIcon size={16} />
             <span>{confirmationCount} confirmations</span>
           </div>
           <div className="stat-item">
@@ -172,17 +168,17 @@ export default function AlertCard({ alert, onConfirm, currentUser }) {
             onClick={handleConfirm}
             disabled={!currentUser}
           >
-            <FaThumbsUp />
+            <CommunityIcon size={16} />
             <span>{confirmed ? 'Confirmed' : 'Confirm'}</span>
           </button>
           
           <button className="action-btn share-btn">
-            <FaShare />
+            <AlertIcon size={16} />
             <span>Share</span>
           </button>
           
           <button className="action-btn report-btn">
-            <FaFlag />
+            <AlertIcon size={16} />
             <span>Report</span>
           </button>
         </div>

@@ -1,5 +1,5 @@
 /**
- * 🔹 Alert Feed Page
+ * Alert Feed Page
  * Displays all community alerts with filtering and realtime updates
  */
 
@@ -10,6 +10,7 @@ import AlertCard from '../components/AlertCard';
 import CreateAlertForm from '../components/CreateAlertForm';
 import { initializeSocket, onNewAlert, onAlertUpdate, onAlertDelete, disconnectSocket } from '../services/socketClient';
 import api, { alertsAPI } from '../services/api';
+import { AlertIcon, VerifiedIcon, LoadingIcon } from '../components/SVGIcons';
 import './AlertFeedPage.css';
 
 // Alert categories for filter
@@ -94,17 +95,17 @@ export default function AlertFeedPage() {
       // Listen for connection events
       socket.on('connect', () => {
         setSocketConnected(true);
-        console.log('✅ Connected to real-time alerts');
+        console.log('Connected to real-time alerts');
       });
 
       socket.on('disconnect', () => {
         setSocketConnected(false);
-        console.log('❌ Disconnected from real-time alerts');
+        console.log('Disconnected from real-time alerts');
       });
 
       // Listen for realtime updates
       const cleanupNewAlert = onNewAlert((newAlert) => {
-        console.log('🔔 New alert received:', newAlert);
+        console.log('New alert received:', newAlert);
         setAlerts(prev => {
           // Avoid duplicates
           const exists = prev.some(a => a._id === newAlert._id || a.id === newAlert.id);
@@ -115,7 +116,7 @@ export default function AlertFeedPage() {
       });
 
       const cleanupUpdate = onAlertUpdate((updatedAlert) => {
-        console.log('🔄 Alert updated:', updatedAlert);
+        console.log('Alert updated:', updatedAlert);
         setAlerts(prev => 
           prev.map(alert => {
             const alertData = updatedAlert.data || updatedAlert;
@@ -128,7 +129,7 @@ export default function AlertFeedPage() {
       });
 
       const cleanupDelete = onAlertDelete(({ alertId }) => {
-        console.log('🗑️ Alert deleted:', alertId);
+        console.log('Alert deleted:', alertId);
         setAlerts(prev => prev.filter(alert => alert._id !== alertId && alert.id !== alertId));
       });
 
@@ -193,7 +194,12 @@ export default function AlertFeedPage() {
         <div className="header-content">
           <h1>Community Alerts</h1>
           <p>Stay informed with verified community alerts</p>
-          {socketConnected && <span className="socket-status">🟢 Live</span>}
+          {socketConnected && (
+            <div className="socket-status">
+              <LoadingIcon size={16} />
+              <span>Live</span>
+            </div>
+          )}
         </div>
         <motion.button
           className="btn-create-alert"
