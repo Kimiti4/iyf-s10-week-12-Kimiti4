@@ -1,20 +1,19 @@
 /**
- * 🎯 Collaborative Quests System
- * Features: Team Missions, Community Challenges, Cooperative Rewards
+ * 🎪 Collaborative Quests - Adventure Awaits!
  */
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import './CollaborativeQuests.css';
+import { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { motion, AnimatePresence } from 'framer-motion'
+import { colors } from '../styles/designSystem'
+import './CollaborativeQuests.css'
 
 const CollaborativeQuests = () => {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('active');
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth()
+  const [activeTab, setActiveTab] = useState('active')
+  const [loading, setLoading] = useState(true)
 
-  // Mock quests data - Replace with actual API calls
-  const [questsData, setQuestsData] = useState({
+  const questsData = {
     activeQuests: [
       {
         id: 1,
@@ -45,26 +44,11 @@ const CollaborativeQuests = () => {
         deadline: Date.now() + 86400000 * 15,
         team: ['You', 'Sarah M.', 'Mike C.', '+29 others'],
         status: 'in-progress'
-      },
-      {
-        id: 3,
-        title: 'Event Extravaganza',
-        description: 'Host 20 community events in one week',
-        icon: '🎪',
-        category: 'Events',
-        participants: 18,
-        targetParticipants: 25,
-        progress: 12,
-        targetProgress: 20,
-        reward: 'Event Champion Badge + 1000 Reputation Points',
-        deadline: Date.now() + 86400000 * 3,
-        team: ['You', 'Lisa P.', 'David K.', '+15 others'],
-        status: 'in-progress'
       }
     ],
     completedQuests: [
       {
-        id: 4,
+        id: 3,
         title: 'Welcome Committee',
         description: 'Welcome 500 new members to the community',
         icon: '👋',
@@ -75,117 +59,89 @@ const CollaborativeQuests = () => {
         reward: 'Welcoming Spirit Badge + 300 Reputation Points',
         completedDate: Date.now() - 86400000 * 5,
         yourContribution: 'Welcomed 23 members'
-      },
-      {
-        id: 5,
-        title: 'Content Creation Sprint',
-        description: 'Publish 100 quality posts in 48 hours',
-        icon: '✍️',
-        category: 'Content',
-        participants: 42,
-        progress: 100,
-        targetProgress: 100,
-        reward: 'Content Creator Badge + 400 Reputation Points',
-        completedDate: Date.now() - 86400000 * 12,
-        yourContribution: 'Published 8 posts'
       }
     ],
     upcomingQuests: [
       {
-        id: 6,
-        title: 'Global Outreach Challenge',
-        description: 'Connect with members from 50 different countries',
-        icon: '🌍',
-        category: 'Networking',
-        startDate: Date.now() + 86400000 * 7,
-        estimatedDuration: '2 weeks',
-        previewReward: 'Global Connector Badge + 600 Reputation Points'
-      },
-      {
-        id: 7,
+        id: 4,
         title: 'Innovation Hackathon',
         description: 'Build 10 new features or tools for the community',
         icon: '💡',
         category: 'Development',
-        startDate: Date.now() + 86400000 * 14,
+        startDate: Date.now() + 86400000 * 7,
         estimatedDuration: '1 week',
         previewReward: 'Innovator Badge + 800 Reputation Points'
       }
     ]
-  });
+  }
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 500);
-  }, []);
+    setTimeout(() => setLoading(false), 500)
+  }, [])
 
   const formatDate = (timestamp) => {
-    const diff = timestamp - Date.now();
-    const days = Math.floor(diff / 86400000);
+    const diff = timestamp - Date.now()
+    const days = Math.floor(diff / 86400000)
     
-    if (days === 0) return 'Ends today';
-    if (days === 1) return 'Ends tomorrow';
-    return `Ends in ${days} days`;
-  };
+    if (days === 0) return 'Ends today 🎉'
+    if (days === 1) return 'Ends tomorrow ⏰'
+    return `Ends in ${days} days 📅`
+  }
 
-  const getProgressColor = (progress) => {
-    if (progress >= 100) return '#4caf50';
-    if (progress >= 75) return '#667eea';
-    if (progress >= 50) return '#ffd93d';
-    return '#ff6b6b';
-  };
+  const getProgressEmoji = (progress) => {
+    if (progress >= 100) return '🏆'
+    if (progress >= 75) return '🔥'
+    if (progress >= 50) return '🚀'
+    return '🌱'
+  }
 
   if (loading) {
     return (
       <div className="quests-loading">
         <div className="loading-spinner"></div>
-        <p>Loading quests...</p>
+        <p>Loading your quests... 🎯</p>
       </div>
-    );
+    )
   }
 
   return (
     <div className="collaborative-quests">
-      {/* Header */}
-      <div className="quests-header">
+      <motion.div 
+        className="quests-header"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
         <div className="header-content">
-          <h1>🎯 Collaborative Quests</h1>
-          <p>Team up with the community to achieve amazing goals together!</p>
+          <h1>🎪 Collaborative Quests</h1>
+          <p>Team up with your Jamii to achieve amazing goals!</p>
         </div>
         <div className="quest-stats">
           <div className="stat-item">
             <span className="stat-value">{questsData.activeQuests.length}</span>
-            <span className="stat-label">Active Quests</span>
+            <span className="stat-label">🔥 Active</span>
           </div>
           <div className="stat-item">
             <span className="stat-value">{questsData.completedQuests.length}</span>
-            <span className="stat-label">Completed</span>
+            <span className="stat-label">🏆 Completed</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Tabs */}
       <div className="quests-tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'active' ? 'active' : ''}`}
-          onClick={() => setActiveTab('active')}
-        >
-           Active Quests
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'completed' ? 'active' : ''}`}
-          onClick={() => setActiveTab('completed')}
-        >
-           Completed
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
-          onClick={() => setActiveTab('upcoming')}
-        >
-           Upcoming
-        </button>
+        {['active', 'completed', 'upcoming'].map(tab => (
+          <motion.button
+            key={tab}
+            className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+            whileHover={{ scale: 1.05 }}
+          >
+            {tab === 'active' && '🔥 Active Quests'}
+            {tab === 'completed' && '🏆 Completed'}
+            {tab === 'upcoming' && '📅 Upcoming'}
+          </motion.button>
+        ))}
       </div>
 
-      {/* Tab Content */}
       <div className="tab-content">
         <AnimatePresence mode="wait">
           {activeTab === 'active' && (
@@ -197,13 +153,14 @@ const CollaborativeQuests = () => {
               exit={{ opacity: 0, y: -20 }}
             >
               {questsData.activeQuests.map((quest) => (
-                <div key={quest.id} className="quest-card active">
+                <motion.div 
+                  key={quest.id} 
+                  className="quest-card active"
+                  whileHover={{ y: -5, boxShadow: '0 15px 35px rgba(102, 126, 234, 0.25)' }}
+                >
                   <div className="quest-header">
                     <div className="quest-icon">{quest.icon}</div>
-                    <div className="quest-meta">
-                      <span className="quest-category">{quest.category}</span>
-                      <span className="quest-status">🔥 In Progress</span>
-                    </div>
+                    <span className="quest-category">{quest.category}</span>
                   </div>
 
                   <h3>{quest.title}</h3>
@@ -211,7 +168,7 @@ const CollaborativeQuests = () => {
 
                   <div className="quest-progress-section">
                     <div className="progress-info">
-                      <span>Progress</span>
+                      <span>Progress {getProgressEmoji(quest.progress / quest.targetProgress * 100)}</span>
                       <span>{Math.round((quest.progress / quest.targetProgress) * 100)}%</span>
                     </div>
                     <div className="progress-bar">
@@ -219,136 +176,34 @@ const CollaborativeQuests = () => {
                         className="progress-fill"
                         style={{ 
                           width: `${(quest.progress / quest.targetProgress) * 100}%`,
-                          background: getProgressColor((quest.progress / quest.targetProgress) * 100)
+                          background: `linear-gradient(90deg, ${colors.primary[500]}, ${colors.accent[500]})`
                         }}
                       ></div>
-                    </div>
-                    <div className="progress-detail">
-                      <span>{quest.progress} / {quest.targetProgress}</span>
                     </div>
                   </div>
 
                   <div className="quest-participants">
-                    <div className="participants-info">
-                      <span className="participants-count">
-                        👥 {quest.participants} / {quest.targetParticipants} participants
-                      </span>
-                    </div>
-                    <div className="team-preview">
-                      {quest.team.slice(0, 3).map((member, idx) => (
-                        <span key={idx} className="team-member">{member}</span>
-                      ))}
-                    </div>
+                    <span>👥 {quest.participants} / {quest.targetParticipants} adventurers</span>
                   </div>
 
                   <div className="quest-reward">
-                    <span className="reward-icon">🎁</span>
-                    <span className="reward-text">{quest.reward}</span>
+                    <span>🎁 {quest.reward}</span>
                   </div>
 
                   <div className="quest-footer">
-                    <span className="quest-deadline">⏰ {formatDate(quest.deadline)}</span>
-                    <button className="btn-join-quest">Join Quest</button>
+                    <span>⏰ {formatDate(quest.deadline)}</span>
+                    <motion.button className="btn-join-quest" whileHover={{ scale: 1.05 }}>
+                      Join Quest 🚀
+                    </motion.button>
                   </div>
-                </div>
-              ))}
-            </motion.div>
-          )}
-
-          {activeTab === 'completed' && (
-            <motion.div 
-              key="completed"
-              className="quests-grid"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              {questsData.completedQuests.map((quest) => (
-                <div key={quest.id} className="quest-card completed">
-                  <div className="quest-header">
-                    <div className="quest-icon">{quest.icon}</div>
-                    <div className="quest-meta">
-                      <span className="quest-category">{quest.category}</span>
-                      <span className="quest-status">✅ Completed</span>
-                    </div>
-                  </div>
-
-                  <h3>{quest.title}</h3>
-                  <p className="quest-description">{quest.description}</p>
-
-                  <div className="quest-completion">
-                    <div className="completion-badge">
-                      <span className="badge-icon">✓</span>
-                      <span className="badge-text">Quest Complete!</span>
-                    </div>
-                    <div className="your-contribution">
-                      <strong>Your Contribution:</strong> {quest.yourContribution}
-                    </div>
-                  </div>
-
-                  <div className="quest-reward earned">
-                    <span className="reward-icon">🎁</span>
-                    <span className="reward-text">{quest.reward}</span>
-                  </div>
-
-                  <div className="quest-footer">
-                    <span className="quest-completed-date">
-                      Completed {new Date(quest.completedDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          )}
-
-          {activeTab === 'upcoming' && (
-            <motion.div 
-              key="upcoming"
-              className="quests-grid"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              {questsData.upcomingQuests.map((quest) => (
-                <div key={quest.id} className="quest-card upcoming">
-                  <div className="quest-header">
-                    <div className="quest-icon">{quest.icon}</div>
-                    <div className="quest-meta">
-                      <span className="quest-category">{quest.category}</span>
-                      <span className="quest-status">📅 Coming Soon</span>
-                    </div>
-                  </div>
-
-                  <h3>{quest.title}</h3>
-                  <p className="quest-description">{quest.description}</p>
-
-                  <div className="quest-preview">
-                    <div className="preview-info">
-                      <span className="info-label">Starts:</span>
-                      <span className="info-value">{new Date(quest.startDate).toLocaleDateString()}</span>
-                    </div>
-                    <div className="preview-info">
-                      <span className="info-label">Duration:</span>
-                      <span className="info-value">{quest.estimatedDuration}</span>
-                    </div>
-                  </div>
-
-                  <div className="quest-reward preview">
-                    <span className="reward-icon">🎁</span>
-                    <span className="reward-text">{quest.previewReward}</span>
-                  </div>
-
-                  <div className="quest-footer">
-                    <button className="btn-notify-me">Notify Me</button>
-                  </div>
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CollaborativeQuests;
+export default CollaborativeQuests

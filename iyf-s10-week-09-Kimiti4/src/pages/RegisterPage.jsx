@@ -1,150 +1,166 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+/**
+ * 🎉 Register Page - Join the Jamii Adventure!
+ */
+
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { motion } from 'framer-motion'
+import { colors } from '../styles/designSystem'
 
 export default function RegisterPage() {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        location: ''
-    });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    location: ''
+  })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  
+  const { register } = useAuth()
+  const navigate = useNavigate()
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
     
-    const { register } = useAuth();
-    const navigate = useNavigate();
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords don\'t match! 🤔')
+      return
+    }
     
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+    if (formData.password.length < 6) {
+      setError('Password needs at least 6 characters! 🔐')
+      return
+    }
     
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        
-        // Validation
-        if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match');
-            return;
-        }
-        
-        if (formData.password.length < 6) {
-            setError('Password must be at least 6 characters');
-            return;
-        }
-        
-        setLoading(true);
-        
-        try {
-            const { name, email, password, location } = formData;
-            // Backend expects 'username' not 'name', and 'profile.location'
-            await register({ 
-                username: name, 
-                email, 
-                password, 
-                profile: { location }
-            });
-            // Redirect to login page after successful registration
-            navigate('/login', { 
-                state: { 
-                    message: 'Registration successful! Please login with your credentials.' 
-                } 
-            });
-        } catch (err) {
-            setError(err.message || 'Registration failed. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
+    setLoading(true)
     
-    return (
-        <div className="auth-page">
-            <div className="auth-container">
-                <h1>Join JamiiLink</h1>
-                <p className="auth-subtitle">Create your account to connect with your community</p>
-                
-                {error && <div className="error-message">{error}</div>}
-                
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label htmlFor="name">Full Name</label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            placeholder="John Doe"
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            placeholder="john@example.com"
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="location">Location (Optional)</label>
-                        <input
-                            type="text"
-                            id="location"
-                            name="location"
-                            value={formData.location}
-                            onChange={handleChange}
-                            placeholder="Nairobi, Kenya"
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            minLength="6"
-                            placeholder="Minimum 6 characters"
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="confirmPassword">Confirm Password</label>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required
-                            placeholder="Re-enter password"
-                        />
-                    </div>
-                    
-                    <button type="submit" className="btn btn-primary" disabled={loading}>
-                        {loading ? 'Creating Account...' : 'Sign Up'}
-                    </button>
-                </form>
-                
-                <div className="auth-footer">
-                    <p>Already have an account? <Link to="/login">Login here</Link></p>
-                </div>
-            </div>
+    try {
+      await register({ 
+        username: formData.name, 
+        email: formData.email, 
+        password: formData.password, 
+        profile: { location: formData.location }
+      })
+      navigate('/login', { 
+        state: { message: '🎉 Welcome to JamiiLink! Please login to start exploring.' } 
+      })
+    } catch (err) {
+      setError('Registration failed - please try again! 😢')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="auth-page">
+      <motion.div 
+        className="auth-container"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="auth-header">
+          <span className="auth-emoji">🎈</span>
+          <h1>Join the Jamii! 🌟</h1>
+          <p>Start your community adventure today!</p>
         </div>
-    );
+        
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label>Full Name 👤</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Your awesome name"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Email 📧</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="you@jamiilink.co.ke"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Location 🌍</label>
+            <input
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="Nairobi, Kenya"
+            />
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label>Password 🔐</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Secret code"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Confirm 🔒</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Repeat code"
+                required
+              />
+            </div>
+          </div>
+          
+          {error && (
+            <motion.div 
+              className="error-message"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              ❌ {error}
+            </motion.div>
+          )}
+          
+          <motion.button 
+            type="submit" 
+            className="btn-primary"
+            disabled={loading}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            {loading ? 'Creating Magic... ✨' : 'Join JamiiLink 🚀'}
+          </motion.button>
+        </form>
+        
+        <div className="auth-footer">
+          <p>Already a member? <Link to="/login">Welcome back! 👋</Link></p>
+        </div>
+      </motion.div>
+    </div>
+  )
 }

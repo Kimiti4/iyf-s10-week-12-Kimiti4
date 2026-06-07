@@ -1,276 +1,220 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { postsAPI } from '../services/api';
-import { useOrganization } from '../context/OrganizationContext';
-import { validatePost, sanitizeInput } from '../utils/validation';
-
 /**
- * CreatePostPage - Create new post with optional image upload
+ * ✍️ Create Post Page - With Offline Support!
  */
+
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { queueOfflinePost, isOnline } from '../utils/offlinePost'
+import { useOrganization } from '../context/OrganizationContext'
+import { validatePost, sanitizeInput } from '../utils/validation'
+import { motion } from 'framer-motion'
+
 export default function CreatePostPage() {
-    const navigate = useNavigate();
-    const { currentOrg } = useOrganization();
-    const [formData, setFormData] = useState({
-        title: '',
-        content: '',
-        category: 'all',
-        location: ''
-    });
-    const [formErrors, setFormErrors] = useState({});
-    const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+  const navigate = useNavigate()
+  const { currentOrg } = useOrganization()
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    category: 'all',
+    location: ''
+  })
+  const [formErrors, setFormErrors] = useState({})
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [isOfflineMode, setIsOfflineMode] = useState(!isOnline())
+  const [pendingQueue, setPendingQueue] = useState(0)
+
+  const categories = [
+    { value: 'all', label: '🏠 For You (General)' },
+    { value: 'mtaani', label: '🔔 Mtaani Alerts' },
+    { value: 'skills', label: '🤝 Skill Swaps' },
+    { value: 'farm', label: '🌱 Farm Market' },
+    { value: 'gigs', label: '💼 Gig Economy' }
+  ]
+
+  useEffect(() => {
+    const updateOnlineStatus = () => {
+      setIsOfflineMode(!isOnline())
+    }
     
-    const categories = [
-        { value: 'all', label: '🏠 For You (General)' },
-        { value: 'mtaani', label: '🔔 Mtaani Alerts' },
-        { value: 'skills', label: '🤝 Skill Swaps' },
-        { value: 'farm', label: '🌱 Farm Market' },
-        { value: 'gigs', label: '💼 Gig Economy' }
-    ];
+    window.addEventListener('online', updateOnlineStatus)
+    window.addEventListener('offline', updateOnlineStatus)
     
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+    return () => {
+      window.removeEventListener('online', updateOnlineStatus)
+      window.removeEventListener('offline', updateOnlineStatus)
+    }
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+    if (formErrors[name]) {
+      setFormErrors({ ...formErrors, [name]: '' })
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setFormErrors({})
+    setLoading(true)
+
+    const sanitizedData = {
+      ...formData,
+      title: sanitizeInput(formData.title.trim()),
+      content: sanitizeInput(formData.content.trim()),
+      location: formData.location ? sanitizeInput(formData.location.trim()) : ''
+    }
+
+    const validation = validatePost(sanitizedData)
+    if (!validation.valid) {
+      setFormErrors(validation.errors)
+      setError('Please fix the errors below ✋')
+      setLoading(false)
+      return
+    }
+
+    try {
+      if (isOnline()) {
+        // Try online submission
+        const response = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sanitizedData)
+        })
         
-        // Clear error for this field when user starts typing
-        if (formErrors[name]) {
-            setFormErrors({
-                ...formErrors,
-                [name]: ''
-            });
+        if (response.ok) {
+          if (currentOrg) navigate(`/org/${currentOrg.slug}`)
+          else navigate('/posts')
+        } else {
+          throw new Error('Failed to create post')
         }
-    };
-    
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-                setError('Please select an image file');
-                return;
-            }
-            
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                setError('Image must be less than 5MB');
-                return;
-            }
-            
-            setImageFile(file);
-            
-            // Create preview
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-    
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setFormErrors({});
-        setLoading(true);
+      } else {
+        // Queue for offline submission
+        await queueOfflinePost(sanitizedData)
+        setPendingQueue(pendingQueue + 1)
+        alert(`Post saved! 📭 It will send when you're back online.`)
+        navigate(-1)
+      }
+    } catch (err) {
+      // Fallback to offline queue on error
+      await queueOfflinePost(sanitizedData)
+      setPendingQueue(pendingQueue + 1)
+      alert(`Saved for later! 📭 Will send when online.`)
+      navigate(-1)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="create-post-page">
+      <motion.div 
+        className="container"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <h1>✍️ Create New Post</h1>
         
-        try {
-            // Sanitize inputs
-            const sanitizedData = {
-                ...formData,
-                title: sanitizeInput(formData.title.trim()),
-                content: sanitizeInput(formData.content.trim()),
-                location: formData.location ? sanitizeInput(formData.location.trim()) : ''
-            };
-            
-            // Validate form
-            const validation = validatePost(sanitizedData);
-            
-            if (!validation.valid) {
-                setFormErrors(validation.errors);
-                setError('Please fix the errors below');
-                setLoading(false);
-                return;
-            }
-            
-            let postData = { ...sanitizedData };
-            
-            // Add organization if selected
-            if (currentOrg) {
-                postData.organization = currentOrg._id;
-            }
-            
-            // If there's an image, we'll need to handle it differently
-            // For now, we'll send without image (backend needs multer setup)
-            if (imageFile) {
-                // TODO: Implement image upload with FormData
-                // const formData = new FormData();
-                // formData.append('image', imageFile);
-                // formData.append('title', title);
-                // etc.
-                // Image upload feature pending backend multer configuration
-            }
-            
-            await postsAPI.create(postData);
-            
-            // Navigate to organization page if posting to an org, otherwise to posts list
-            if (currentOrg) {
-                navigate(`/org/${currentOrg.slug}`);
-            } else {
-                navigate('/posts');
-            }
-        } catch (err) {
-            setError(err.message || 'Failed to create post');
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    return (
-        <div className="create-post-page">
-            <div className="container">
-                <h1>Create New Post</h1>
-                
-                {/* Organization Badge */}
-                {currentOrg && (
-                    <div className="org-badge-banner">
-                        <span className="org-badge-icon">
-                            {currentOrg.type === 'school' && '🏫'}
-                            {currentOrg.type === 'university' && '🎓'}
-                            {currentOrg.type === 'estate' && '🏘️'}
-                            {currentOrg.type === 'church' && '⛪'}
-                            {currentOrg.type === 'ngo' && '🤝'}
-                            {currentOrg.type === 'sme' && '💼'}
-                            {currentOrg.type === 'coworking' && '🏢'}
-                            {currentOrg.type === 'community' && '👥'}
-                            {currentOrg.type === 'youth_group' && '🌟'}
-                            {currentOrg.type === 'professional' && '💼'}
-                        </span>
-                        <div className="org-badge-info">
-                            <span className="org-badge-label">Posting to:</span>
-                            <span className="org-badge-name">{currentOrg.name}</span>
-                        </div>
-                    </div>
-                )}
-                
-                {error && <div className="error-message">{error}</div>}
-                
-                <form onSubmit={handleSubmit} className="create-post-form">
-                    <div className="form-group">
-                        <label htmlFor="title">Title</label>
-                        <input
-                            type="text"
-                            id="title"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            required
-                            placeholder="What's on your mind? (5-200 characters)"
-                            maxLength="200"
-                            className={formErrors.title ? 'input-error' : ''}
-                        />
-                        {formErrors.title && (
-                            <span className="field-error">{formErrors.title}</span>
-                        )}
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="category">Category</label>
-                        <select
-                            id="category"
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            required
-                        >
-                            {categories.map(cat => (
-                                <option key={cat.value} value={cat.value}>
-                                    {cat.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="location">Location (Optional)</label>
-                        <input
-                            type="text"
-                            id="location"
-                            name="location"
-                            value={formData.location}
-                            onChange={handleChange}
-                            placeholder="Where is this happening?"
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="content">Content</label>
-                        <textarea
-                            id="content"
-                            name="content"
-                            value={formData.content}
-                            onChange={handleChange}
-                            required
-                            rows="8"
-                            placeholder="Share details with your community... (min 10 characters)"
-                            maxLength="5000"
-                            className={formErrors.content ? 'input-error' : ''}
-                        />
-                        <small>{formData.content.length}/5000 characters</small>
-                        {formErrors.content && (
-                            <span className="field-error">{formErrors.content}</span>
-                        )}
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="image">Upload Image (Optional)</label>
-                        <input
-                            type="file"
-                            id="image"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                        />
-                        <small>Max size: 5MB. Formats: JPG, PNG, GIF</small>
-                        
-                        {imagePreview && (
-                            <div className="image-preview">
-                                <img src={imagePreview} alt="Preview" />
-                                <button 
-                                    type="button"
-                                    className="btn-remove-image"
-                                    onClick={() => {
-                                        setImageFile(null);
-                                        setImagePreview('');
-                                    }}
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                    
-                    <div className="form-actions">
-                        <button 
-                            type="button" 
-                            className="btn btn-secondary"
-                            onClick={() => navigate(-1)}
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            type="submit" 
-                            className="btn btn-primary"
-                            disabled={loading}
-                        >
-                            {loading ? 'Creating...' : 'Create Post'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
+        {currentOrg && (
+          <div className="org-badge-banner">
+            <span className="org-badge-icon">
+              {{
+                school: '🏫', university: '🎓', estate: '🏘️',
+                church: '⛪', ngo: '🤝', sme: '💼',
+                coworking: '🏢', community: '👥', youth_group: '🌟',
+                professional: '💼'
+              }[currentOrg.type] || '🏢'}
+            </span>
+            <span>Posting to: <strong>{currentOrg.name}</strong></span>
+          </div>
+        )}
+
+        {isOfflineMode && (
+          <div className="offline-warning">
+            📴 You're offline - your post will be queued and sent later
+          </div>
+        )}
+
+        {error && (
+          <motion.div 
+            className="error-message"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            ❌ {error}
+          </motion.div>
+        )}
+
+        <form onSubmit={handleSubmit} className="create-post-form">
+          <div className="form-group">
+            <label>Title 📝</label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="What's happening? (5-200 chars)"
+              maxLength="200"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Category 🏷️</label>
+            <select name="category" value={formData.category} onChange={handleChange}>
+              {categories.map(cat => (
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Location 🌍 (Optional)</label>
+            <input
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="Where is this happening?"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Details 📄</label>
+            <textarea
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              rows="6"
+              placeholder="Share details with your community..."
+              maxLength="5000"
+              required
+            />
+            <small>{formData.content.length}/5000 characters</small>
+          </div>
+
+          <div className="form-actions">
+            <button 
+              type="button" 
+              className="btn-secondary"
+              onClick={() => navigate(-1)}
+            >
+              Cancel
+            </button>
+            <motion.button 
+              type="submit" 
+              className="btn-primary"
+              disabled={loading}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {loading ? 'Saving... ⏳' : isOfflineMode ? 'Save Offline 📥' : 'Publish 🚀'}
+            </motion.button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  )
 }

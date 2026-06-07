@@ -332,3 +332,41 @@ export default {
   RECOMMENDED: 'Implement Feature #1 (Impact Meter) + Feature #2 (Skill Matching)',
   RATIONALE: 'Combination creates daily engagement habit + recurring usage + viral growth + user value',
 };
+## Implementation Plan: Novel Features Integration
+
+Based on the analysis files, here's a prioritized roadmap:
+
+### **Phase 1: Foundation (Weeks 1-2)**
+
+| Priority | Feature | Implementation Target | Files to Create/Modify |
+|----------|---------|---------------------|------------------------|
+| 🔥 P0 | **Offline-First PWA** | Enable offline post creation | `public/sw.js`, `utils/offlinePost.js`, update `next.config.js` |
+| 🔥 P0 | **Reputation Passport Export** | Portable reputation for users | New endpoint `/api/reputation/export`, Add export button to ReputationSystem |
+
+### **Phase 2: Core Novel Features (Weeks 3-6)**
+
+| Priority | Feature | Implementation Target | Files to Create/Modify |
+|----------|---------|---------------------|------------------------|
+| ⭐ P1 | **Community Impact Meter** | Track real community contributions | New models: `ImpactMetrics.js`, API routes, integrate into ProfilePage/CreatorDashboard |
+| ⭐ P1 | **Smart Skill Matching** | Connect complementary skills | `SkillMatching.jsx`, `/api/skills/*` endpoints, skill profile UI |
+| ⭐ P1 | **Hyperlocal Map View** | Location-based content discovery | `MapView.jsx`, `/api/map/*` endpoints, location filters |
+| ⭐ P1 | **Contribution-Weighted Voting** | Update governance voting power | Modify CommunityGovernance to use contribution scores |
+
+### **Phase 3: Creator Economy (Weeks 7-8)**
+
+| Priority | Feature | Implementation Target | Files to Create/Modify |
+|----------|---------|---------------------|------------------------|
+| 🌟 P2 | **Creator Ownership Stack** | Rights ledger + transparent royalties | `RightsLedger.jsx`, `/api/creators/*` endpoints |
+| 🌟 P2 | **Event Ticketing** | In-platform event management | `EventTicketing.jsx`, `/api/events/tickets` |
+| 🌟 P2 | **Digital Watermarking** | IP protection for creators | Integration with watermarking service |
+
+### **Phase 4: Advanced (Weeks 9-12)**
+
+| Priority | Feature | Implementation Target |
+|----------|---------|---------------------|
+| 💎 P3 | **AI Content Co-Pilot** | Context-aware post drafting assistance |
+| 💎 P3 | **Cross-Platform Recognition** | API for external reputation verification |
+| 💎 P3 | **Hybrid DAO Governance** | Delegated voting + quadratic influence |
+
+---
+
