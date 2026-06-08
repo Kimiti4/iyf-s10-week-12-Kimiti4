@@ -117,7 +117,7 @@ exports.createAlert = asyncHandler(async (req, res) => {
     tags,
     images,
     organization,
-    status: 'active',
+    status: 'active', // Auto-activate for now (can add moderation later)
     verificationLevel: 'unverified'
   });
 
@@ -127,14 +127,6 @@ exports.createAlert = asyncHandler(async (req, res) => {
     .populate('organization', 'name slug');
 
   logger.info(`New alert created: ${alert._id} by ${req.user.username}`);
-
-  // Emit Socket.IO event
-  try {
-    const { emitAlertCreated } = require('../services/socketService');
-    emitAlertCreated(populatedAlert.toObject(), 'global');
-  } catch (error) {
-    logger.info('Socket.IO not available for alert broadcast');
-  }
 
   res.status(201).json({
     success: true,
@@ -210,18 +202,9 @@ exports.deleteAlert = asyncHandler(async (req, res) => {
     });
   }
 
-  const alertId = alert._id;
   await alert.deleteOne();
 
-  logger.info(`Alert deleted: ${alertId} by ${req.user.username}`);
-
-  // Emit Socket.IO event
-  try {
-    const { emitAlertDeleted } = require('../services/socketService');
-    emitAlertDeleted(alertId, 'global');
-  } catch (error) {
-    logger.info('Socket.IO not available for alert delete broadcast');
-  }
+  logger.info(`Alert deleted: ${alert._id} by ${req.user.username}`);
 
   res.json({
     success: true,
@@ -249,14 +232,6 @@ exports.confirmAlert = asyncHandler(async (req, res) => {
       .populate('author', 'username avatar profile.verified');
 
     logger.info(`Alert confirmed: ${alert._id} by ${req.user.username}`);
-
-    // Emit Socket.IO event
-    try {
-      const { emitAlertConfirmed } = require('../services/socketService');
-      emitAlertConfirmed(updatedAlert.toObject(), 'global');
-    } catch (error) {
-      logger.info('Socket.IO not available for alert confirm broadcast');
-    }
 
     res.json({
       success: true,

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState, useCallback } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { OrganizationProvider } from './context/OrganizationContext'
@@ -12,9 +12,8 @@ import PullToRefreshIndicator from './components/PullToRefresh'
 import ConstellationBackground from './enhanced/components/ConstellationBackground'
 import { usePullToRefresh } from './hooks/usePullToRefresh'
 import { useSwipeGestures } from './hooks/useSwipeGestures'
-import PWAInstallPrompt from './components/PWAInstallPrompt'
 import './App.css'
-import './index.css'
+import './index.css' // Import mobile-first responsive styles
 import './styles/DesignSystem.css'
 import './styles/InstagramUI.css'
 import './styles/PageBackgrounds.css'
@@ -46,28 +45,28 @@ import CreatorDashboard from './pages/CreatorDashboard'
 import ReputationSystem from './pages/ReputationSystem'
 import CommunityGovernance from './pages/CommunityGovernance'
 import CollaborativeQuests from './pages/CollaborativeQuests'
-import SkillMatcher from './pages/SkillMatcher'
 import TiannaraAssistant from './components/TiannaraAssistant'
 import CommunityEvents from './components/CommunityEvents'
 import EnhancedEmergencyAlerts from './components/EnhancedEmergencyAlerts'
 import AlertFeedPage from './pages/AlertFeedPage'
 
 function AppRoutes() {
-  const { user } = useAuth()
-  const navigate = useNavigate()
+  const { user } = useAuth();
+  const navigate = useNavigate();
   
+  // Listen for auth events
   useEffect(() => {
-    const handleAuthExpired = () => navigate('/login')
-    const handleLogout = () => navigate('/login')
+    const handleAuthExpired = () => navigate('/login');
+    const handleLogout = () => navigate('/login');
     
-    window.addEventListener('auth:expired', handleAuthExpired)
-    window.addEventListener('auth:logout', handleLogout)
+    window.addEventListener('auth:expired', handleAuthExpired);
+    window.addEventListener('auth:logout', handleLogout);
     
     return () => {
-      window.removeEventListener('auth:expired', handleAuthExpired)
-      window.removeEventListener('auth:logout', handleLogout)
-    }
-  }, [navigate])
+      window.removeEventListener('auth:expired', handleAuthExpired);
+      window.removeEventListener('auth:logout', handleLogout);
+    };
+  }, [navigate]);
   
   return (
     <Routes>
@@ -83,16 +82,6 @@ function AppRoutes() {
       <Route path="/events" element={<CommunityEvents currentUser={user} />} />
       <Route path="/alerts" element={<AlertFeedPage />} />
       <Route path="/emergency-alerts" element={<EnhancedEmergencyAlerts currentUser={user} />} />
-      
-      {/* Skill Matcher Route - Phase 2 */}
-      <Route 
-        path="/skills" 
-        element={
-          <ProtectedRoute>
-            <SkillMatcher />
-          </ProtectedRoute>
-        } 
-      />
       
       {/* User Profile Route */}
       <Route path="/profile/:userId?" element={<UserProfilePage />} />
@@ -212,32 +201,37 @@ function AppRoutes() {
       />
       <Route path="/original/about" element={<AboutPage />} />
     </Routes>
-  )
+  );
 }
 
 function MainLayout() {
-  const { isCollapsed } = useSidebar()
+  const { isCollapsed } = useSidebar();
   
   return (
     <main className={`main-content with-sidebar ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
       <AppRoutes />
     </main>
-  )
+  );
 }
 
 function App() {
-  const [feedbackOpen, setFeedbackOpen] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  const closeSidebar = () => setSidebarOpen(false)
-  const openSidebar = () => setSidebarOpen(true)
+  // Close sidebar when clicking overlay
+  const closeSidebar = () => setSidebarOpen(false);
+  const openSidebar = () => setSidebarOpen(true);
   
+  // Pull to refresh handler
   const handleRefresh = useCallback(async () => {
-    window.location.reload()
-  }, [])
+    // Trigger a page reload or data refetch
+    window.location.reload();
+  }, []);
   
-  const { isRefreshing, progress } = usePullToRefresh(handleRefresh, 100)
-  useSwipeGestures(openSidebar, closeSidebar, 100)
+  const { isRefreshing, progress } = usePullToRefresh(handleRefresh, 100);
+  
+  // Swipe gestures for sidebar
+  useSwipeGestures(openSidebar, closeSidebar, 100);
   
   return (
     <Router>
@@ -245,48 +239,53 @@ function App() {
         <OrganizationProvider>
           <SidebarProvider>
             <ToastProvider>
-              <div className="App">
-                <ConstellationBackground />
-                <PullToRefreshIndicator isRefreshing={isRefreshing} progress={progress} />
-                
-                <div 
-                  className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
-                  onClick={closeSidebar}
-                />
-                
-                <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
-                <NavBar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-                <MainLayout />
-                <MobileBottomNav />
-                
-                <div className="jamii-mode-widget">
-                  <JamiiModeToggle />
-                </div>
-                
-                <TrendingChip topic="#JamiiLink" count={42} />
-                
-                <footer className="footer">
-                  <div className="container">
-                    <p>&copy; 2026 JamiiLink powered by <a href='https://github.com/Kimiti4'>Kimiti4</a></p>
-                  </div>
-                </footer>
-                
-                <button 
-                  className="floating-feedback-btn"
-                  onClick={() => setFeedbackOpen(true)}
-                  title="Share Feedback"
-                >
-                  💬
-                </button>
-                
-                <FeedbackForm 
-                  isOpen={feedbackOpen} 
-                  onClose={() => setFeedbackOpen(false)} 
-                />
-                
-                {/* PWA Install Prompt */}
-                <PWAInstallPrompt />
+            <div className="App">
+              {/* 🔹 Constellation Background */}
+              <ConstellationBackground />
+              
+              {/* Pull to Refresh Indicator */}
+              <PullToRefreshIndicator isRefreshing={isRefreshing} progress={progress} />
+              
+              {/* Sidebar Overlay Backdrop */}
+              <div 
+                className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
+                onClick={closeSidebar}
+              />
+              
+              <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+              <NavBar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+              <MainLayout />
+              <MobileBottomNav />
+              
+              {/* 🌙 Jamii Mode Toggle - Add to sidebar or as floating widget */}
+              <div className="jamii-mode-widget">
+                <JamiiModeToggle />
               </div>
+              
+              {/* 🔥 Trending Floating Chip */}
+              <TrendingChip topic="#JamiiLink" count={42} />
+              
+              <footer className="footer">
+                <div className="container">
+                  <p>&copy; 2026 JamiiLink powered by <a href='https://github.com/Kimiti4'>Kimiti4</a></p>
+                </div>
+              </footer>
+              
+              {/* Floating Feedback Button */}
+              <button 
+                className="floating-feedback-btn"
+                onClick={() => setFeedbackOpen(true)}
+                title="Share Feedback"
+              >
+                💬
+              </button>
+              
+              {/* Feedback Form Modal */}
+              <FeedbackForm 
+                isOpen={feedbackOpen} 
+                onClose={() => setFeedbackOpen(false)} 
+              />
+            </div>
             </ToastProvider>
           </SidebarProvider>
         </OrganizationProvider>

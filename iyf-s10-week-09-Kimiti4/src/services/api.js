@@ -84,13 +84,6 @@ export const authAPI = {
         method: 'POST',
         body: JSON.stringify(credentials)
     }),
-
-    /**
-     * Logout user
-     */
-    logout: () => request('/auth/logout', {
-        method: 'POST'
-    }),
     
     /**
      * Get current user profile
@@ -108,7 +101,7 @@ export const authAPI = {
     
     /**
      * Change password
-     * @param {Object} passwordData - { currentPassword, newPassword, confirmPassword }
+     * @param {Object} passwordData - { currentPassword, newPassword }
      */
     changePassword: (passwordData) => request('/auth/change-password', {
         method: 'PUT',
