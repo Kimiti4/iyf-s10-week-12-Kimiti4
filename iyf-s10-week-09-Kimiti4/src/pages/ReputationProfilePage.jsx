@@ -75,7 +75,7 @@ export default function ReputationProfilePage() {
             </motion.div>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       <motion.button 
         className="btn-primary"

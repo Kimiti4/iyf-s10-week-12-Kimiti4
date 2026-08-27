@@ -12,6 +12,7 @@
 
 import { Component } from 'react';
 import logger from '../utils/logger';
+import { captureException } from '../utils/telemetry';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -40,10 +41,9 @@ class ErrorBoundary extends Component {
       errorInfo
     });
     
-    // TODO: Send error to monitoring service (Sentry, etc.)
-    // if (process.env.NODE_ENV === 'production') {
-    //   Sentry.captureException(error, { contexts: { react: errorInfo } });
-    // }
+    // Send error to monitoring service (Sentry-ready)
+    logger.captureException(error, { contexts: { react: errorInfo } });
+    captureException(error, { componentStack: errorInfo.componentStack });
   }
 
   handleReset = () => {

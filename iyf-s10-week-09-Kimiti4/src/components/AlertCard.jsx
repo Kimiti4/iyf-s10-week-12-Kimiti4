@@ -16,6 +16,7 @@ import {
   FaShare,
   FaFlag
 } from 'react-icons/fa';
+import { useToast } from './Toast';
 import './AlertCard.css';
 
 // Verification level configurations
@@ -55,6 +56,7 @@ const SEVERITY_CONFIG = {
 };
 
 export default function AlertCard({ alert, onConfirm, currentUser }) {
+  const toast = useToast();
   const [confirmed, setConfirmed] = useState(
     alert.confirmations?.some(c => c.user === currentUser?._id) || false
   );
@@ -65,7 +67,7 @@ export default function AlertCard({ alert, onConfirm, currentUser }) {
 
   const handleConfirm = async () => {
     if (!currentUser) {
-      alert('Please login to confirm alerts');
+      toast.info('Please login to confirm alerts');
       return;
     }
 

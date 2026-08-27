@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useToast } from './Toast';
 
 // ============================================
 // REPUTATION BADGE COMPONENT
@@ -293,6 +294,7 @@ export const ReputationLeaderboard = ({ tier = null }) => {
 // FEEDBACK COMPONENT
 // ============================================
 export const FeedbackForm = ({ toUserId, onSubmit }) => {
+  const toast = useToast();
   const [ratings, setRatings] = useState({
     reliability: 5,
     quality: 5,
@@ -320,7 +322,7 @@ export const FeedbackForm = ({ toUserId, onSubmit }) => {
       onSubmit?.();
     } catch (error) {
       console.error('Error submitting feedback:', error);
-      alert('Failed to submit feedback');
+      toast.error('Failed to submit feedback');
     } finally {
       setLoading(false);
     }

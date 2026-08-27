@@ -7,39 +7,41 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { colors } from '../styles/designSystem'
+import api from '../services/api'
+import html2pdf from 'html2pdf.js'
+import ImpactMeterWidget from '../components/ImpactMeterWidget'
+import { useToast } from '../components/Toast'
 import './ReputationSystem.css'
 
 const ReputationSystem = () => {
   const { user } = useAuth()
+  const toast = useToast()
   const [activeTab, setActiveTab] = useState('overview')
   const [loading, setLoading] = useState(true)
-  const [showExportOptions, setShowExportOptions] = useState(false)
-
-  const reputationData = {
-    score: 2847.50,
-    level: 12,
-    rank: '#3',
-    nextLevel: {
-      level: 13,
-      requiredScore: 3000,
-      progress: 94.9
-    },
-    badges: [
-      { id: 1, name: 'First Post', icon: '📝', earned: true, description: 'Created your first post', earnedDate: '2025-01-15' },
-      { id: 2, name: 'Helper', icon: '🤝', earned: true, description: 'Helped 10 community members', earnedDate: '2025-02-20' },
-      { id: 3, name: 'Content Creator', icon: '🎨', earned: true, description: 'Published 20 posts', earnedDate: '2025-04-10' },
-      { id: 4, name: 'Top Contributor', icon: '⭐', earned: false, description: 'Reach top 1% of contributors' }
-    ],
-    activity: [
-      { type: 'post', count: 45, points: 45, label: 'Posts Created' },
-      { type: 'reply', count: 128, points: 256, label: 'Helpful Replies' },
-      { type: 'event', count: 8, points: 40, label: 'Events Hosted' }
-    ]
-  }
+  const [reputationData, setReputationData] = useState({
+    score: 0,
+    level: 1,
+    rank: '-',
+    nextLevel: { level: 2, requiredScore: 100, progress: 0 },
+    badges: [],
+    activity: []
+  })
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 500)
-  }, [])
+    const fetchReputation = async () => {
+      try {
+        if (user?.id) {
+          const res = await api.reputation.getProfile(user.id);
+          if (res.data) setReputationData(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch reputation data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReputation();
+  }, [user]);
 
   const getLevelEmoji = (level) => {
     if (level >= 30) return '👑'
@@ -52,71 +54,53 @@ const ReputationSystem = () => {
 
   // Export Creator Passport
   const exportPassport = async (format = 'json') => {
-    const passport = {
-      creator_id: user?.id || 'anonymous',
-      name: user?.name || 'JamiiLink User',
-      verified_since: '2024-01-15',
-      metrics: {
-        total_score: reputationData.score,
-        level: reputationData.level,
-        rank: reputationData.rank
-      },
-      badges: reputationData.badges.filter(b => b.earned).map(b => ({
-        title: b.name,
-        description: b.description,
-        earned: b.earnedDate
-      })),
-      works: reputationData.activity.map(a => ({
-        label: a.label,
-        count: a.count
-      })),
-      export_date: new Date().toISOString(),
-      signature: 'HMAC-SHA256-signed-by-jamiilink'
-    }
+    try {
+      const res = await api.reputation.exportPassport();
+      const passport = res.data;
 
-    if (format === 'json') {
-      const blob = new Blob([JSON.stringify(passport, null, 2)], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `reputation-passport-${user?.name?.replace(/\s+/g, '-').toLowerCase() || 'user'}.json`
-      a.click()
-      URL.revokeObjectURL(url)
-    } else if (format === 'pdf') {
-      // For PDF, we'll generate a structured HTML that can be printed
-      generatePDFPassport(passport)
+      if (format === 'json') {
+        const blob = new Blob([JSON.stringify(passport, null, 2)], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `reputation-passport-${user?.name?.replace(/\s+/g, '-').toLowerCase() || 'user'}.json`
+        a.click()
+        URL.revokeObjectURL(url)
+      } else if (format === 'pdf') {
+        generatePDFPassport(passport)
+      }
+    } catch (error) {
+      console.error('Failed to export passport:', error);
+      toast.error('Failed to generate export.');
     }
   }
 
   const generatePDFPassport = (passport) => {
     const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>JamiiLink Reputation Passport</title>
-        <style>
-          body { font-family: 'Inter var', sans-serif; padding: 40px; background: #f0fdf4; }
-          .passport { background: white; padding: 30px; border-radius: 12px; max-width: 600px; margin: 0 auto; }
-          h1 { color: #16a34a; text-align: center; }
-          .badge { display: inline-block; background: #dcfce7; padding: 8px 16px; margin: 5px; border-radius: 20px; }
-        </style>
-      </head>
-      <body>
-        <div class="passport">
-          <h1>🏆 JamiiLink Reputation Passport</h1>
-          <p><strong>Name:</strong> ${passport.name}</p>
-          <p><strong>Score:</strong> ${passport.metrics.total_score} points (Level ${passport.metrics.level})</p>
-          <p><strong>Rank:</strong> ${passport.metrics.rank}</p>
-          <h2>Badges</h2>
-          ${passport.badges.map(b => `<span class="badge">${b.title}</span>`).join('')}
+      <div style="font-family: 'Inter var', sans-serif; padding: 40px; background: #f0fdf4; width: 600px; border-radius: 12px;">
+        <h1 style="color: #16a34a; text-align: center;">🏆 JamiiLink Reputation Passport</h1>
+        <p><strong>Name:</strong> ${passport.name}</p>
+        <p><strong>Score:</strong> ${passport.metrics.total_score} points (Level ${passport.metrics.level})</p>
+        <p><strong>Rank:</strong> ${passport.metrics.rank}</p>
+        <p><strong>Verified Since:</strong> ${new Date(passport.verified_since).toLocaleDateString()}</p>
+        <h2>Activity</h2>
+        <ul>
+          ${passport.works.map(w => `<li>${w.count} ${w.label}</li>`).join('')}
+        </ul>
+        <h2>Badges</h2>
+        <div>
+          ${passport.badges.map(b => `<span style="display: inline-block; background: #dcfce7; padding: 8px 16px; margin: 5px; border-radius: 20px;">${b.title}</span>`).join('')}
         </div>
-      </body>
-      </html>
+        <p style="margin-top: 30px; font-size: 12px; color: #64748b; text-align: center;">Signature: ${passport.signature}</p>
+      </div>
     `
-    const printWindow = window.open('', '_blank')
-    printWindow.document.write(html)
-    printWindow.document.close()
-    printWindow.print()
+    const element = document.createElement('div')
+    element.innerHTML = html
+    document.body.appendChild(element)
+    
+    html2pdf().from(element).save(`reputation-passport-${passport.name.replace(/\\s+/g, '-').toLowerCase()}.pdf`).then(() => {
+      document.body.removeChild(element)
+    })
   }
 
   if (loading) {
@@ -138,6 +122,8 @@ const ReputationSystem = () => {
         <h1>🏆 Your Reputation</h1>
         <p>Celebrating your contributions to the Jamii!</p>
       </motion.div>
+
+      {user?.id && <ImpactMeterWidget userId={user.id} />}
 
       <motion.div 
         className="level-display"

@@ -12,11 +12,7 @@ import PullToRefreshIndicator from './components/PullToRefresh'
 import ConstellationBackground from './enhanced/components/ConstellationBackground'
 import { usePullToRefresh } from './hooks/usePullToRefresh'
 import { useSwipeGestures } from './hooks/useSwipeGestures'
-import './App.css'
-import './index.css' // Import mobile-first responsive styles
-import './styles/DesignSystem.css'
-import './styles/InstagramUI.css'
-import './styles/PageBackgrounds.css'
+import './index.css' // Unified whimsical design system
 import Sidebar from './components/Sidebar'
 import NavBar from './components/NavBar'
 import MobileBottomNav from './components/MobileBottomNav'
@@ -37,6 +33,7 @@ import AdminDashboard from './enhanced/pages/AdminDashboard'
 import FounderDashboard from './pages/FounderDashboard'
 import OrganizationPage from './pages/OrganizationPage'
 import SettingsPage from './pages/SettingsPage'
+import SkillExchange from './pages/SkillExchange'
 import MarketplacePage from './pages/MarketplacePage'
 import UserProfilePage from './pages/UserProfilePage'
 import ChatPage from './pages/ChatPage'
@@ -49,6 +46,7 @@ import TiannaraAssistant from './components/TiannaraAssistant'
 import CommunityEvents from './components/CommunityEvents'
 import EnhancedEmergencyAlerts from './components/EnhancedEmergencyAlerts'
 import AlertFeedPage from './pages/AlertFeedPage'
+import DraftsPage from './pages/DraftsPage'
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -92,6 +90,16 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <ChatPage />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Offline Drafts */}
+      <Route 
+        path="/drafts" 
+        element={
+          <ProtectedRoute>
+            <DraftsPage />
           </ProtectedRoute>
         } 
       />

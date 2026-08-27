@@ -67,7 +67,7 @@ export default function AlertFeedPage() {
       }
 
       const response = await alertsAPI.getAll(params);
-      setAlerts(response.data.data || []);
+      setAlerts(response.data || []);
     } catch (error) {
       console.error('Error fetching alerts:', error);
       toast.error('Failed to load alerts');
@@ -117,13 +117,13 @@ export default function AlertFeedPage() {
   // Handle creating a new alert
   const handleCreateAlert = async (formData) => {
     try {
-      const response = await api.post('/alerts', formData);
+      const response = await alertsAPI.create(formData);
       toast.success('Alert created successfully!');
       setShowCreateForm(false);
       
       // Alert will be added via Socket.IO, but just in case
-      if (response.data?.data) {
-        setAlerts(prev => [response.data.data, ...prev]);
+      if (response.data) {
+        setAlerts(prev => [response.data, ...prev]);
       }
     } catch (error) {
       console.error('Error creating alert:', error);
@@ -135,7 +135,7 @@ export default function AlertFeedPage() {
   // Handle confirming an alert
   const handleConfirmAlert = async (alertId) => {
     try {
-      await api.post(`/alerts/${alertId}/confirm`);
+      await alertsAPI.confirm(alertId);
       toast.success('Alert confirmed!');
     } catch (error) {
       console.error('Error confirming alert:', error);

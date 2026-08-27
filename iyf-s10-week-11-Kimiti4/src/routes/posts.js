@@ -10,6 +10,7 @@ const { protect, optionalAuth } = require('../middleware/authPG'); // PostgreSQL
 
 // Public routes (can optionally show user info if authenticated)
 router.get('/', optionalAuth, postsController.getAllPosts);
+router.get('/trending', postsController.getTrendingTags);
 router.get('/:id', postsController.getPostById);
 
 // Comment routes

@@ -5,6 +5,8 @@
  */
 
 import logger from '../utils/logger';
+import { fetchWithTelemetry } from '../utils/telemetry';
+import { fetchWithRetry } from '../utils/apiRetry';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -28,7 +30,7 @@ const request = async (endpoint, options = {}) => {
     };
     
     try {
-        const response = await fetch(url, config);
+        const response = await fetchWithRetry(() => fetchWithTelemetry(url, config));
         
         // Handle 401 (unauthorized) - redirect to login
         if (response.status === 401) {
@@ -106,6 +108,24 @@ export const authAPI = {
     changePassword: (passwordData) => request('/auth/change-password', {
         method: 'PUT',
         body: JSON.stringify(passwordData)
+    }),
+
+    /**
+     * Send Verification Code
+     * @param {Object} data - { method: 'email'|'phone'|'totp', contact }
+     */
+    sendVerification: (data) => request('/auth/send-verification', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+
+    /**
+     * Verify Code
+     * @param {Object} data - { method, contact, code, secret }
+     */
+    verifyCode: (data) => request('/auth/verify-code', {
+        method: 'POST',
+        body: JSON.stringify(data)
     })
 };
 
@@ -118,6 +138,15 @@ export const postsAPI = {
     getAll: (params = {}) => {
         const query = new URLSearchParams(params).toString();
         return request(`/posts${query ? `?${query}` : ''}`);
+    },
+
+    /**
+     * Get trending hashtags
+     * @param {Object} params - { limit }
+     */
+    getTrending: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return request(`/posts/trending${query ? `?${query}` : ''}`);
     },
     
     /**
@@ -240,6 +269,12 @@ export const commentsAPI = {
     like: (commentId) => request(`/comments/${commentId}/like`, {
         method: 'PATCH'
     })
+};
+
+// ===== REPUTATION API =====
+export const reputationAPI = {
+    getProfile: (userId) => request(`/reputation/${userId}`),
+    exportPassport: () => request('/reputation/export')
 };
 
 // ===== ORGANIZATIONS API =====
@@ -432,10 +467,41 @@ export const alertsAPI = {
      */
     delete: (id) => request(`/alerts/${id}`, {
         method: 'DELETE'
+    }),
+    
+    /**
+     * Confirm alert
+     * @param {string} id - Alert ID
+     */
+    confirm: (id) => request(`/alerts/${id}/confirm`, {
+        method: 'POST'
     })
 };
 
 // Export default object for convenience
+// ===== IMPACT API =====
+export const impactAPI = {
+    getDashboard: (userId) => request(`/impact/${userId}/dashboard`),
+    track: (data) => request('/impact/track', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    })
+};
+
+// ===== SKILLS API =====
+export const skillsAPI = {
+    getProfile: () => request('/skills/profile'),
+    saveProfile: (data) => request('/skills/profile', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+    getMatches: () => request('/skills/matches'),
+    completeExchange: (matchId, data) => request(`/skills/complete/${matchId}`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    })
+};
+
 export default {
     auth: authAPI,
     posts: postsAPI,
@@ -443,6 +509,9 @@ export default {
     users: usersAPI,
     organizations: organizationsAPI,
     alerts: alertsAPI,
+    reputation: reputationAPI,
+    impact: impactAPI,
+    skills: skillsAPI,
     isAuthenticated,
     getCurrentUser,
     logout

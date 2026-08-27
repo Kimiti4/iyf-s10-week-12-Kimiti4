@@ -1,295 +1,562 @@
-/* ========================================
-   📱 Mobile-First Responsive Foundation
-   ======================================== */
+/* ==========================================================================
+   JAMII LINK - WHIMSICAL & ENGAGING DESIGN SYSTEM
+   ========================================================================== */
 
-/* Reset and base styles */
 :root {
-  /* Typography */
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Vibrant Whimsical Palette */
+  --bg-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 50%, #fbc2eb 100%);
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
   
-  /* 🎨 Design Tokens - Mobile First */
-  --sidebar-width: 100%;
-  --nav-height: 60px;
-  --content-padding: 1rem;
-  --transition-speed: 0.3s ease;
+  /* Primary Colors */
+  --primary: #ff6b6b;
+  --secondary: #4ecdc4;
+  --accent: #ffe66d;
   
-  /* Colors */
-  --primary-color: #4a90e2;
-  --accent-color: #ee5a24;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #1a1a2e;
-  --text-secondary: #6c757d;
+  /* Text */
+  --text-dark: #2d3436;
+  --text-muted: #636e72;
+  --text-light: #ffffff;
   
-  /* Spacing */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  
-  /* Border Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  /* Radii */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 30px;
   --radius-full: 9999px;
   
-  /* Shadows */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Safe area for mobile nav */
+  --safe-bottom: env(safe-area-inset-bottom, 20px);
+}
+/* ==========================================================================
+   DESIGN TOKENS (RESTORED LAYER)
+   Restores the design-token system (previously src/styles/DesignSystem.css)
+   that many component stylesheets (NavBar, Sidebar, MobileBottomNav, feed,
+   cards, etc.) depend on. 4px grid + Tailwind-inspired palette.
+   ========================================================================== */
+:root {
+  /* ---------- Color System ---------- */
+  /* Primary accent - Emerald (community, growth, trust) */
+  --color-primary-50: #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-200: #a7f3d0;
+  --color-primary-300: #6ee7b7;
+  --color-primary-400: #34d399;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+  --color-primary-900: #064e3b;
+
+  /* Secondary accent - Indigo */
+  --color-secondary-50: #eef2ff;
+  --color-secondary-100: #e0e7ff;
+  --color-secondary-200: #c7d2fe;
+  --color-secondary-300: #a5b4fc;
+  --color-secondary-400: #818cf8;
+  --color-secondary-500: #6366f1;
+  --color-secondary-600: #4f46e5;
+  --color-secondary-700: #4338ca;
+  --color-secondary-800: #3730a3;
+  --color-secondary-900: #312e81;
+
+  /* Zinc neutrals */
+  --color-zinc-50: #fafafa;
+  --color-zinc-100: #f4f4f5;
+  --color-zinc-200: #e4e4e7;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --color-zinc-600: #52525b;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-800: #27272a;
+  --color-zinc-900: #18181b;
+
+  /* Semantic colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+
+  /* Legacy aliases used by a few widgets */
+  --primary-500: #10b981;
+  --primary-600: #059669;
+  --primary-color: #10b981;
+  --accent-color: #6366f1;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f4f5;
+  --text-primary: #18181b;
+  --zinc-300: #d4d4d8;
+  --zinc-700: #3f3f46;
+
+  /* ---------- Spacing (4px grid) ---------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+
+  /* ---------- Typography ---------- */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+  --font-black: 900;
+
+  /* ---------- Border Radius ---------- */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  /* ---------- Shadows ---------- */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+  /* ---------- Transitions ---------- */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slower: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-speed: 200ms ease;
+
+  /* ---------- Z-Index Scale ---------- */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
 }
 
-/* ✅ Tablet Breakpoint */
-@media (min-width: 768px) {
-  :root {
-    --sidebar-width: 240px;
-    --content-padding: 2rem;
-  }
-}
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
 
-/* ✅ Desktop Breakpoint */
-@media (min-width: 1024px) {
-  :root {
-    --sidebar-width: 280px;
-  }
-}
-
-/* ✅ Large Desktop */
-@media (min-width: 1200px) {
-  :root {
-    --content-padding: 3rem;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Outfit', 'Segoe UI', system-ui, sans-serif;
 }
 
 body {
-  margin: 0;
-  min-width: 320px;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text-dark);
   min-height: 100vh;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ========================================
-   🎯 Touch-Friendly Targets (Mobile HIG)
-   ======================================== */
-button,
-.nav-item,
-.post-action,
-.clickable {
-  min-height: 44px; /* Apple Human Interface Guidelines */
-  min-width: 44px;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
   border: none;
-  background: transparent;
-  transition: all var(--transition-speed);
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
-button:active,
-.clickable:active {
-  transform: scale(0.95);
-  opacity: 0.8;
-}
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
 
-/* ========================================
-   🖼️ Fluid Images & Media
-   ======================================== */
-img,
-video,
-.reel-card img,
-.post-image {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Vertical video optimization for Reels */
-.reel-card img,
-.post-image {
-  width: 100%;
-  aspect-ratio: 9/16;
-  object-fit: cover;
-  border-radius: var(--radius-md);
-}
-
-/* ========================================
-   📐 Responsive Grid System
-   ======================================== */
-.feed-grid,
-.content-grid {
-  display: grid;
-  grid-template-columns: 1fr; /* Mobile: single column */
-  gap: var(--spacing-md);
-  padding: var(--content-padding);
-}
-
-/* Tablet: 2 columns */
-@media (min-width: 768px) {
-  .feed-grid,
-  .content-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-lg);
-  }
-}
-
-/* Desktop: 3 columns */
-@media (min-width: 1200px) {
-  .feed-grid,
-  .content-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* ========================================
-   🎬 Swipeable Carousel (Reels)
-   ======================================== */
-.reels-container {
+.App {
   display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md) calc(80px + var(--safe-bottom));
+  transition: all 0.3s ease;
+  z-index: 1;
+  position: relative;
+}
+
+/* Sidebar behavior for PC / Tablet */
+@media (min-width: 768px) {
+  .main-content {
+    margin-left: 80px; /* Collapsed sidebar width */
+    max-width: calc(100% - 80px);
+    padding-bottom: var(--space-xl);
+  }
+  
+  .main-content.with-sidebar:not(.sidebar-collapsed) {
+    margin-left: 280px; /* Expanded sidebar width */
+    max-width: calc(100% - 280px);
+  }
+}
+
+/* ==========================================================================
+   GLASSMORPHISM COMPONENTS
+   ========================================================================== */
+
+.glass-card, .post-card, .alert-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+}
+
+.glass-card:hover, .post-card:hover, .alert-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-sm);
+  color: var(--text-dark);
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
+
+p {
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+  color: var(--text-dark);
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, var(--primary), #ff9a9e);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(45deg, var(--secondary), #a8edea);
+  color: var(--text-dark);
+}
+
+.btn-secondary:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+}
+
+.btn-create-alert {
+  background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+  color: var(--text-dark);
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-weight: bold;
+  box-shadow: var(--glass-shadow);
+  border: 2px solid white;
+}
+
+/* ==========================================================================
+   INPUTS & FORMS
+   ========================================================================== */
+
+input, textarea, select {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  font-size: 1rem;
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+  margin-bottom: var(--space-md);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.5);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.2);
+}
+
+input::placeholder, textarea::placeholder {
+  color: rgba(45, 52, 54, 0.6);
+}
+
+/* ==========================================================================
+   NAVIGATION (MOBILE BOTTOM NAV)
+   ========================================================================== */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.5);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0 calc(10px + var(--safe-bottom));
+  z-index: 1000;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+  border-radius: 30px 30px 0 0;
+}
+
+@media (min-width: 768px) {
+  .bottom-nav {
+    display: none; /* Hide on larger screens */
+  }
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-muted);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.nav-item.active {
+  color: var(--primary);
+  transform: translateY(-5px);
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+/* Floating Create Button in Nav */
+.nav-item.create {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -30px;
+  box-shadow: 0 10px 25px rgba(255, 107, 107, 0.5);
+  border: 4px solid rgba(255,255,255,0.8);
+}
+
+/* ==========================================================================
+   HEADER / TOP BAR
+   ========================================================================== */
+
+.header, .nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.4);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-md);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.05);
+}
+
+@media (min-width: 768px) {
+  .header, .nav-bar {
+    width: calc(100% - 80px);
+    left: 80px;
+  }
+  .with-sidebar:not(.sidebar-collapsed) ~ .header,
+  .with-sidebar:not(.sidebar-collapsed) ~ .nav-bar {
+    width: calc(100% - 280px);
+    left: 280px;
+  }
+}
+
+/* ==========================================================================
+   ALERTS SPECIFIC STYLES
+   ========================================================================== */
+
+.alert-feed-page {
+  animation: fadeIn 0.5s ease;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.filters-bar {
+  display: flex;
+  gap: var(--space-sm);
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
-  scrollbar-width: none; /* Hide scrollbar Firefox */
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  scrollbar-width: none; /* Firefox */
+}
+.filters-bar::-webkit-scrollbar {
+  display: none; /* Chrome */
 }
 
-.reels-container::-webkit-scrollbar {
-  display: none; /* Hide scrollbar Chrome/Safari */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
 }
 
-.reel-card {
-  flex: 0 0 85%; /* Show partial next card for affordance */
-  scroll-snap-align: start;
-  transition: transform 0.2s ease;
+.filter-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text-dark);
 }
 
-.reel-card:active {
-  transform: scale(0.98);
+.filter-select {
+  padding: 8px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.6);
+  border: 1px solid white;
+  margin-bottom: 0;
 }
 
-/* ========================================
-   ✨ Animations & Micro-interactions
-   ======================================== */
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4); }
-  50% { box-shadow: 0 0 0 12px rgba(74, 144, 226, 0); }
+.alert-card {
+  position: relative;
+  overflow: hidden;
 }
 
-.post-card.active {
-  animation: pulse-glow 2s infinite;
-  border: 2px solid var(--primary-color);
+.alert-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 6px; height: 100%;
 }
 
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
+.alert-card.severity-critical::before { background: #ff4757; }
+.alert-card.severity-warning::before { background: #ffa502; }
+.alert-card.severity-info::before { background: #1e90ff; }
+.alert-card.severity-official::before { background: #2ed573; }
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.fade-in {
-  animation: fade-in 0.3s ease-out;
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }
 
-/* ========================================
-   🌙 Jamii Mode Toggle Support
-   ======================================== */
-[data-jamii-mode="focus"] {
-  --sidebar-width: 0px;
-  --content-padding: 1rem;
+.floating {
+  animation: float 4s ease-in-out infinite;
 }
 
-[data-jamii-mode="community"] {
-  --sidebar-width: 280px;
-  --content-padding: 2rem;
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+.text-gradient {
+  background: linear-gradient(45deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-[data-jamii-mode="discovery"] {
-  --sidebar-width: 320px;
-  --content-padding: 3rem;
-}
-
-/* ========================================
-   🔥 Trending Floating Chip
-   ======================================== */
-.trending-chip {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: linear-gradient(135deg, #ff6b6b, var(--accent-color));
-  color: white;
-  padding: 0.5rem 1rem;
+.glass-badge {
+  background: rgba(255,255,255,0.5);
+  backdrop-filter: blur(4px);
+  padding: 4px 12px;
   border-radius: var(--radius-full);
-  font-weight: 600;
-  box-shadow: 0 4px 20px rgba(238, 90, 36, 0.4);
-  z-index: 900;
-  cursor: grab;
-  transition: transform 0.2s, box-shadow 0.2s;
-  user-select: none;
-}
-
-.trending-chip:active {
-  cursor: grabbing;
-  transform: scale(0.95);
-}
-
-.trending-chip:hover {
-  box-shadow: 0 6px 25px rgba(238, 90, 36, 0.6);
-}
-
-/* ========================================
-   📱 Mobile-Specific Optimizations
-   ======================================== */
-@media (max-width: 767px) {
-  /* Hide desktop-only elements */
-  .desktop-only {
-    display: none !important;
-  }
-  
-  /* Optimize text for mobile readability */
-  body {
-    font-size: 16px; /* Prevents iOS zoom on input focus */
-  }
-  
-  /* Better spacing for mobile cards */
-  .post-card,
-  .card {
-    margin-bottom: var(--spacing-md);
-    border-radius: var(--radius-md);
-  }
-}
-
-/* ========================================
-   ♿ Accessibility Enhancements
-   ======================================== */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Focus indicators for keyboard navigation */
-button:focus-visible,
-a:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-}
-
-/* ========================================
-   🚀 Performance Optimizations
-   ======================================== */
-/* Lazy loading support */
-img[loading="lazy"] {
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-img[loading="lazy"].loaded {
-  opacity: 1;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border: 1px solid rgba(255,255,255,0.6);
 }

@@ -13,6 +13,19 @@ const { auth, checkAuth } = require('../middleware/auth');
 // ============================================
 
 /**
+ * GET /api/reputation/export
+ * Export Reputation Passport
+ */
+router.get('/export', auth, async (req, res) => {
+  try {
+    await reputationController.exportPassport(req, res);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * GET /api/reputation/:userId
  * Get user's reputation profile
  */

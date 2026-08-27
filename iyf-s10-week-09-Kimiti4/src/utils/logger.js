@@ -56,6 +56,27 @@ const logger = {
     if (isDevelopment) {
       console.log(`[AUTH] ${event}:`, details);
     }
+  },
+
+  /**
+   * Capture exceptions for monitoring (Sentry-ready)
+   */
+  captureException: (error, extra = {}) => {
+    // Sentry-ready implementation
+    const errorData = {
+      message: error.message || error.toString(),
+      stack: error.stack,
+      extra,
+      timestamp: new Date().toISOString()
+    };
+    
+    // In production, this would be: Sentry.captureException(error, extra)
+    console.error('[MONITORING] Exception captured:', errorData);
+    
+    // Mock sending to monitoring service
+    if (!isDevelopment) {
+      // fetch('/api/monitoring/errors', { method: 'POST', body: JSON.stringify(errorData) }).catch(() => {});
+    }
   }
 };
 

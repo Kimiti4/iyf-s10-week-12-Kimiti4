@@ -4,13 +4,13 @@ import { useAuth } from '../context/AuthContext'
 import SearchBar from './SearchBar'
 import OrganizationSelector from './OrganizationSelector'
 import DarkModeToggle from './DarkModeToggle'
+import { FaHome, FaStore, FaCalendarAlt, FaRobot, FaBell, FaComments, FaChartLine, FaPalette, FaTrophy, FaVoteYea, FaBullseye, FaUserShield, FaCrown, FaPlus, FaSignOutAlt } from 'react-icons/fa'
 import './NavBar.css'
 
 function NavBar() {
   const { user, isAuthenticated, logout } = useAuth()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [chatNotifications] = useState(3) // Mock notifications
 
   const isActive = (path) => location.pathname === path
 
@@ -43,11 +43,9 @@ function NavBar() {
         <div className="navbar-left">
           <button 
             className="mobile-menu-btn"
-            onClick={() => {
-              console.log('Menu toggle clicked, current state:', mobileMenuOpen);
-              setMobileMenuOpen(!mobileMenuOpen);
-            }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
           >
             <span className={`hamburger ${mobileMenuOpen ? 'open' : ''}`}>
               <span></span>
@@ -56,7 +54,7 @@ function NavBar() {
             </span>
           </button>
           <Link to="/" className="navbar-logo">
-            <span className="logo-icon"></span>
+            <span className="logo-icon">🌍</span>
             <span className="logo-text">
               Jamii<span className="logo-highlight">Link</span>
             </span>
@@ -83,7 +81,7 @@ function NavBar() {
               className={`nav-item ${isActive('/') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon"></span>
+              <span className="nav-icon"><FaHome /></span>
               <span className="nav-text">Feed</span>
             </Link>
             <Link 
@@ -91,7 +89,7 @@ function NavBar() {
               className={`nav-item ${isActive('/marketplace') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon"></span>
+              <span className="nav-icon"><FaStore /></span>
               <span className="nav-text">Market</span>
             </Link>
             <Link 
@@ -99,7 +97,7 @@ function NavBar() {
               className={`nav-item ${isActive('/events') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon"></span>
+              <span className="nav-icon"><FaCalendarAlt /></span>
               <span className="nav-text">Events</span>
             </Link>
           </div>
@@ -111,7 +109,7 @@ function NavBar() {
               className={`nav-item nav-feature ${isActive('/tiannara') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon"></span>
+              <span className="nav-icon"><FaRobot /></span>
               <span className="nav-text">Tiannara</span>
             </Link>
             <Link 
@@ -119,7 +117,7 @@ function NavBar() {
               className={`nav-item nav-alert ${isActive('/alerts') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon"></span>
+              <span className="nav-icon"><FaBell /></span>
               <span className="nav-text">Alerts</span>
             </Link>
             {/* Chat Icon with Notification Badge */}
@@ -128,12 +126,7 @@ function NavBar() {
               className="nav-item nav-chat"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon chat-icon">
-                
-                {chatNotifications > 0 && (
-                  <span className="chat-badge">{chatNotifications}</span>
-                )}
-              </span>
+              <span className="nav-icon chat-icon"><FaComments /></span>
               <span className="nav-text">Chat</span>
             </Link>
             <Link 
@@ -141,7 +134,7 @@ function NavBar() {
               className={`nav-item nav-activity ${isActive('/activity') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon activity-icon"></span>
+              <span className="nav-icon activity-icon"><FaChartLine /></span>
               <span className="nav-text">Activity</span>
             </Link>
             <Link 
@@ -149,7 +142,7 @@ function NavBar() {
               className={`nav-item nav-creator ${isActive('/creator') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon creator-icon"></span>
+              <span className="nav-icon creator-icon"><FaPalette /></span>
               <span className="nav-text">Creator</span>
             </Link>
             <Link 
@@ -157,7 +150,7 @@ function NavBar() {
               className={`nav-item nav-reputation ${isActive('/reputation') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon reputation-icon"></span>
+              <span className="nav-icon reputation-icon"><FaTrophy /></span>
               <span className="nav-text">Reputation</span>
             </Link>
             <Link 
@@ -165,7 +158,7 @@ function NavBar() {
               className={`nav-item nav-governance ${isActive('/governance') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon governance-icon"></span>
+              <span className="nav-icon governance-icon"><FaVoteYea /></span>
               <span className="nav-text">Governance</span>
             </Link>
             <Link 
@@ -173,7 +166,7 @@ function NavBar() {
               className={`nav-item nav-quests ${isActive('/quests') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon quests-icon"></span>
+              <span className="nav-icon quests-icon"><FaBullseye /></span>
               <span className="nav-text">Quests</span>
             </Link>
           </div>
@@ -193,26 +186,26 @@ function NavBar() {
                     className="nav-btn btn-founder"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <span className="btn-icon"></span>
+                    <span className="btn-icon"><FaCrown /></span>
                     <span className="btn-text">Founder</span>
                   </Link>
-                ) : (
+                ) : (user?.role === 'admin' || user?.isAdmin ? (
                   <Link 
                     to="/admin" 
                     className="nav-btn btn-admin"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <span className="btn-icon"></span>
+                    <span className="btn-icon"><FaUserShield /></span>
                     <span className="btn-text">Admin</span>
                   </Link>
-                )}
+                ) : null)}
                 
                 <Link 
                   to="/original/posts/create" 
                   className="nav-btn btn-create"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <span className="btn-icon"></span>
+                  <span className="btn-icon"><FaPlus /></span>
                   <span className="btn-text">Create</span>
                 </Link>
 
@@ -238,7 +231,7 @@ function NavBar() {
                     }} 
                     className="nav-btn btn-logout"
                   >
-                    <span className="btn-icon"></span>
+                    <span className="btn-icon"><FaSignOutAlt /></span>
                     <span className="btn-text">Logout</span>
                   </button>
                 </div>

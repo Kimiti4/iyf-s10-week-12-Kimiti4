@@ -19,6 +19,7 @@ export default function EnhancedLoginPage() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [notice, setNotice] = useState('');
     const [formErrors, setFormErrors] = useState({});
     const [loading, setLoading] = useState(false);
     
@@ -59,9 +60,15 @@ export default function EnhancedLoginPage() {
         }
     };
     
+    const getBackendBase = () => (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/+api\/?$/, '');
+
     const handleSocialLogin = (provider) => {
-        // TODO: Implement OAuth
-        alert(`${provider} login coming soon!`);
+        if (provider === 'Google') {
+            const backendUrl = getBackendBase();
+            window.location.href = `${backendUrl}/api/auth/google`;
+        } else {
+            setNotice(`${provider} login is coming soon. Meanwhile, sign up with email or Google.`);
+        }
     };
     
     return (
@@ -98,6 +105,18 @@ export default function EnhancedLoginPage() {
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {notice && (
+                    <motion.div 
+                        className="form-notice"
+                        role="status"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                    >
+                        {notice}
+                    </motion.div>
+                )}
                 
                 {/* Login Method Toggle */}
                 <div className="login-method-toggle">
@@ -183,9 +202,13 @@ export default function EnhancedLoginPage() {
                             <input type="checkbox" />
                             <span>Remember me</span>
                         </label>
-                        <Link to="/forgot-password" className="forgot-link">
+                        <button
+                            type="button"
+                            className="forgot-link"
+                            onClick={() => setNotice('Password reset is coming soon. Contact your community admin for assistance.')}
+                        >
                             Forgot password?
-                        </Link>
+                        </button>
                     </div>
                     
                     <motion.button 

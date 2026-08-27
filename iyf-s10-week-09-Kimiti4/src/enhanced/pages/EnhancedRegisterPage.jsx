@@ -7,10 +7,11 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { FaEnvelope, FaPhone, FaLock, FaUser, FaMapMarkerAlt, FaEye, FaEyeSlash, FaCheckCircle } from 'react-icons/fa';
+import { FaEnvelope, FaPhone, FaLock, FaUser, FaMapMarkerAlt, FaEye, FaEyeSlash, FaCheckCircle, FaQrcode } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { validateRegistration, sanitizeInput } from '../../utils/validation';
 import ConstellationBackground from '../components/ConstellationBackground';
+import api from '../../services/api';
 import './EnhancedRegisterPage.css';
 
 export default function EnhancedRegisterPage() {
@@ -27,6 +28,8 @@ export default function EnhancedRegisterPage() {
     const [verificationMethod, setVerificationMethod] = useState('email');
     const [verificationCode, setVerificationCode] = useState('');
     const [codeSent, setCodeSent] = useState(false);
+    const [totpSecret, setTotpSecret] = useState('');
+    const [qrCodeUrl, setQrCodeUrl] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -41,7 +44,6 @@ export default function EnhancedRegisterPage() {
             [name]: value
         });
         
-        // Clear error for this field when user starts typing
         if (formErrors[name]) {
             setFormErrors({
                 ...formErrors,
@@ -50,57 +52,11 @@ export default function EnhancedRegisterPage() {
         }
     };
     
-    const sendVerificationCode = async () => {
-        setError('');
-        setLoading(true);
-        
-        try {
-            // TODO: Implement actual verification code sending
-            // For now, simulate success
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setCodeSent(true);
-        } catch (err) {
-            setError('Failed to send verification code. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    const verifyCode = async () => {
-        setError('');
-        setLoading(true);
-        
-        try {
-            // TODO: Implement actual code verification
-            // For now, accept any 6-digit code
-            if (verificationCode.length === 6) {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Trigger confetti celebration
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    colors: ['#3b82f6', '#8b5cf6', '#ec4899']
-                });
-                
-                setStep(2);
-            } else {
-                setError('Please enter a valid 6-digit code');
-            }
-        } catch (err) {
-            setError('Invalid verification code');
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    const handleSubmit = async (e) => {
+    const handleNextStep = (e) => {
         e.preventDefault();
         setError('');
         setFormErrors({});
         
-        // Sanitize inputs
         const sanitizedData = {
             ...formData,
             name: sanitizeInput(formData.name),
@@ -108,7 +64,6 @@ export default function EnhancedRegisterPage() {
             location: sanitizeInput(formData.location)
         };
         
-        // Validate form using utility
         const validation = validateRegistration({
             username: sanitizedData.name,
             email: sanitizedData.email,
@@ -122,36 +77,68 @@ export default function EnhancedRegisterPage() {
             return;
         }
         
+        setStep(2);
+    };
+
+    const sendVerificationCode = async () => {
+        setError('');
         setLoading(true);
         
         try {
-            const { name, email, phone, password, location } = formData;
-            await register({ 
-                username: name, 
-                email,
-                phone,
-                password, 
-                profile: { location },
-                verified: true // Mark as verified after code verification
+            const contact = verificationMethod === 'phone' ? formData.phone : formData.email;
+            const response = await api.auth.sendVerification({ method: verificationMethod, contact });
+            
+            if (verificationMethod === 'totp' && response.data?.secret) {
+                setTotpSecret(response.data.secret);
+                setQrCodeUrl(response.data.qrCode);
+            }
+            
+            setCodeSent(true);
+        } catch (err) {
+            setError(err.message || 'Failed to send verification code. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    const verifyCodeAndRegister = async () => {
+        setError('');
+        setLoading(true);
+        
+        try {
+            // 1. Verify Code
+            const contact = verificationMethod === 'phone' ? formData.phone : formData.email;
+            await api.auth.verifyCode({
+                method: verificationMethod,
+                contact,
+                code: verificationCode,
+                secret: totpSecret
             });
             
-            // Success animation
+            // 2. Actually Register User
+            await register({ 
+                username: formData.name, 
+                email: formData.email.trim().toLowerCase(),
+                phone: formData.phone,
+                password: formData.password, 
+                profile: { location: formData.location },
+                verified: true
+            });
+            
             confetti({
                 particleCount: 150,
                 spread: 100,
                 origin: { y: 0.6 }
             });
             
-            // Redirect to login
             setTimeout(() => {
                 navigate('/login', { 
-                    state: { 
-                        message: '🎉 Registration successful! Your account is verified. Please login.' 
-                    } 
+                    state: { message: '🎉 Registration successful! Your account is verified. Please login.' } 
                 });
             }, 1500);
+            
         } catch (err) {
-            setError(err.message || 'Registration failed. Please try again.');
+            setError(err.message || 'Invalid verification code or registration failed');
         } finally {
             setLoading(false);
         }
@@ -167,12 +154,10 @@ export default function EnhancedRegisterPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                {/* Header */}
                 <motion.div className="register-header">
                     <h1>✨ Join JamiiLink</h1>
                     <p className="subtitle">Create your account and start connecting</p>
                     
-                    {/* Progress Steps */}
                     <div className="progress-steps">
                         <div className={`step ${step >= 1 ? 'active' : ''}`}>
                             <div className="step-number">1</div>
@@ -186,7 +171,6 @@ export default function EnhancedRegisterPage() {
                     </div>
                 </motion.div>
                 
-                {/* Error Message */}
                 <AnimatePresence>
                     {error && (
                         <motion.div 
@@ -200,10 +184,9 @@ export default function EnhancedRegisterPage() {
                     )}
                 </AnimatePresence>
                 
-                {/* Step 1: Basic Information */}
                 {step === 1 && (
                     <motion.form
-                        onSubmit={handleSubmit}
+                        onSubmit={handleNextStep}
                         className="enhanced-register-form"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -220,9 +203,7 @@ export default function EnhancedRegisterPage() {
                                 required
                                 className={formErrors.username ? 'input-error' : ''}
                             />
-                            {formErrors.username && (
-                                <span className="field-error">{formErrors.username}</span>
-                            )}
+                            {formErrors.username && <span className="field-error">{formErrors.username}</span>}
                         </div>
                         
                         <div className="input-group">
@@ -236,9 +217,7 @@ export default function EnhancedRegisterPage() {
                                 required
                                 className={formErrors.email ? 'input-error' : ''}
                             />
-                            {formErrors.email && (
-                                <span className="field-error">{formErrors.email}</span>
-                            )}
+                            {formErrors.email && <span className="field-error">{formErrors.email}</span>}
                         </div>
                         
                         <div className="input-group">
@@ -270,7 +249,7 @@ export default function EnhancedRegisterPage() {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                placeholder="Password (min 8 characters, uppercase, lowercase, number)"
+                                placeholder="Password (min 8 characters)"
                                 required
                                 minLength="8"
                                 className={formErrors.password ? 'input-error' : ''}
@@ -282,9 +261,7 @@ export default function EnhancedRegisterPage() {
                             >
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </button>
-                            {formErrors.password && (
-                                <span className="field-error">{formErrors.password}</span>
-                            )}
+                            {formErrors.password && <span className="field-error">{formErrors.password}</span>}
                         </div>
                         
                         <div className="input-group">
@@ -298,24 +275,20 @@ export default function EnhancedRegisterPage() {
                                 required
                                 className={formErrors.confirmPassword ? 'input-error' : ''}
                             />
-                            {formErrors.confirmPassword && (
-                                <span className="field-error">{formErrors.confirmPassword}</span>
-                            )}
+                            {formErrors.confirmPassword && <span className="field-error">{formErrors.confirmPassword}</span>}
                         </div>
                         
                         <motion.button 
                             type="submit" 
                             className="btn-register"
-                            disabled={loading}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
-                            {loading ? 'Creating Account...' : 'Create Account'}
+                            Next: Verification
                         </motion.button>
                     </motion.form>
                 )}
                 
-                {/* Step 2: Verification */}
                 {step === 2 && (
                     <motion.div
                         className="verification-section"
@@ -325,12 +298,11 @@ export default function EnhancedRegisterPage() {
                         <div className="verification-header">
                             <FaCheckCircle className="verified-icon" />
                             <h2>Verify Your Account</h2>
-                            <p>We sent a verification code to your {verificationMethod}</p>
+                            <p>Choose a method to secure your account</p>
                         </div>
                         
                         {!codeSent ? (
                             <div className="verification-method">
-                                <p>Choose verification method:</p>
                                 <div className="method-buttons">
                                     <button
                                         type="button"
@@ -344,7 +316,14 @@ export default function EnhancedRegisterPage() {
                                         className={`method-btn ${verificationMethod === 'phone' ? 'active' : ''}`}
                                         onClick={() => setVerificationMethod('phone')}
                                     >
-                                        <FaPhone /> Phone
+                                        <FaPhone /> Messaging
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`method-btn ${verificationMethod === 'totp' ? 'active' : ''}`}
+                                        onClick={() => setVerificationMethod('totp')}
+                                    >
+                                        <FaQrcode /> Authenticator
                                     </button>
                                 </div>
                                 <motion.button
@@ -354,11 +333,22 @@ export default function EnhancedRegisterPage() {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
-                                    {loading ? 'Sending...' : 'Send Verification Code'}
+                                    {loading ? 'Processing...' : (verificationMethod === 'totp' ? 'Generate QR Code' : 'Send Code')}
                                 </motion.button>
                             </div>
                         ) : (
                             <div className="code-input-section">
+                                {verificationMethod === 'totp' && qrCodeUrl && (
+                                    <div className="totp-setup">
+                                        <p>Scan this QR code with Google Authenticator or Authy:</p>
+                                        <img src={qrCodeUrl} alt="TOTP QR Code" className="qr-code" />
+                                    </div>
+                                )}
+                                
+                                {verificationMethod !== 'totp' && (
+                                    <p>Enter the 6-digit code sent to your {verificationMethod}</p>
+                                )}
+                                
                                 <input
                                     type="text"
                                     value={verificationCode}
@@ -369,26 +359,29 @@ export default function EnhancedRegisterPage() {
                                 />
                                 <motion.button
                                     className="btn-verify"
-                                    onClick={verifyCode}
+                                    onClick={verifyCodeAndRegister}
                                     disabled={loading || verificationCode.length !== 6}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
-                                    {loading ? 'Verifying...' : 'Verify Code'}
+                                    {loading ? 'Verifying & Registering...' : 'Verify & Create Account'}
                                 </motion.button>
                                 <button
                                     type="button"
                                     className="resend-link"
-                                    onClick={() => setCodeSent(false)}
+                                    onClick={() => {
+                                        setCodeSent(false);
+                                        setVerificationCode('');
+                                        setQrCodeUrl('');
+                                    }}
                                 >
-                                    Resend code
+                                    Change method / Resend
                                 </button>
                             </div>
                         )}
                     </motion.div>
                 )}
                 
-                {/* Footer */}
                 <div className="register-footer">
                     <p>Already have an account? <Link to="/login">Login here</Link></p>
                 </div>

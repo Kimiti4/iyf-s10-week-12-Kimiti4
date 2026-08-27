@@ -213,6 +213,123 @@ const updateProfile = asyncHandler(async (req, res) => {
   });
 });
 
+const otplib = require('otplib');
+const qrcode = require('qrcode');
+const nodemailer = require('nodemailer');
+
+// In-memory store for email/bot verification codes
+// Format: { 'emailOrPhone': { code: '123456', expiresAt: 123456789 } }
+const verificationCodes = new Map();
+
+// Generate a 6-digit code
+const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+/**
+ * Send Verification Code
+ */
+const sendVerification = asyncHandler(async (req, res) => {
+  const { method, contact } = req.body;
+  
+  if (!method || !contact) {
+    return res.status(400).json({ success: false, error: 'Method and contact are required' });
+  }
+
+  if (method === 'totp') {
+    // Generate TOTP secret and QR code for Authenticator apps
+    const secret = otplib.authenticator.generateSecret();
+    const otpauth = otplib.authenticator.keyuri(contact, 'JamiiLink', secret);
+    
+    const qrCodeDataUrl = await qrcode.toDataURL(otpauth);
+    
+    return res.json({
+      success: true,
+      message: 'TOTP setup generated',
+      data: { secret, qrCode: qrCodeDataUrl }
+    });
+  }
+
+  // Generate standard 6-digit code for Email/Phone
+  const code = generateCode();
+  verificationCodes.set(contact, { code, expiresAt: Date.now() + 10 * 60 * 1000 });
+
+  if (method === 'email') {
+    // Configure Ethereal Email (Mock SMTP for dev)
+    const testAccount = await nodemailer.createTestAccount();
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: { user: testAccount.user, pass: testAccount.pass }
+    });
+
+    const info = await transporter.sendMail({
+      from: '"JamiiLink Security" <security@jamiilink.com>',
+      to: contact,
+      subject: 'Your JamiiLink Verification Code',
+      text: `Your verification code is: ${code}`,
+      html: `<h2>Welcome to JamiiLink!</h2><p>Your verification code is: <strong>${code}</strong></p>`
+    });
+
+    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+    
+    return res.json({
+      success: true,
+      message: 'Verification code sent via Email (Check server console for preview URL)'
+    });
+  } else if (method === 'phone') {
+    // Simulated WhatsApp/Telegram Bot
+    console.log(`[BOT SIMULATION] Sending WhatsApp/Telegram message to ${contact}: Your code is ${code}`);
+    
+    return res.json({
+      success: true,
+      message: 'Verification code sent via Messaging App'
+    });
+  }
+
+  res.status(400).json({ success: false, error: 'Invalid verification method' });
+});
+
+/**
+ * Verify Code
+ */
+const verifyCode = asyncHandler(async (req, res) => {
+  const { method, contact, code, secret } = req.body;
+
+  if (!method || !contact || !code) {
+    return res.status(400).json({ success: false, error: 'Method, contact, and code are required' });
+  }
+
+  if (method === 'totp') {
+    if (!secret) return res.status(400).json({ success: false, error: 'TOTP secret required for verification' });
+    
+    const isValid = otplib.authenticator.check(code, secret);
+    if (!isValid) return res.status(400).json({ success: false, error: 'Invalid authenticator code' });
+    
+    return res.json({ success: true, message: 'Code verified successfully' });
+  }
+
+  // Handle Email/Phone
+  const record = verificationCodes.get(contact);
+  
+  if (!record) {
+    return res.status(400).json({ success: false, error: 'No verification code requested or it expired' });
+  }
+  
+  if (Date.now() > record.expiresAt) {
+    verificationCodes.delete(contact);
+    return res.status(400).json({ success: false, error: 'Verification code expired' });
+  }
+  
+  if (record.code !== code) {
+    return res.status(400).json({ success: false, error: 'Invalid verification code' });
+  }
+  
+  // Clean up code after successful verification
+  verificationCodes.delete(contact);
+
+  res.json({ success: true, message: 'Code verified successfully' });
+});
+
 /**
  * Change password
  */
@@ -278,4 +395,4 @@ const changePassword = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { register, login, logout, getMe, updateProfile, changePassword };
+module.exports = { register, login, logout, getMe, updateProfile, changePassword, sendVerification, verifyCode };

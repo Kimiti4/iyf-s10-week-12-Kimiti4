@@ -48,6 +48,16 @@
     text-align: center;
 }
 
+.form-notice {
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.35);
+    color: #93c5fd;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
 /* Login Method Toggle */
 .login-method-toggle {
     display: flex;

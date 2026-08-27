@@ -236,28 +236,7 @@
   position: relative;
 }
 
-/* Specific Nav Icons */
-.primary-nav .nav-item:nth-child(1) .nav-icon::before {
-  content: '';
-}
-
-.primary-nav .nav-item:nth-child(2) .nav-icon::before {
-  content: '\\e800'; /* Shopping cart icon using Unicode */
-  font-family: 'FontAwesome';
-}
-
-.primary-nav .nav-item:nth-child(3) .nav-icon::before {
-  content: '';
-}
-
-.feature-nav .nav-item:nth-child(1) .nav-icon::before {
-  content: '';
-}
-
-.feature-nav .nav-item:nth-child(2) .nav-icon::before {
-  content: '\\e801'; /* Alert bell icon */
-  font-family: 'FontAwesome';
-}
+/* Nav icons are rendered with react-icons in JSX */
 
 .nav-text {
   font-size: 1.1rem;
@@ -271,83 +250,7 @@
   position: relative;
 }
 
-.chat-icon::before {
-  content: '\\e802'; /* Chat bubble */
-  font-family: 'FontAwesome';
-  font-size: 1.4rem;
-  animation: chatBounce 2s ease-in-out infinite;
-}
-
-.activity-icon::before {
-  content: '\\e803'; /* Activity chart */
-  font-family: 'FontAwesome';
-  font-size: 1.3rem;
-}
-
-.creator-icon::before {
-  content: '\\e804'; /* Creator palette */
-  font-family: 'FontAwesome';
-  font-size: 1.3rem;
-  animation: creatorPulse 2s ease-in-out infinite;
-}
-
-@keyframes creatorPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-}
-
-.reputation-icon::before {
-  content: '\\e805'; /* Trophy */
-  font-family: 'FontAwesome';
-  font-size: 1.3rem;
-  animation: trophyShine 2.5s ease-in-out infinite;
-}
-
-@keyframes trophyShine {
-  0%, 100% { 
-    filter: brightness(1);
-    transform: scale(1);
-  }
-  50% { 
-    filter: brightness(1.3);
-    transform: scale(1.1);
-  }
-}
-
-.governance-icon::before {
-  content: '\\e806'; /* Governance ballot */
-  font-family: 'FontAwesome';
-  font-size: 1.3rem;
-  animation: ballotBox 2s ease-in-out infinite;
-}
-
-@keyframes ballotBox {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-.quests-icon::before {
-  content: '\\e807'; /* Quest target */
-  font-family: 'FontAwesome';
-  font-size: 1.3rem;
-  animation: targetPulse 2s ease-in-out infinite;
-}
-
-@keyframes targetPulse {
-  0%, 100% { 
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  50% { 
-    transform: scale(1.15);
-    filter: brightness(1.2);
-  }
-}
-
-@keyframes chatBounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
+/* Chat Icon container */
 
 .chat-badge {
   position: absolute;
@@ -853,8 +756,8 @@
 }
 
 /* Enhanced hover effects with subtle scale */
-.nav-item:hover .nav-icon::before {
-  transform: scale(1.15);
+.nav-item:hover .nav-icon {
+  transform: scale(1.05);
 }
 
 /* Ripple effect on click */

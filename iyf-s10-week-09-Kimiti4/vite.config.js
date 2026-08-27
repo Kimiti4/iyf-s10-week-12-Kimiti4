@@ -1,8 +1,40 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+import compression from 'vite-plugin-compression'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    compression({ algorithm: 'brotliCompress', ext: '.br' }),
+    visualizer({ filename: 'dist/stats.html', open: false, gzipSize: true, brotliSize: true }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      // Custom authored SW (src/sw.js). generateSW would overwrite it, so we
+      // use injectManifest to keep our offline-draft sync handler.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
+      includeAssets: ['icon-192.png', 'offline.html'],
+      manifest: {
+        name: 'JamiiLink PWA',
+        short_name: 'JamiiLink',
+        description: 'Community network for connection and impact',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: 'icon-192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          }
+        ]
+      },
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}']
+      }
+    })
+  ],
   server: {
     port: 5174,
     proxy: {

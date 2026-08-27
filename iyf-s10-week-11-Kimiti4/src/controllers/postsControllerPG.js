@@ -259,6 +259,33 @@ const getOrganizationPosts = asyncHandler(async (req, res) => {
   });
 });
 
+// GET trending hashtags
+const getTrendingTags = asyncHandler(async (req, res) => {
+  const { limit = 10 } = req.query;
+  const { query } = require('../config/postgres');
+  
+  const result = await query(`
+    SELECT unnest(tags) AS tag, COUNT(*) AS count
+    FROM posts
+    WHERE tags IS NOT NULL
+    GROUP BY tag
+    ORDER BY count DESC
+    LIMIT $1
+  `, [parseInt(limit)]);
+
+  const formattedTags = result.rows.map(row => ({
+    tag: row.tag.replace(/^#/, ''), // Remove # if it's there
+    count: parseInt(row.count),
+    trend: 'up', // Mock for now
+    change: '+10%' // Mock for now
+  }));
+
+  res.json({
+    success: true,
+    data: formattedTags
+  });
+});
+
 module.exports = {
   getAllPosts,
   getPostById,
@@ -268,5 +295,6 @@ module.exports = {
   likePost,
   upvotePost,
   getUserPosts,
-  getOrganizationPosts
+  getOrganizationPosts,
+  getTrendingTags
 };

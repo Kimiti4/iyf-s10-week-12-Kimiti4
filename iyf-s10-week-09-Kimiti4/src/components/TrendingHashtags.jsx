@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import logger from '../utils/logger';
+import api from '../services/api';
 import './TrendingHashtags.css';
 
 export default function TrendingHashtags({ limit = 10 }) {
@@ -21,22 +21,18 @@ export default function TrendingHashtags({ limit = 10 }) {
 
   const fetchTrendingHashtags = async () => {
     try {
-      // TODO: Replace with actual API call
-      // For now, using mock data
-      const mockHashtags = [
-        { tag: 'NairobiTraffic', count: 2847, trend: 'up', change: '+42%' },
-        { tag: 'KenyaAgriculture', count: 1923, trend: 'up', change: '+28%' },
-        { tag: 'SkillSwap', count: 1456, trend: 'up', change: '+15%' },
-        { tag: 'MtaaniAlerts', count: 1234, trend: 'down', change: '-5%' },
-        { tag: 'GigEconomy', count: 987, trend: 'up', change: '+12%' },
-        { tag: 'FarmersMarket', count: 876, trend: 'up', change: '+23%' },
-        { tag: 'CommunityHelp', count: 765, trend: 'stable', change: '0%' },
-        { tag: 'KCBusiness', count: 654, trend: 'up', change: '+8%' },
-        { tag: 'NairobiLife', count: 543, trend: 'down', change: '-3%' },
-        { tag: 'KenyaTech', count: 432, trend: 'up', change: '+19%' },
-      ];
-
-      setHashtags(mockHashtags.slice(0, limit));
+      const res = await api.posts.getTrending({ limit });
+      if (res.data && res.data.length > 0) {
+        setHashtags(res.data);
+      } else {
+        // Fallback to mock data if no tags exist
+        const mockHashtags = [
+          { tag: 'NairobiTraffic', count: 2847, trend: 'up', change: '+42%' },
+          { tag: 'KenyaAgriculture', count: 1923, trend: 'up', change: '+28%' },
+          { tag: 'SkillSwap', count: 1456, trend: 'up', change: '+15%' },
+        ];
+        setHashtags(mockHashtags.slice(0, limit));
+      }
       setLoading(false);
     } catch (error) {
       logger.error('Error fetching trending hashtags:', error);

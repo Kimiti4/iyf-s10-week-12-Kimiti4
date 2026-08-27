@@ -15,8 +15,8 @@ const {
   unconfirmAlert,
   verifyAlert,
   getAlertStats
-} = require('../controllers/alertsController');
-const requireAuth = require('../middleware/requireAuth');
+} = require('../controllers/alertsControllerPG');
+const { protect: requireAuth, restrictTo } = require('../middleware/authPG');
 
 // Public routes
 router.get('/', getAlerts);
@@ -33,6 +33,6 @@ router.post('/:id/confirm', requireAuth, confirmAlert);
 router.delete('/:id/confirm', requireAuth, unconfirmAlert);
 
 // Admin/Moderator verification route
-router.put('/:id/verify', requireAuth, verifyAlert);
+router.put('/:id/verify', requireAuth, restrictTo('admin', 'moderator'), verifyAlert);
 
 module.exports = router;

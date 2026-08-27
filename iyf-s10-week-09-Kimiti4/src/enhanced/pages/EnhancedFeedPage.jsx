@@ -11,13 +11,41 @@ import ConstellationBackground from '../components/ConstellationBackground';
 import EnhancedPostCard from '../components/EnhancedPostCard';
 import ReelsSection from '../components/ReelsSection';
 import { FeedSkeleton } from '../../components/SkeletonLoader';
+import { postsAPI } from '../../services/api';
+import { fetchWithRetry } from '../../utils/apiRetry';
 import './EnhancedFeedPage.css';
+
+/** Map backend post records onto the shape the feed cards expect. */
+function normalizePost(p) {
+    const author = p.author || {};
+    return {
+        id: p._id || p.id || `post-${Math.random().toString(36).slice(2, 9)}`,
+        title: p.title || '',
+        content: p.content || p.body || p.description || '',
+        author: {
+            _id: author._id || author.id || p.userId || 'unknown',
+            username: author.username || author.name || author.displayName || 'Anonymous',
+            avatar: author.avatar || author.profile?.avatar || null,
+            profile: author.profile || { avatar: author.avatar || null }
+        },
+        verified: !!p.verified,
+        likes: Number(p.likes ?? p.upvotes ?? 0) || 0,
+        downvotes: Number(p.downvotes ?? 0) || 0,
+        reblogs: Number(p.reblogs ?? p.shares ?? 0) || 0,
+        comments: Number(Array.isArray(p.comments) ? p.comments.length : (p.comments ?? 0)) || 0,
+        tags: Array.isArray(p.tags) ? p.tags : [],
+        category: p.category || 'all',
+        image: p.image || p.imageUrl || '',
+        createdAt: p.createdAt || new Date().toISOString()
+    };
+}
 
 export default function EnhancedFeedPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [posts, setPosts] = useState([]);
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [dataMode, setDataMode] = useState('live'); // 'live' | 'sample'
     const [showHeader, setShowHeader] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [showBackToTop, setShowBackToTop] = useState(false);
@@ -25,7 +53,7 @@ export default function EnhancedFeedPage() {
     // Get active feed from URL query params
     const activeFeed = searchParams.get('feed') || 'all';
     
-    // Mock data for demonstration with categories
+    // Sample content shown when the backend is unreachable
     useEffect(() => {
         const mockPosts = [
             // Mtaani Alerts
@@ -214,10 +242,41 @@ export default function EnhancedFeedPage() {
             }
         ];
         
-        setTimeout(() => {
-            setPosts(mockPosts);
-            setLoading(false);
-        }, 500);
+        let cancelled = false;
+
+        const loadPosts = async () => {
+            try {
+                const data = await fetchWithRetry(
+                    () => postsAPI.getAll({ limit: 50, sort: 'new' }),
+                    2,
+                    400
+                );
+                if (cancelled) return;
+                const list = Array.isArray(data)
+                    ? data
+                    : Array.isArray(data.posts) ? data.posts
+                    : Array.isArray(data.data) ? data.data
+                    : [];
+
+                if (list.length > 0) {
+                    setPosts(list.map(normalizePost));
+                    setDataMode('live');
+                } else {
+                    setPosts(mockPosts);
+                    setDataMode('sample');
+                }
+            } catch (err) {
+                if (cancelled) return;
+                // Backend unreachable — show friendly sample content + banner
+                setPosts(mockPosts);
+                setDataMode('sample');
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        };
+
+        loadPosts();
+        return () => { cancelled = true; };
     }, []);
     
     // Filter posts based on active feed
@@ -284,6 +343,16 @@ export default function EnhancedFeedPage() {
             
             {/* Main Content - No Sidebar */}
             <main className="feed-content-full">
+                    {dataMode === 'sample' && (
+                        <motion.div
+                            className="sample-data-banner"
+                            role="status"
+                            initial={{ opacity: 0, y: -8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            🔹 You're viewing sample content — connect the backend (dev server on port 3000) to see live community posts.
+                        </motion.div>
+                    )}
                     {/* Reels Section - Only show on "For You" feed */}
                     {activeFeed === 'all' && (
                         <ReelsSection />

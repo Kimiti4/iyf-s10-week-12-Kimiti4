@@ -6,11 +6,13 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { queueOfflinePost, isOnline } from '../utils/offlinePost'
 import { useOrganization } from '../context/OrganizationContext'
+import { useToast } from '../components/Toast'
 import { validatePost, sanitizeInput } from '../utils/validation'
 import { motion } from 'framer-motion'
 
 export default function CreatePostPage() {
   const navigate = useNavigate()
+  const toast = useToast()
   const { currentOrg } = useOrganization()
   const [formData, setFormData] = useState({
     title: '',
@@ -85,6 +87,7 @@ export default function CreatePostPage() {
         })
         
         if (response.ok) {
+          toast.success('Post published successfully! 🎉')
           if (currentOrg) navigate(`/org/${currentOrg.slug}`)
           else navigate('/posts')
         } else {
@@ -94,14 +97,14 @@ export default function CreatePostPage() {
         // Queue for offline submission
         await queueOfflinePost(sanitizedData)
         setPendingQueue(pendingQueue + 1)
-        alert(`Post saved! 📭 It will send when you're back online.`)
+        toast.success(`Post saved! 📭 It will send when you're back online.`)
         navigate(-1)
       }
     } catch (err) {
       // Fallback to offline queue on error
       await queueOfflinePost(sanitizedData)
       setPendingQueue(pendingQueue + 1)
-      alert(`Saved for later! 📭 Will send when online.`)
+      toast.success(`Saved for later! 📭 Will send when online.`)
       navigate(-1)
     } finally {
       setLoading(false)

@@ -8,11 +8,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { SKILL_CATEGORIES, getSkillMatches, createSkillProfile } from '../models/SkillMatch'
 import SkillMatchCard from '../components/SkillMatchCard'
 import ImpactMeter from '../components/ImpactMeter'
+import { useToast } from '../components/Toast'
 import { colors } from '../styles/designSystem'
 import './SkillMatcher.css'
 
 const SkillMatcher = () => {
   const { user } = useAuth()
+  const toast = useToast()
   const [activeTab, setActiveTab] = useState('matches')
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
@@ -29,7 +31,7 @@ const SkillMatcher = () => {
   }
 
   const handleConnect = (matchedUserId) => {
-    alert(`Connection request sent to user ${matchedUserId}! 🎉`)
+    toast.success(`Connection request sent to user ${matchedUserId}! 🎉`)
   }
 
   const handleCreateProfile = async () => {
@@ -129,7 +131,7 @@ const SkillMatcher = () => {
 
               <motion.button
                 className="btn-primary"
-                onClick={() => alert('Profile saved! 🎉')}
+                onClick={() => toast.success('Profile saved! 🎉')}
                 whileHover={{ scale: 1.05 }}
               >
                 Save Profile ✨

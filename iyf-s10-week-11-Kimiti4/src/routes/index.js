@@ -13,17 +13,21 @@ const metricsRoutes = require('./metrics');
 const tiannaraRoutes = require('./tiannara');
 const authRoutes = require('./auth');
 const alertsRoutes = require('./alerts');
+const { query } = require('../config/postgres');
 
 // Health check
 router.get('/health', (req, res) => {
-  res.json({
-    status: '✅ OK',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    memory: process.memoryUsage().heapUsed / 1024 / 1024,
-    environment: process.env.NODE_ENV || 'development',
-    categories: ['mtaani', 'skill', 'farm', 'gig', 'alert']
-  });
+  query('SELECT 1')
+    .then(() => res.json({
+      status: 'ok',
+      db: true,
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: process.memoryUsage().heapUsed / 1024 / 1024,
+      environment: process.env.NODE_ENV || 'development',
+      categories: ['mtaani', 'skill', 'farm', 'gig', 'alert']
+    }))
+    .catch(() => res.status(503).json({ status: 'degraded', db: false }));
 });
 
 // Market prices endpoint (FarmLink price transparency)

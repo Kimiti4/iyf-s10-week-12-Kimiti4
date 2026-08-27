@@ -45,11 +45,13 @@
   visibility: visible;
 }
 
-/* Main content should NOT shift on mobile */
-.main-content {
-  margin-left: 0 !important;
-  width: 100%;
-  transition: filter 0.3s;
+/* Main content should NOT shift on mobile/tablet (sidebar is off-canvas there) */
+@media (max-width: 1023px) {
+  .main-content {
+    margin-left: 0 !important;
+    width: 100%;
+    transition: filter 0.3s;
+  }
 }
 
 /* Dim content when sidebar open on mobile */
@@ -236,6 +238,18 @@
 
 .sidebar.collapsed .nav-label {
   display: none;
+}
+
+.offline-badge {
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
 }
 
 .nav-badge {

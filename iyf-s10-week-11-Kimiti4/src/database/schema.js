@@ -8,6 +8,8 @@ const createTables = async () => {
   console.log('🔧 Creating database tables...');
 
   try {
+    await query(`CREATE EXTENSION IF NOT EXISTS pgcrypto`);
+
     // 1. Users Table
     await query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -47,9 +49,53 @@ const createTables = async () => {
         -- Current organization context
         current_organization_id UUID,
         
+        -- Reputation
+        reputation_score INTEGER DEFAULT 0,
+        reputation_level VARCHAR(20) DEFAULT 'bronze',
+        
         -- Timestamps
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS impact_metrics (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        event_type VARCHAR(50) NOT NULL,
+        impact_value INTEGER DEFAULT 1,
+        reference_id VARCHAR(255),
+        description TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS user_skills (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        skill_name VARCHAR(100) NOT NULL,
+        proficiency INTEGER DEFAULT 3,
+        is_offering BOOLEAN DEFAULT true,
+        is_seeking BOOLEAN DEFAULT false,
+        description TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS skill_matches (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user1_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        user2_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        skill1 VARCHAR(100) NOT NULL,
+        skill2 VARCHAR(100) NOT NULL,
+        status VARCHAR(20) DEFAULT 'pending',
+        quality_rating INTEGER,
+        testimonial TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        completed_at TIMESTAMP
       )
     `);
 
@@ -195,6 +241,41 @@ const createTables = async () => {
       )
     `);
 
+    await query(`
+      CREATE TABLE IF NOT EXISTS alerts (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title VARCHAR(200) NOT NULL,
+        description TEXT NOT NULL,
+        category VARCHAR(50) NOT NULL,
+        severity VARCHAR(20) NOT NULL DEFAULT 'medium',
+        location VARCHAR(300),
+        longitude DOUBLE PRECISION,
+        latitude DOUBLE PRECISION,
+        images JSONB DEFAULT '[]'::jsonb,
+        tags TEXT[],
+        author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        organization_id UUID REFERENCES organizations(id) ON DELETE SET NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'active',
+        verification_level VARCHAR(30) NOT NULL DEFAULT 'unverified',
+        reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        reviewed_at TIMESTAMP,
+        review_notes TEXT,
+        views INTEGER NOT NULL DEFAULT 0,
+        expires_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS alert_confirmations (
+        alert_id UUID NOT NULL REFERENCES alerts(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        confirmed_at TIMESTAMP DEFAULT NOW(),
+        PRIMARY KEY (alert_id, user_id)
+      )
+    `);
+
     // 6. MFA Methods Table
     await query(`
       CREATE TABLE IF NOT EXISTS mfa_methods (
@@ -239,6 +320,15 @@ const createTables = async () => {
       console.log('ℹ️  Column current_organization_id may already exist or cannot be added');
     }
     await query(`CREATE INDEX IF NOT EXISTS idx_users_current_org ON users(current_organization_id)`);
+
+    // Add reputation columns if they don't exist
+    try {
+      await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reputation_score INTEGER DEFAULT 0`);
+      await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reputation_level VARCHAR(20) DEFAULT 'bronze'`);
+    } catch (err) {
+      console.log('ℹ️  Reputation columns may already exist or cannot be added');
+    }
+    await query(`CREATE INDEX IF NOT EXISTS idx_users_reputation ON users(reputation_score DESC)`);
     
     await query(`CREATE INDEX IF NOT EXISTS idx_org_slug ON organizations(slug)`);
     

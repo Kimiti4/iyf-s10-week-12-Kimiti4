@@ -188,6 +188,10 @@ class UserRepository {
         verificationNotes: row.verification_notes,
         expiresAt: row.verification_expires_at
       },
+      reputation: {
+        score: row.reputation_score || 0,
+        level: row.reputation_level || 'bronze'
+      },
       mfa: {
         enabled: row.mfa_enabled,
         requireAllMethods: row.mfa_require_all_methods,

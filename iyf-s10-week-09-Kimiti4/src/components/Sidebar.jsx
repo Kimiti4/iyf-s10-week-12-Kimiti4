@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useSidebar } from '../context/SidebarContext'
+import OfflineBadge from './OfflineBadge'
 import './Sidebar.css'
 
 function Sidebar({ isOpen = false, onClose = () => {} }) {
@@ -119,14 +120,6 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
           <span className="nav-icon">🛒</span>
           {!isCollapsed && <span className="nav-label">Marketplace</span>}
         </Link>
-        <Link 
-          to="/groups" 
-          className={`nav-item ${isActive('/groups') ? 'active' : ''}`}
-          title={isCollapsed ? 'Groups' : ''}
-        >
-          <span className="nav-icon">👥</span>
-          {!isCollapsed && <span className="nav-label">Groups</span>}
-        </Link>
 
         {/* Personal */}
         {!isCollapsed && <h3 className="nav-section-title">Personal</h3>}
@@ -143,17 +136,25 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
           className={`nav-item ${isActive('/settings') ? 'active' : ''}`}
           title={isCollapsed ? 'Settings' : ''}
         >
-          <span className="nav-icon">️</span>
+          <span className="nav-icon">⚙️</span>
           {!isCollapsed && <span className="nav-label">Settings</span>}
         </Link>
         <Link 
-          to="/messages" 
-          className={`nav-item ${isActive('/messages') ? 'active' : ''}`}
+          to="/chat" 
+          className={`nav-item ${isActive('/chat') ? 'active' : ''}`}
           title={isCollapsed ? 'Messages' : ''}
         >
           <span className="nav-icon">💬</span>
           {!isCollapsed && <span className="nav-label">Messages</span>}
-          {!isCollapsed && <span className="nav-badge">3</span>}
+        </Link>
+        <Link 
+          to="/drafts" 
+          className={`nav-item ${isActive('/drafts') ? 'active' : ''}`}
+          title={isCollapsed ? 'Drafts' : ''}
+        >
+          <span className="nav-icon">📝</span>
+          {!isCollapsed && <span className="nav-label">Drafts</span>}
+          <OfflineBadge />
         </Link>
 
         {/* Admin/Founder */}
@@ -175,7 +176,7 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
                 className={`nav-item ${isActive('/admin') ? 'active' : ''}`}
                 title={isCollapsed ? 'Admin Panel' : ''}
               >
-                <span className="nav-icon"></span>
+                <span className="nav-icon">🛠️</span>
                 {!isCollapsed && <span className="nav-label">Admin Panel</span>}
               </Link>
             )}

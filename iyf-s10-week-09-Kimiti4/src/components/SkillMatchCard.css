@@ -1,0 +1,104 @@
+.skill-match-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.match-header {
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.match-user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  background: #e0e7ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.match-user-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+}
+
+.match-score {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.match-details {
+  margin-bottom: 20px;
+}
+
+.skill-group {
+  margin-bottom: 15px;
+}
+
+.skill-group strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-tag {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.match-tag {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.offer-tag {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.match-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #4f46e5;
+  background: white;
+  color: #4f46e5;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #4f46e5;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}

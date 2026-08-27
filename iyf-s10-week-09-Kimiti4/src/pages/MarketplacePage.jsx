@@ -8,10 +8,12 @@ import { useAuth } from '../context/AuthContext'
 import { colors } from '../styles/designSystem'
 import ProductCard from '../components/ProductCard'
 import StoreCard from '../components/StoreCard'
+import { useToast } from '../components/Toast'
 import './MarketplacePage.css'
 
 export default function MarketplacePage() {
   const { user } = useAuth()
+  const toast = useToast()
   const [activeTab, setActiveTab] = useState('products')
   const [loading, setLoading] = useState(true)
   const [products, setProducts] = useState([])
@@ -147,7 +149,7 @@ export default function MarketplacePage() {
           className="create-listing-btn"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => alert('Listing feature coming soon! 🚀')}
+          onClick={() => toast.info('Listing feature coming soon! 🚀')}
         >
           <span className="btn-icon">+</span>
           <span className="btn-text">Sell Something</span>

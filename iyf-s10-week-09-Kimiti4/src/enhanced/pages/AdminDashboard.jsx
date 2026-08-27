@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { FaUsers, FaChartLine, FaCog, FaPlus, FaEdit, FaTrash, FaCheck, FaTimes, FaArrowLeft } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import logger from '../../utils/logger';
+import { useToast } from '../../components/Toast';
 import './AdminDashboard.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   const [organizations, setOrganizations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +63,7 @@ export default function AdminDashboard() {
       // Refresh list
       fetchOrganizations();
     } catch (err) {
-      alert('Error deleting organization: ' + err.message);
+      toast.error('Error deleting organization: ' + err.message);
     }
   };
 
@@ -300,7 +302,7 @@ function MembersTab({ organizations }) {
       // Refresh members
       fetchMembers(selectedOrg);
     } catch (err) {
-      alert('Error updating role: ' + err.message);
+      toast.error('Error updating role: ' + err.message);
     }
   };
 
@@ -409,9 +411,9 @@ function SettingsTab({ organization }) {
 
       if (!response.ok) throw new Error('Failed to update organization');
       
-      alert('Organization updated successfully!');
+      toast.success('Organization updated successfully!');
     } catch (err) {
-      alert('Error updating organization: ' + err.message);
+      toast.error('Error updating organization: ' + err.message);
     } finally {
       setSaving(false);
     }

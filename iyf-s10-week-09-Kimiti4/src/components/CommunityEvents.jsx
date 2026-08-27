@@ -25,6 +25,7 @@ import {
   FaList
 } from 'react-icons/fa';
 import logger from '../utils/logger';
+import { useToast } from './Toast';
 import './CommunityEvents.css';
 
 // Mock data for development
@@ -140,6 +141,7 @@ const getMockEvents = () => [
 ];
 
 export default function CommunityEvents({ currentUser }) {
+  const toast = useToast();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -446,7 +448,7 @@ export default function CommunityEvents({ currentUser }) {
                           }).catch(err => logger.debug('Share cancelled'));
                         } else {
                           navigator.clipboard.writeText(window.location.href);
-                          alert('✅ Event link copied to clipboard!');
+                          toast.success('✅ Event link copied to clipboard!');
                         }
                       }}
                       whileHover={{ scale: 1.1 }}
