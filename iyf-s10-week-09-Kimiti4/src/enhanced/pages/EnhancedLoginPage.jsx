@@ -191,6 +191,7 @@ export default function EnhancedLoginPage() {
                         <button
                             type="button"
                             className="toggle-password"
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? <FaEyeSlash /> : <FaEye />}

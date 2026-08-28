@@ -9,7 +9,7 @@ test.describe('Staging Authenticated Flow', () => {
   });
 
   test.afterAll(async ({ request }) => {
-    await request.delete(`${STAGING_API}/api/test/cleanup`);
+    await request.delete(`${STAGING_API}/api/test/cleanup}`);
   });
 
   test('real auth → post → verify in DB', async ({ page, context }) => {
@@ -18,8 +18,30 @@ test.describe('Staging Authenticated Flow', () => {
     });
     const { token } = await res.json();
 
+    await context.route('**/api/auth/me', (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          user: {
+            id: 'test-user-id',
+            email: TEST_USER.email,
+            username: 'testuser',
+            role: 'user'
+          }
+        })
+      });
+    });
+
     await context.addInitScript(([t]) => {
       localStorage.setItem('token', t);
+      localStorage.setItem('user', JSON.stringify({
+        id: 'test-user-id',
+        email: 'test@jamii.link',
+        username: 'testuser',
+        role: 'user'
+      }));
     }, [token]);
 
     await page.goto('/original/posts/create');

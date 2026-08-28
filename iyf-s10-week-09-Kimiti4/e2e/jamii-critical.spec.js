@@ -24,21 +24,18 @@ test.describe('JamiiLink Critical Path', () => {
   });
 
   test('aggregate feed is interactable from an empty draft store', async ({ page }) => {
-    // Home renders the app shell (constellation + nav)
-    await expect(page.locator('nav')).toBeVisible();
-    await expect(page.locator('.enhanced-navbar')).toBeVisible();
+    await expect(page.locator('nav.enhanced-navbar')).toBeVisible();
   });
 
   test('auth pages render without crashing', async ({ page }) => {
     await page.goto('/login');
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
+    await expect(page.locator('button.btn-login')).toBeVisible();
     await page.goto('/register');
     await expect(page.locator('button[type="submit"]')).toBeVisible();
   });
 
   test('drafts page shows the empty state', async ({ page }) => {
     await page.goto('/drafts');
-    // The empty state text is rendered by DraftsPage.
     await expect(page.getByText(/No pending drafts/i).first()).toBeVisible();
   });
 });

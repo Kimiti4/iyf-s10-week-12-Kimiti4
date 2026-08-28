@@ -46,7 +46,9 @@ const logger = {
    * Log API errors with context
    */
   apiError: (endpoint, error) => {
-    console.error(`[API ERROR] ${endpoint}:`, error);
+    if (isDevelopment) {
+      console.error(`[API ERROR] ${endpoint}:`, error);
+    }
   },
 
   /**

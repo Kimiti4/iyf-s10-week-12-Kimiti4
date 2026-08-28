@@ -21,7 +21,7 @@ export default function MobileBottomNav() {
     ];
 
     return (
-        <nav className="ig-nav">
+        <div className="ig-nav" role="navigation" aria-label="Mobile navigation">
             {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
 

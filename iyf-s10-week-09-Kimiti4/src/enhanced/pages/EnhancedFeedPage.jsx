@@ -284,7 +284,7 @@ export default function EnhancedFeedPage() {
                 </section>
             )}
 
-            <main className="ig-feed">
+            <section className="ig-feed">
                 {loading ? (
                     <FeedSkeleton count={3} />
                 ) : filteredPosts.length === 0 ? (
