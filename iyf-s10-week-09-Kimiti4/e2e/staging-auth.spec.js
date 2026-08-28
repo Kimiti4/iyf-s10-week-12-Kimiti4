@@ -5,11 +5,19 @@ const TEST_USER = { email: 'test@jamii.link', password: 'TestPass123!' };
 
 test.describe('Staging Authenticated Flow', () => {
   test.beforeAll(async ({ request }) => {
-    await request.post(`${STAGING_API}/api/test/seed`);
+    try {
+      await request.post(`${STAGING_API}/api/test/seed`);
+    } catch (e) {
+      console.warn('Seed failed (may not exist in this env):', e.message);
+    }
   });
 
   test.afterAll(async ({ request }) => {
-    await request.delete(`${STAGING_API}/api/test/cleanup}`);
+    try {
+      await request.delete(`${STAGING_API}/api/test/cleanup`);
+    } catch (e) {
+      // cleanup endpoint may not exist
+    }
   });
 
   test('real auth → post → verify in DB', async ({ page, context }) => {
@@ -45,7 +53,7 @@ test.describe('Staging Authenticated Flow', () => {
     }, [token]);
 
     await page.goto('/original/posts/create');
-    await page.waitForTimeout(1000);
+    await expect(page.locator('input[name="title"]')).toBeVisible({ timeout: 15000 });
 
     await page.fill('input[name="title"]', 'Staging validation post');
     await page.selectOption('select[name="category"]', 'mtaani');

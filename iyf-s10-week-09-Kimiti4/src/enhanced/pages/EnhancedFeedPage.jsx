@@ -268,7 +268,7 @@ export default function EnhancedFeedPage() {
             </header>
 
             {activeFeed === 'all' && (
-                <section className="ig-stories">
+                <section className="ig-stories" aria-label="Community feeds" tabIndex={0}>
                     <div className="ig-stories__track">
                         {['Nairobi', 'Mtaani', 'Skills', 'Farm', 'Gigs'].map((name) => (
                             <div key={name} className="ig-story">
@@ -284,7 +284,7 @@ export default function EnhancedFeedPage() {
                 </section>
             )}
 
-            <section className="ig-feed">
+            <main className="ig-feed">
                 {loading ? (
                     <FeedSkeleton count={3} />
                 ) : filteredPosts.length === 0 ? (

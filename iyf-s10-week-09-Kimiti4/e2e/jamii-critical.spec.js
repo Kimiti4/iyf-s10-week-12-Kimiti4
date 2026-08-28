@@ -1,13 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-/**
- * JamiiLink critical path: auth → feed → offline draft → sync.
- * NOTE: Adjust selectors to match the actual rendered markup when running
- * against the live dev server; the API route mock keeps the feed stable.
- */
 test.describe('JamiiLink Critical Path', () => {
   test.beforeEach(async ({ page }) => {
-    // Intercept the feed API to keep tests deterministic.
     await page.route('**/api/posts', (route) => {
       if (route.request().method() === 'GET') {
         return route.fulfill({
@@ -20,10 +14,10 @@ test.describe('JamiiLink Critical Path', () => {
       }
       return route.continue();
     });
-    await page.goto('/');
   });
 
   test('aggregate feed is interactable from an empty draft store', async ({ page }) => {
+    await page.goto('/');
     await expect(page.locator('nav.enhanced-navbar')).toBeVisible();
   });
 
@@ -31,10 +25,20 @@ test.describe('JamiiLink Critical Path', () => {
     await page.goto('/login');
     await expect(page.locator('button.btn-login')).toBeVisible();
     await page.goto('/register');
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
+    await expect(page.locator('button.btn-register, form[action*="register"] button[type="submit"], .register-form button[type="submit"]').first()).toBeVisible();
   });
 
-  test('drafts page shows the empty state', async ({ page }) => {
+  test('drafts page shows the empty state', async ({ context, page }) => {
+    await context.addInitScript(() => {
+      localStorage.setItem('token', 'test-token-for-e2e');
+      localStorage.setItem('user', JSON.stringify({
+        id: 'test-user',
+        email: 'test@jamii.link',
+        username: 'testuser',
+        role: 'user',
+      }));
+    });
+
     await page.goto('/drafts');
     await expect(page.getByText(/No pending drafts/i).first()).toBeVisible();
   });
