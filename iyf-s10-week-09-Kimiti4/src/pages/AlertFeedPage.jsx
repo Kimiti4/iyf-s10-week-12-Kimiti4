@@ -3,7 +3,7 @@
  * Displays all community alerts with filtering and realtime updates
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '../components/Toast';
 import AlertCard from '../components/AlertCard';
@@ -12,7 +12,6 @@ import { initializeSocket, onNewAlert, onAlertUpdate, onAlertDelete, disconnectS
 import api, { alertsAPI } from '../services/api';
 import './AlertFeedPage.css';
 
-// Alert categories for filter
 const CATEGORIES = [
   { value: 'all', label: 'All Alerts' },
   { value: 'emergency', label: 'Emergency' },
@@ -27,7 +26,6 @@ const CATEGORIES = [
   { value: 'weather', label: 'Weather' }
 ];
 
-// Verification levels for filter
 const VERIFICATION_LEVELS = [
   { value: 'all', label: 'All Levels' },
   { value: 'unverified', label: 'Unverified' },
@@ -45,23 +43,27 @@ export default function AlertFeedPage() {
     verificationLevel: 'all',
     severity: 'all'
   });
-  
-  const toast = useToast();
 
-  // Fetch alerts from API
+  const toast = useToast();
+  const toastRef = useRef(toast);
+
+  useEffect(() => {
+    toastRef.current = toast;
+  }, [toast]);
+
   const fetchAlerts = useCallback(async () => {
     try {
       setLoading(true);
       const params = {};
-      
+
       if (filters.category !== 'all') {
         params.category = filters.category;
       }
-      
+
       if (filters.verificationLevel !== 'all') {
         params.verificationLevel = filters.verificationLevel;
       }
-      
+
       if (filters.severity !== 'all') {
         params.severity = filters.severity;
       }
@@ -70,28 +72,25 @@ export default function AlertFeedPage() {
       setAlerts(response.data || []);
     } catch (error) {
       console.error('Error fetching alerts:', error);
-      toast.error('Failed to load alerts');
+      toastRef.current.error('Failed to load alerts');
     } finally {
       setLoading(false);
     }
-  }, [filters, toast]);
+  }, [filters]);
 
-  // Initialize Socket.IO and fetch alerts
   useEffect(() => {
-    // Initialize socket connection
     const socket = initializeSocket();
 
-    // Listen for realtime updates
     const cleanupNewAlert = onNewAlert((newAlert) => {
       console.log('🔔 New alert received:', newAlert);
       setAlerts(prev => [newAlert, ...prev]);
-      toast.info(`New ${newAlert.category.replace('_', ' ')} alert!`);
+      toastRef.current.info(`New ${newAlert.category.replace('_', ' ')} alert!`);
     });
 
     const cleanupUpdate = onAlertUpdate((updatedAlert) => {
       console.log('🔄 Alert updated:', updatedAlert);
-      setAlerts(prev => 
-        prev.map(alert => 
+      setAlerts(prev =>
+        prev.map(alert =>
           alert._id === updatedAlert._id ? updatedAlert : alert
         )
       );
@@ -102,55 +101,48 @@ export default function AlertFeedPage() {
       setAlerts(prev => prev.filter(alert => alert._id !== alertId));
     });
 
-    // Initial fetch
     fetchAlerts();
 
-    // Cleanup on unmount
     return () => {
       cleanupNewAlert();
       cleanupUpdate();
       cleanupDelete();
       disconnectSocket();
     };
-  }, [fetchAlerts, toast]);
+  }, [fetchAlerts]);
 
-  // Handle creating a new alert
   const handleCreateAlert = async (formData) => {
     try {
       const response = await alertsAPI.create(formData);
-      toast.success('Alert created successfully!');
+      toastRef.current.success('Alert created successfully!');
       setShowCreateForm(false);
-      
-      // Alert will be added via Socket.IO, but just in case
+
       if (response.data) {
         setAlerts(prev => [response.data, ...prev]);
       }
     } catch (error) {
       console.error('Error creating alert:', error);
-      toast.error(error.response?.data?.message || 'Failed to create alert');
+      toastRef.current.error(error.response?.data?.message || 'Failed to create alert');
       throw error;
     }
   };
 
-  // Handle confirming an alert
   const handleConfirmAlert = async (alertId) => {
     try {
       await alertsAPI.confirm(alertId);
-      toast.success('Alert confirmed!');
+      toastRef.current.success('Alert confirmed!');
     } catch (error) {
       console.error('Error confirming alert:', error);
-      toast.error('Failed to confirm alert');
+      toastRef.current.error('Failed to confirm alert');
     }
   };
 
-  // Filter change handler
   const handleFilterChange = (filterType, value) => {
     setFilters(prev => ({ ...prev, [filterType]: value }));
   };
 
   return (
     <div className="alert-feed-page">
-      {/* Header */}
       <div className="page-header">
         <div className="header-content">
           <h1>Community Alerts</h1>
@@ -166,7 +158,6 @@ export default function AlertFeedPage() {
         </motion.button>
       </div>
 
-      {/* Create Alert Form */}
       <AnimatePresence>
         {showCreateForm && (
           <motion.div
@@ -175,7 +166,7 @@ export default function AlertFeedPage() {
             exit={{ opacity: 0, height: 0 }}
             className="create-form-wrapper"
           >
-            <CreateAlertForm 
+            <CreateAlertForm
               onSubmit={handleCreateAlert}
               onCancel={() => setShowCreateForm(false)}
             />
@@ -183,7 +174,6 @@ export default function AlertFeedPage() {
         )}
       </AnimatePresence>
 
-      {/* Filters */}
       <div className="filters-bar">
         <div className="filter-group">
           <label>Category:</label>
@@ -231,7 +221,6 @@ export default function AlertFeedPage() {
         </div>
       </div>
 
-      {/* Alerts List */}
       <div className="alerts-container">
         {loading ? (
           <div className="loading-state">
