@@ -159,9 +159,11 @@ Edit CSS files in each component. Main color scheme:
 Adjust Framer Motion properties in JSX:
 ```jsx
 <motion.div
+  {% raw %}
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.5 }}
+{% endraw %}
 >
 ```
 

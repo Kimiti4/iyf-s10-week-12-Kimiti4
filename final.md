@@ -426,7 +426,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
+          {% raw %}
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+{% endraw %}
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test e2e/ --reporter=html
       - uses: actions/upload-artifact@v4
@@ -1075,7 +1077,9 @@ export default ToastProvider = ({ children }) => (
     {children}
     <Toaster 
       position="top-center" 
-      toastOptions={{ duration: 3000, style: { background: '#1a1a1a', color: '#fff' } }} 
+      {% raw %}
+      toastOptions={{ duration: 3000, style: { background: '#1a1a1a', color: '#fff' } }}
+{% endraw %} 
     />
   </>
 );

@@ -54,6 +54,6 @@ export default function MobileBottomNav() {
                     </Link>
                 );
             })}
-        </nav>
+        </div>
     );
 }

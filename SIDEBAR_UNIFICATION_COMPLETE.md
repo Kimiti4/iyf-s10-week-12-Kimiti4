@@ -234,7 +234,9 @@ export function SidebarProvider({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   
   return (
+    {% raw %}
     <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed }}>
+{% endraw %}
       {children}
     </SidebarContext.Provider>
   )

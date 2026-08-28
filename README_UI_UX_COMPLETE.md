@@ -193,8 +193,10 @@ The Kenyan geometric avatar:
 import { colors, typography, spacing } from './designSystem';
 
 // Use directly
+{% raw %}
 style={{ color: colors.primary[500] }}
 style={{ fontSize: typography.fontSize.lg }}
+{% endraw %}
 ```
 
 ### 2. `SVGIcons.jsx`

@@ -45,7 +45,9 @@ import {
 import { colors } from '../styles/designSystem';
 
 // Replace emoji with icons
+{% raw %}
 <nav className="flex gap-8" style={{ color: colors.primary[600] }}>
+{% endraw %}
   <button><HomeIcon size={24} /></button>
   <button><PostsIcon size={24} /></button>
   <button><SearchIcon size={24} /></button>
