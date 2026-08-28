@@ -2,7 +2,7 @@
  * Lighthouse CI config (npm i -D @lhci/cli, then npx lhci autorun).
  * Uses Vite's preview server for an accurate production-like build.
  */
-module.exports = {
+export default {
   ci: {
     collect: {
       startServerCommand: 'npm run preview',
