@@ -9,10 +9,10 @@ export default {
       startServerReadyPattern: 'Local:   http://localhost:',
       startServerTimeout: 60000,
       url: ['http://localhost:4173/', 'http://localhost:4173/login', 'http://localhost:4173/register'],
+      staticDistDir: './dist',
       settings: {
         preset: 'desktop',
         chromeFlags: '--no-sandbox --disable-dev-shm-usage --disable-gpu',
-        // Skip audits that commonly false-fail on SPAs
         skipAudits: ['uses-http2', 'offscreen-images', 'render-blocking-resources'],
       },
     },

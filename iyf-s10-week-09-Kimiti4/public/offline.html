@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="You are currently offline. JamiiLink will reconnect automatically when you are back online.">
   <title>JamiiLink - Offline</title>
   <style>
     body {
@@ -20,12 +21,12 @@
     }
     .emoji { font-size: 4rem; margin-bottom: 20px; }
     h1 { font-size: 1.5rem; margin-bottom: 10px; }
-    p { opacity: 0.9; max-width: 400px; }
+    p { opacity: 0.95; max-width: 400px; line-height: 1.5; }
     .retry-btn {
       margin-top: 20px;
       padding: 12px 24px;
       background: white;
-      color: #667eea;
+      color: #4c51bf;
       border: none;
       border-radius: 8px;
       font-weight: 600;
@@ -34,9 +35,9 @@
   </style>
 </head>
 <body>
-  <div class="emoji">📡</div>
+  <div class="emoji" aria-hidden="true">📡</div>
   <h1>You're Offline!</h1>
   <p>JamiiLink works offline. Your posts will be saved and sent when you reconnect. 🌍</p>
-  <button class="retry-btn" onclick="window.location.reload()">Try Again</button>
+  <button class="retry-btn" onclick="window.location.reload()" type="button">Try Again</button>
 </body>
 </html>
