@@ -29,6 +29,7 @@ export default function MobileBottomNav() {
                     <Link
                         key={item.path}
                         to={item.path}
+                        aria-label={item.label}
                         className={`ig-nav__btn ${isActive ? 'ig-nav__btn--active' : ''}`}
                         onClick={() => triggerHaptic('click')}
                     >

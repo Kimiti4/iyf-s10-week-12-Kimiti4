@@ -29,6 +29,7 @@ test.describe('JamiiLink Critical Path', () => {
   });
 
   test('drafts page shows the empty state', async ({ context, page }) => {
+    // Seed auth so ProtectedRoute renders DraftsPage instead of redirecting to /login
     await context.addInitScript(() => {
       localStorage.setItem('token', 'test-token-for-e2e');
       localStorage.setItem('user', JSON.stringify({
@@ -38,6 +39,24 @@ test.describe('JamiiLink Critical Path', () => {
         role: 'user',
       }));
     });
+    // AuthContext verifies the seeded token via GET /api/auth/me on boot;
+    // without this mock the fake token fails and initializeAuth() clears the
+    // session, bouncing us to /login before DraftsPage can render.
+    await context.route('**/api/auth/me', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          user: {
+            id: 'test-user',
+            email: 'test@jamii.link',
+            username: 'testuser',
+            role: 'user',
+          },
+        }),
+      })
+    );
 
     await page.goto('/drafts');
     await expect(page.getByText(/No pending drafts/i).first()).toBeVisible();

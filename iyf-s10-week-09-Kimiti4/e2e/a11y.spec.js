@@ -20,6 +20,22 @@ test.describe('Accessibility Compliance', () => {
   });
 
   async function checkAccessibility(page, testInfo) {
+    // Wait for Framer Motion entrance animations to complete so axe measures
+    // final colors/opacity instead of mid-animation (opacity:0) states.
+    await page.waitForFunction(() => {
+      const els = document.querySelectorAll(
+        '.enhanced-login-container, .enhanced-register-container, .auth-container, .ig-app, .motion-shell'
+      );
+      let allSettled = true;
+      els.forEach((el) => {
+        const cs = getComputedStyle(el);
+        if (parseFloat(cs.opacity || '1') < 0.99) allSettled = false;
+      });
+      return allSettled;
+    }, undefined, { timeout: 10000 }).catch(() => {
+      // If no motion containers are found or animation never flags, proceed with the scan.
+    });
+
     const { violations } = await new AxeBuilder({ page }).analyze();
     if (violations.length > 0) {
       testInfo.attachments.push({
@@ -39,8 +55,38 @@ test.describe('Accessibility Compliance', () => {
     await expect(page.locator('a:focus, button:focus').first()).toBeVisible();
   });
 
-  test('drafts page is accessible', async ({ page }, testInfo) => {
+  test('drafts page is accessible', async ({ page, context }, testInfo) => {
+    // Seed auth so ProtectedRoute renders DraftsPage instead of redirecting to /login
+    await context.addInitScript(() => {
+      localStorage.setItem('token', 'test-token-for-a11y');
+      localStorage.setItem('user', JSON.stringify({
+        id: 'test-user-a11y',
+        email: 'a11y@jamii.link',
+        username: 'a11yuser',
+        role: 'user',
+      }));
+    });
+    // Mock the boot-time token verification so the seeded session survives
+    // AuthContext.initializeAuth() and we actually scan DraftsPage (not the
+    // login page we'd otherwise be redirected to).
+    await context.route('**/api/auth/me', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          user: {
+            id: 'test-user-a11y',
+            email: 'a11y@jamii.link',
+            username: 'a11yuser',
+            role: 'user',
+          },
+        }),
+      })
+    );
     await page.goto('/drafts');
+    // Guard: confirm we're really on DraftsPage, not redirected to /login
+    await expect(page.getByText(/No pending drafts/i).first()).toBeVisible();
     await checkAccessibility(page, testInfo);
   });
 

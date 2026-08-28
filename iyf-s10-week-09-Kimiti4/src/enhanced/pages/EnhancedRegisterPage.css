@@ -8,8 +8,7 @@
 }
 
 .enhanced-register-container {
-    background: rgba(30, 41, 59, 0.8);
-    backdrop-filter: blur(10px);
+    background: #0f172a;
     border-radius: 20px;
     padding: 3rem;
     width: 100%;
@@ -33,10 +32,11 @@
     background-clip: text;
 }
 
-.subtitle {
-    color: #94a3b8;
+.enhanced-register-container .subtitle {
+    color: #cbd5e1;
     font-size: 1rem;
     margin-bottom: 2rem;
+    opacity: 1;
 }
 
 /* Progress Steps */
@@ -53,11 +53,11 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    color: #64748b;
+    color: #cbd5e1;
 }
 
 .step.active {
-    color: #60a5fa;
+    color: #93c5fd;
 }
 
 .step-number {
@@ -229,9 +229,9 @@
 .method-btn {
     padding: 1rem;
     border: 2px solid rgba(147, 197, 253, 0.2);
-    background: rgba(15, 23, 42, 0.5);
+    background: #0f172a;
     border-radius: 12px;
-    color: #94a3b8;
+    color: #cbd5e1;
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -244,7 +244,7 @@
 .method-btn.active {
     border-color: #3b82f6;
     background: rgba(59, 130, 246, 0.1);
-    color: #60a5fa;
+    color: #93c5fd;
 }
 
 .method-btn:hover:not(.active) {
@@ -331,7 +331,7 @@
 .resend-link {
     background: none;
     border: none;
-    color: #60a5fa;
+    color: #93c5fd;
     cursor: pointer;
     font-size: 0.95rem;
     text-decoration: underline;
@@ -339,25 +339,25 @@
 }
 
 .resend-link:hover {
-    color: #93c5fd;
+    color: #bfdbfe;
 }
 
 /* Footer */
 .register-footer {
     text-align: center;
     margin-top: 2rem;
-    color: #94a3b8;
+    color: #cbd5e1;
 }
 
 .register-footer a {
-    color: #60a5fa;
+    color: #93c5fd;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
 .register-footer a:hover {
-    color: #93c5fd;
+    color: #bfdbfe;
     text-decoration: underline;
 }
 

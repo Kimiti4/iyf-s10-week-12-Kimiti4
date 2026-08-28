@@ -284,7 +284,7 @@ export default function EnhancedFeedPage() {
                 </section>
             )}
 
-            <main className="ig-feed">
+            <section className="ig-feed" aria-label="Community feed">
                 {loading ? (
                     <FeedSkeleton count={3} />
                 ) : filteredPosts.length === 0 ? (
@@ -336,7 +336,7 @@ export default function EnhancedFeedPage() {
                         ))}
                     </AnimatePresence>
                 )}
-            </main>
+            </section>
 
             <AnimatePresence>
                 {showBackToTop && (

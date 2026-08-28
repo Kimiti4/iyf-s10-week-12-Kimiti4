@@ -82,5 +82,5 @@ export default function ConstellationBackground() {
         };
     }, []);
 
-    return <canvas ref={canvasRef} className="constellation-canvas" />;
+    return <canvas ref={canvasRef} className="constellation-canvas" aria-hidden="true" role="presentation" />;
 }

@@ -82,6 +82,8 @@ function TrendingChip({ topic = '#JamiiLink', count = 42 }) {
         left: `${position.x}px`,
         top: `${position.y}px`
       }}
+      role="complementary"
+      aria-label={`Trending: ${topic}`}
       onMouseDown={handleMouseDown}
       onClick={handleClick}
     >

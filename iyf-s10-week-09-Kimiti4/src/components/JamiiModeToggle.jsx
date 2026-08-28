@@ -37,7 +37,7 @@ function JamiiModeToggle() {
   });
 
   return (
-    <div className="jamii-mode-toggle">
+    <div className="jamii-mode-toggle" role="complementary" aria-label="Jamii Mode">
       <div className="mode-toggle-header">
         <span className="toggle-icon">🌍</span>
         <span className="toggle-label">Jamii Mode</span>

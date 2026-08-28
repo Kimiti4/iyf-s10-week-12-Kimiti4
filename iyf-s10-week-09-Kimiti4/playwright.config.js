@@ -7,6 +7,10 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
+  // staging-auth.spec.js targets the live Railway API and has its own config
+  // (npx playwright test --config playwright-staging.config.js), so exclude it
+  // from the default CI/dev run to keep this suite deterministic.
+  testIgnore: /staging-auth\.spec\.js/,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
