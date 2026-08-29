@@ -7,10 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "lhci": "lhci autorun",
+    "test:console": "node scripts/verify-no-console-errors.mjs",
     "lint": "eslint src e2e --ext .js,.jsx",
     "test:e2e": "playwright test",
-    "test:a11y": "playwright test e2e/a11y.spec.js",
-    "lhci": "lhci autorun"
+    "test:a11y": "playwright test e2e/a11y.spec.js"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

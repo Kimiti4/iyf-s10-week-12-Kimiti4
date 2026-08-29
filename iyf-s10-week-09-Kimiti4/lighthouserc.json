@@ -1,11 +1,11 @@
 {
   "ci": {
     "collect": {
-      "startServerCommand": "npm run preview",
-      "startServerReadyPattern": "Local:   http://localhost:",
+      "startServerCommand": "node scripts/lhci-server.mjs",
+      "startServerReadyPattern": "LHCI server listening",
       "startServerTimeout": 60000,
       "url": ["http://localhost:4173/", "http://localhost:4173/login", "http://localhost:4173/register"],
-      "staticDistDir": "./dist",
+      "numberOfRuns": 2,
       "settings": {
         "preset": "desktop",
         "chromeFlags": "--no-sandbox --disable-dev-shm-usage --disable-gpu",
@@ -23,9 +23,6 @@
         "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
         "total-blocking-time": ["warn", { "maxNumericValue": 300 }]
       }
-    },
-    "upload": {
-      "target": "temporary-public-storage"
     }
   }
 }

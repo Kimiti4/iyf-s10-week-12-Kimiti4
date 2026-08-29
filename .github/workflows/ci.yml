@@ -66,6 +66,12 @@ jobs:
           cache-dependency-path: iyf-s10-week-09-Kimiti4/package-lock.json
       - run: npm ci
         working-directory: iyf-s10-week-09-Kimiti4
+      # Point the bundle's API base at the LHCI stub server (overrides .env,
+      # which bakes in the Railway URL and causes CORS console errors).
+      - run: npm run build
+        working-directory: iyf-s10-week-09-Kimiti4
+        env:
+          VITE_API_URL: http://localhost:4173/api
       - run: npx lhci autorun
         working-directory: iyf-s10-week-09-Kimiti4
       - uses: actions/upload-artifact@v4
