@@ -6,17 +6,20 @@ import './TrendingChip.css';
  * Draggable chip showing live trending topics
  */
 function TrendingChip({ topic = '#JamiiLink', count = 42 }) {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  // Initialize at the bottom-right corner synchronously so the chip never
+  // paints stretched across the viewport. Starting at {0,0} combined with the
+  // desktop CSS `right`/`bottom` stretched the fixed element full-width/height,
+  // then the mount effect snapped it to the corner - a large, deterministic
+  // cumulative layout shift on every page.
+  const [position, setPosition] = useState(() => {
+    if (typeof window === 'undefined') return { x: 0, y: 0 };
+    return {
+      x: Math.max(0, window.innerWidth - 100),
+      y: Math.max(0, window.innerHeight - 80)
+    };
+  });
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-
-  // Initialize position (bottom-right)
-  useEffect(() => {
-    setPosition({
-      x: window.innerWidth - 100,
-      y: window.innerHeight - 80
-    });
-  }, []);
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
