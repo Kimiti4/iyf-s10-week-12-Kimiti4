@@ -20,20 +20,18 @@ test.describe('Accessibility Compliance', () => {
   });
 
   async function checkAccessibility(page, testInfo) {
-    // Wait for Framer Motion entrance animations to complete so axe measures
-    // final colors/opacity instead of mid-animation (opacity:0) states.
+    // Wait for all Framer Motion entrance animations (parents and staggered
+    // children) to complete so axe measures final colors/opacity instead of
+    // mid-animation (opacity:0) states that yield blended backgrounds.
     await page.waitForFunction(() => {
-      const els = document.querySelectorAll(
-        '.enhanced-login-container, .enhanced-register-container, .auth-container, .ig-app, .motion-shell'
-      );
-      let allSettled = true;
-      els.forEach((el) => {
-        const cs = getComputedStyle(el);
-        if (parseFloat(cs.opacity || '1') < 0.99) allSettled = false;
-      });
-      return allSettled;
-    }, undefined, { timeout: 10000 }).catch(() => {
-      // If no motion containers are found or animation never flags, proceed with the scan.
+      const els = document.querySelectorAll('body *');
+      for (const el of els) {
+        const o = parseFloat(getComputedStyle(el).opacity || '1');
+        if (o > 0 && o < 0.99) return false;
+      }
+      return true;
+    }, undefined, { timeout: 15000 }).catch(() => {
+      // If animations run forever, proceed; axe will still flag real issues.
     });
 
     const { violations } = await new AxeBuilder({ page }).analyze();

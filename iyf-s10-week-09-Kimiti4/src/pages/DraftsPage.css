@@ -85,7 +85,7 @@
 }
 
 .drafts-empty p {
-  color: var(--color-zinc-500);
+  color: var(--color-zinc-600);
   max-width: 380px;
   margin: 0 auto;
 }
