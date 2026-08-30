@@ -16,7 +16,6 @@
   align-items: center;
   gap: var(--spacing-sm);
   min-height: 44px; /* Touch-friendly */
-  backdrop-filter: blur(10px);
 }
 
 .trending-chip:hover {

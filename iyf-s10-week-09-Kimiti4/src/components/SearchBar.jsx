@@ -28,7 +28,7 @@ export default function SearchBar({ onSearch }) {
                 onChange={(e) => setQuery(e.target.value)}
                 aria-label="Search posts"
             />
-            <button type="submit" className="btn-search">
+            <button type="submit" className="btn-search" style={{ minWidth: 24, minHeight: 24 }}>
                 🔍
             </button>
         </form>

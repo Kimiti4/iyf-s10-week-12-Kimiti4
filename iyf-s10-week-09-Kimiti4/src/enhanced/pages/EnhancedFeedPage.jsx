@@ -348,9 +348,9 @@ export default function EnhancedFeedPage() {
                                 )}
 
                                 <div className="post-actions">
-                                    <button className="post-action" aria-label="Comment"><FaComment /> {post.comments}</button>
-                                    <button className="post-action" aria-label="Reblog"><FaRetweet /> {post.reblogs}</button>
-                                    <button className="post-action" aria-label="Like"><FaHeart /> {post.likes}</button>
+                                    <button className="post-action" aria-label="Comment"><FaComment aria-hidden="true" /> {post.comments}</button>
+                                    <button className="post-action" aria-label="Reblog"><FaRetweet aria-hidden="true" /> {post.reblogs}</button>
+                                    <button className="post-action" aria-label="Like"><FaHeart aria-hidden="true" /> {post.likes}</button>
                                     <span className="post-action">{post.downvotes} &darr;</span>
                                 </div>
                             </motion.article>
