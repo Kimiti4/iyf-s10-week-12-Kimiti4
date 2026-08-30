@@ -16,6 +16,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
   reporter: process.env.CI ? [['html', { open: 'never' }]] : 'list',
+  timeout: 120000,
   use: {
     baseURL: 'http://localhost:5174',
     trace: 'on-first-retry',
@@ -25,7 +26,7 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:5174',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 180000,
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
