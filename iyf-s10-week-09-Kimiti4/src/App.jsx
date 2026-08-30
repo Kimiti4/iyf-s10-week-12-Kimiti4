@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, lazy, Suspense } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { OrganizationProvider } from './context/OrganizationContext'
 import { SidebarProvider, useSidebar } from './context/SidebarContext'
@@ -16,37 +16,41 @@ import './index.css' // Unified whimsical design system
 import Sidebar from './components/Sidebar'
 import NavBar from './components/NavBar'
 import MobileBottomNav from './components/MobileBottomNav'
-import HomePage from './pages/HomePage'
-import PostListPage from './pages/PostListPage'
-import PostDetailPage from './pages/PostDetailPage'
-import AboutPage from './pages/AboutPage'
-import OriginalLoginPage from './pages/LoginPage'
-import OriginalRegisterPage from './pages/RegisterPage'
-import ProfilePage from './pages/ProfilePage'
-import CreatePostPage from './pages/CreatePostPage'
-import SearchResultsPage from './pages/SearchResultsPage'
-import EnhancedLoginPage from './enhanced/pages/EnhancedLoginPage'
-import EnhancedRegisterPage from './enhanced/pages/EnhancedRegisterPage'
+const HomePage = lazy(() => import('./pages/HomePage'))
+const PostListPage = lazy(() => import('./pages/PostListPage'))
+const PostDetailPage = lazy(() => import('./pages/PostDetailPage'))
+const AboutPage = lazy(() => import('./pages/AboutPage'))
+const OriginalLoginPage = lazy(() => import('./pages/LoginPage'))
+const OriginalRegisterPage = lazy(() => import('./pages/RegisterPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const CreatePostPage = lazy(() => import('./pages/CreatePostPage'))
+const SearchResultsPage = lazy(() => import('./pages/SearchResultsPage'))
+const EnhancedLoginPage = lazy(() => import('./enhanced/pages/EnhancedLoginPage'))
+const EnhancedRegisterPage = lazy(() => import('./enhanced/pages/EnhancedRegisterPage'))
 import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
-import ReelsPage from './enhanced/pages/ReelsPage'
-import AdminDashboard from './enhanced/pages/AdminDashboard'
-import FounderDashboard from './pages/FounderDashboard'
-import OrganizationPage from './pages/OrganizationPage'
-import SettingsPage from './pages/SettingsPage'
-import SkillExchange from './pages/SkillExchange'
-import MarketplacePage from './pages/MarketplacePage'
-import UserProfilePage from './pages/UserProfilePage'
-import ChatPage from './pages/ChatPage'
-import ActivityHistory from './pages/ActivityHistory'
-import CreatorDashboard from './pages/CreatorDashboard'
-import ReputationSystem from './pages/ReputationSystem'
-import CommunityGovernance from './pages/CommunityGovernance'
-import CollaborativeQuests from './pages/CollaborativeQuests'
-import TiannaraAssistant from './components/TiannaraAssistant'
-import CommunityEvents from './components/CommunityEvents'
-import EnhancedEmergencyAlerts from './components/EnhancedEmergencyAlerts'
-import AlertFeedPage from './pages/AlertFeedPage'
-import DraftsPage from './pages/DraftsPage'
+const ReelsPage = lazy(() => import('./enhanced/pages/ReelsPage'))
+const MtaaniPage = lazy(() => import('./enhanced/pages/MtaaniPage'))
+const SkillsPage = lazy(() => import('./enhanced/pages/SkillsPage'))
+const FarmPage = lazy(() => import('./enhanced/pages/FarmPage'))
+const GigsPage = lazy(() => import('./enhanced/pages/GigsPage'))
+const AdminDashboard = lazy(() => import('./enhanced/pages/AdminDashboard'))
+const FounderDashboard = lazy(() => import('./pages/FounderDashboard'))
+const OrganizationPage = lazy(() => import('./pages/OrganizationPage'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage'))
+const SkillExchange = lazy(() => import('./pages/SkillExchange'))
+const MarketplacePage = lazy(() => import('./pages/MarketplacePage'))
+const UserProfilePage = lazy(() => import('./pages/UserProfilePage'))
+const ChatPage = lazy(() => import('./pages/ChatPage'))
+const ActivityHistory = lazy(() => import('./pages/ActivityHistory'))
+const CreatorDashboard = lazy(() => import('./pages/CreatorDashboard'))
+const ReputationSystem = lazy(() => import('./pages/ReputationSystem'))
+const CommunityGovernance = lazy(() => import('./pages/CommunityGovernance'))
+const CollaborativeQuests = lazy(() => import('./pages/CollaborativeQuests'))
+const TiannaraAssistant = lazy(() => import('./components/TiannaraAssistant'))
+const CommunityEvents = lazy(() => import('./components/CommunityEvents'))
+const EnhancedEmergencyAlerts = lazy(() => import('./components/EnhancedEmergencyAlerts'))
+const AlertFeedPage = lazy(() => import('./pages/AlertFeedPage'))
+const DraftsPage = lazy(() => import('./pages/DraftsPage'))
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -73,6 +77,10 @@ function AppRoutes() {
       <Route path="/login" element={<EnhancedLoginPage />} />
       <Route path="/register" element={<EnhancedRegisterPage />} />
       <Route path="/reels" element={<ReelsPage />} />
+<Route path="/mtaani" element={<MtaaniPage />} />
+<Route path="/skills" element={<SkillsPage />} />
+<Route path="/farm" element={<FarmPage />} />
+<Route path="/gigs" element={<GigsPage />} />
       <Route path="/org/:slug" element={<OrganizationPage />} />
       
       {/* New Unique Feature Routes */}
@@ -216,8 +224,12 @@ function MainLayout() {
   const { isCollapsed } = useSidebar();
   
   return (
-    <main className={`main-content with-sidebar ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
-      <AppRoutes />
+    <main className={`app-main main-content with-sidebar ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <div className="app-content">
+        <Suspense fallback={<div className="route-loading" aria-label="Loading page">Loading&hellip;</div>}>
+          <AppRoutes />
+        </Suspense>
+      </div>
     </main>
   );
 }
@@ -247,7 +259,7 @@ function App() {
         <OrganizationProvider>
           <SidebarProvider>
             <ToastProvider>
-            <div className="App">
+            <div className="App app-shell">
               {/* 🔹 Constellation Background */}
               <ConstellationBackground />
               

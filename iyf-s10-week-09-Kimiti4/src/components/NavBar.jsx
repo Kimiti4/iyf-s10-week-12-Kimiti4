@@ -37,7 +37,7 @@ function NavBar() {
         />
       )}
       
-      <nav className="enhanced-navbar">
+      <nav className="enhanced-navbar topbar">
       <div className="navbar-container">
         {/* Left: Logo & Brand */}
         <div className="navbar-left">

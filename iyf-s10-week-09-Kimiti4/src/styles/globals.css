@@ -1,0 +1,68 @@
+/* ==========================================================================
+   JAMII LINK 2.0 - GLOBAL FOUNDATION
+   Loaded after tokens.css, before index.css. Provides the base reset and
+   body defaults consumed across the whole app.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+
+  background: var(--bg, #f7f8fa);
+  color: var(--text-primary, #101828);
+
+  font-family:
+    Inter,
+    Outfit,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+
+  font-size: 15px;
+  line-height: 1.5;
+
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+video {
+  max-width: 100%;
+  display: block;
+}
+
+::selection {
+  background: var(--brand-100, #e0e7ff);
+  color: var(--brand-700, #3730a3);
+}

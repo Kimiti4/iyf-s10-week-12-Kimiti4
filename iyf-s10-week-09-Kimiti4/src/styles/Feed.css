@@ -1,0 +1,407 @@
+/* ==========================================================================
+   JAMII LINK 2.0 - FEED  (X-style) + RIGHT RAIL
+   Phase 3: spec feed primitives rendered inside the `.social-layout` shell.
+   ========================================================================== */
+
+.feed {
+  width: 100%;
+  min-width: 0;
+}
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 16px;
+}
+
+.feed-title {
+  margin: 0;
+
+  font-size: 22px;
+  font-weight: 750;
+
+  letter-spacing: -0.025em;
+}
+
+.feed-tabs {
+  display: flex;
+
+  border-bottom: 1px solid var(--border);
+
+  margin-bottom: 4px;
+}
+
+.feed-tab {
+  position: relative;
+
+  padding: 13px 18px;
+
+  border: 0;
+  background: transparent;
+
+  color: var(--text-tertiary);
+
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.feed-tab:hover {
+  color: var(--text-primary);
+}
+
+.feed-tab.active {
+  color: var(--brand-600);
+}
+
+.feed-tab.active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 16px;
+  right: 16px;
+  bottom: -1px;
+
+  height: 2px;
+
+  background: var(--brand-500);
+
+  border-radius: 999px;
+}
+
+/* ─── Post composer ─── */
+.post-composer {
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  padding: 16px;
+
+  margin-bottom: 12px;
+}
+
+.composer-row {
+  display: flex;
+  gap: 12px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 auto;
+
+  border-radius: 50%;
+
+  background: var(--brand-100);
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  font-weight: 700;
+  color: var(--brand-700);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  margin-top: 2px;
+}
+
+.post-tags .tag {
+  color: var(--brand-600);
+
+  font-size: 13px;
+
+  font-weight: 500;
+}
+
+.post-title {
+  display: block;
+
+  font-size: 16px;
+}
+
+.composer-input {
+  flex: 1;
+
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 14px;
+
+  border-radius: 12px;
+
+  background: var(--surface-soft);
+
+  color: var(--text-muted);
+}
+
+.composer-actions {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-top: 14px;
+
+  padding-top: 12px;
+
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Posts — X-style (avoid over-carding) ─── */
+.post {
+  background: var(--surface);
+
+  border-top: 1px solid var(--border);
+
+  padding: 18px 4px;
+
+  transition: background var(--transition-fast);
+}
+
+.post:hover {
+  background: #fcfcfd;
+}
+
+.post-header {
+  display: flex;
+
+  gap: 11px;
+}
+
+.post-meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  font-weight: 700;
+}
+
+.post-handle {
+  color: var(--text-muted);
+
+  font-weight: 400;
+}
+
+.post-time {
+  color: var(--text-muted);
+
+  font-weight: 400;
+}
+
+.post-body {
+  margin-left: 53px;
+
+  margin-top: 5px;
+
+  color: var(--text-primary);
+
+  font-size: 15px;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.post-media {
+  margin-left: 53px;
+
+  margin-top: 14px;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  border: 1px solid var(--border);
+}
+
+.post-media img {
+  width: 100%;
+  display: block;
+}
+
+.post-actions {
+  margin-left: 53px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  max-width: 500px;
+
+  margin-top: 12px;
+}
+
+.post-action {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  border: 0;
+  background: transparent;
+
+  color: var(--text-muted);
+
+  padding: 6px;
+
+  border-radius: 8px;
+
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.post-action:hover {
+  background: var(--surface-soft);
+
+  color: var(--brand-600);
+}
+
+/* ─── Right rail ─── */
+.right-rail {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 16px;
+
+  min-width: 0;
+}
+
+.discovery-card {
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius-lg);
+
+  padding: 18px;
+}
+
+.discovery-title {
+  margin: 0 0 14px;
+
+  font-size: 16px;
+
+  font-weight: 700;
+}
+
+.trending-item {
+  display: block;
+
+  padding: 11px 0;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.trending-item:last-child {
+  border-bottom: 0;
+}
+
+.trending-topic {
+  font-weight: 700;
+}
+
+.trending-meta {
+  margin-top: 2px;
+
+  font-size: 12px;
+
+  color: var(--text-muted);
+}
+
+/* ─── Dark mode ─── */
+[data-theme='dark'] .post:hover,
+.dark-mode .post:hover {
+  background: var(--surface-hover);
+}
+
+/* ─── Mobile feed ─── */
+@media (max-width: 768px) {
+  .feed-header {
+    padding: 0 16px;
+  }
+
+  .feed-tabs {
+    overflow-x: auto;
+
+    scrollbar-width: none;
+  }
+
+  .feed-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .feed-tab {
+    flex: 0 0 auto;
+  }
+
+  .post {
+    padding: 16px;
+
+    border-top: 0;
+
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-body,
+  .post-media,
+  .post-actions {
+    margin-left: 0;
+  }
+}
+
+/* ─── Back to top ─── */
+.back-to-top-button {
+  position: fixed;
+
+  right: 24px;
+  bottom: 24px;
+
+  width: 44px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: var(--brand-500);
+
+  color: #fff;
+
+  font-size: 16px;
+
+  box-shadow: var(--shadow-md);
+
+  z-index: 150;
+
+  cursor: pointer;
+}
+
+

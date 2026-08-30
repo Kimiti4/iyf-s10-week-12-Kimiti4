@@ -1,0 +1,113 @@
+/* ==========================================================================
+   JAMII LINK 2.0 - NAVIGATION  (mobile bottom nav)
+   Phase 2: replaces the old `.ig-nav` with the spec's `.mobile-bottom-nav`.
+   Keeps the current 5 item routes; visual system only.
+   Hidden by default (desktop/tablet use topbar + sidebar).
+   ========================================================================== */
+
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* Icon-only glyph on the mobile create button */
+.mobile-create-icon {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    height: var(--mobile-nav-height);
+
+    z-index: 200;
+
+    display: grid;
+
+    grid-template-columns: repeat(5, 1fr);
+
+    align-items: center;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    backdrop-filter: blur(16px);
+
+    border-top: 1px solid var(--border);
+
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .mobile-nav-item {
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 3px;
+
+    border: 0;
+
+    background: transparent;
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+  }
+
+  .mobile-nav-item-icon {
+    font-size: 19px;
+    line-height: 1;
+  }
+
+  .mobile-nav-item-label {
+    line-height: 1;
+  }
+
+  .mobile-nav-item.active {
+    color: var(--brand-600);
+  }
+
+  .mobile-create {
+    width: 46px;
+    height: 46px;
+
+    margin: 0 auto;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 14px;
+
+    border: 0;
+
+    background: var(--brand-500);
+
+    color: #fff;
+
+    font-size: 22px;
+
+    box-shadow: var(--shadow-md);
+  }
+
+  .mobile-create .mobile-nav-item-icon {
+    font-size: 22px;
+  }
+}
+
+[data-theme='dark'] .mobile-bottom-nav,
+.dark-mode .mobile-bottom-nav {
+  background: rgba(17, 24, 39, 0.96);
+}

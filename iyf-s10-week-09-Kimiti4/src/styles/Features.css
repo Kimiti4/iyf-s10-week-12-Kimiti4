@@ -1,0 +1,191 @@
+/* ==========================================================================
+   JAMII LINK 2.0 - FEATURE PAGES  (Mtaani / Skills / Farm / Gigs)
+   Phase 4: shared `.feature-page` structure rendered in the `.social-layout`.
+   ========================================================================== */
+
+.feature-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.feature-hero {
+  padding: 8px 0 20px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.feature-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  color: var(--brand-600);
+}
+
+.feature-eyebrow .feature-emoji {
+  font-size: 14px;
+}
+
+.feature-title {
+  margin: 10px 0 6px;
+
+  font-size: 30px;
+
+  font-weight: 800;
+
+  letter-spacing: -0.03em;
+}
+
+.feature-description {
+  margin: 0;
+
+  max-width: 640px;
+
+  color: var(--text-secondary);
+
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.feature-stats {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+
+  gap: 12px;
+
+  margin-top: 20px;
+}
+
+.stat-card {
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  padding: 14px 16px;
+}
+
+.stat-value {
+  font-size: 22px;
+
+  font-weight: 800;
+
+  color: var(--brand-600);
+}
+
+.stat-label {
+  margin-top: 2px;
+
+  font-size: 13px;
+
+  color: var(--text-muted);
+}
+
+.feature-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-top: 20px;
+}
+
+.feature-card {
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  padding: 18px;
+
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.feature-card:hover {
+  box-shadow: var(--shadow-md);
+
+  transform: translateY(-2px);
+}
+
+.feature-card-title {
+  margin: 0 0 6px;
+
+  font-size: 16px;
+
+  font-weight: 700;
+}
+
+.feature-card-desc {
+  margin: 0 0 12px;
+
+  font-size: 14px;
+
+  line-height: 1.55;
+
+  color: var(--text-secondary);
+}
+
+.feature-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 6px;
+}
+
+.feature-tag {
+  font-size: 12px;
+  font-weight: 500;
+
+  color: var(--brand-700);
+
+  background: var(--brand-50);
+
+  padding: 3px 9px;
+
+  border-radius: 999px;
+}
+
+.feature-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin: 24px 0 4px;
+
+  color: var(--text-secondary);
+}
+
+.feature-header-title {
+  margin: 0;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  color: var(--text-primary);
+}
+
+/* ─── Mobile feature pages ─── */
+@media (max-width: 768px) {
+  .feature-page {
+    padding: 0 16px;
+  }
+
+  .feature-title {
+    font-size: 24px;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}

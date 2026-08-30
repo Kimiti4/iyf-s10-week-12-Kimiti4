@@ -14,7 +14,7 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
   if (!isAuthenticated) return null
 
   return (
-    <aside className={`sidebar ${isCollapsed ? 'collapsed' : 'expanded'} ${isOpen ? 'mobile-open' : ''}`}>
+    <aside className={`app-sidebar sidebar ${isCollapsed ? 'collapsed' : 'expanded'} ${isOpen ? 'mobile-open' : ''}`}>
       {/* Collapse Toggle Button */}
       <button 
         className="sidebar-collapse-btn" 
@@ -70,36 +70,36 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
         {/* Feed Categories */}
         {!isCollapsed && <h3 className="nav-section-title">Feeds</h3>}
         <Link 
-          to="/?feed=mtaani" 
-          className={`nav-item ${location.search.includes('mtaani') ? 'active' : ''}`}
-          title={isCollapsed ? 'Mtaani Alerts' : ''}
+          to="/mtaani" 
+          className={`nav-item ${isActive('/mtaani') ? 'active' : ''}`}
+          title={isCollapsed ? 'Mtaani' : ''}
         >
           <span className="nav-icon">🔔</span>
-          {!isCollapsed && <span className="nav-label">Mtaani Alerts</span>}
+          {!isCollapsed && <span className="nav-label">Mtaani</span>}
         </Link>
         <Link 
-          to="/?feed=skills" 
-          className={`nav-item ${location.search.includes('skills') ? 'active' : ''}`}
-          title={isCollapsed ? 'Skill Swaps' : ''}
+          to="/skills" 
+          className={`nav-item ${isActive('/skills') ? 'active' : ''}`}
+          title={isCollapsed ? 'Skills' : ''}
         >
           <span className="nav-icon">🤝</span>
-          {!isCollapsed && <span className="nav-label">Skill Swaps</span>}
+          {!isCollapsed && <span className="nav-label">Skills</span>}
         </Link>
         <Link 
-          to="/?feed=farm" 
-          className={`nav-item ${location.search.includes('farm') ? 'active' : ''}`}
-          title={isCollapsed ? 'Farm Market' : ''}
+          to="/farm" 
+          className={`nav-item ${isActive('/farm') ? 'active' : ''}`}
+          title={isCollapsed ? 'Farm' : ''}
         >
           <span className="nav-icon">🌱</span>
-          {!isCollapsed && <span className="nav-label">Farm Market</span>}
+          {!isCollapsed && <span className="nav-label">Farm</span>}
         </Link>
         <Link 
-          to="/?feed=gigs" 
-          className={`nav-item ${location.search.includes('gigs') ? 'active' : ''}`}
-          title={isCollapsed ? 'Gig Economy' : ''}
+          to="/gigs" 
+          className={`nav-item ${isActive('/gigs') ? 'active' : ''}`}
+          title={isCollapsed ? 'Gigs' : ''}
         >
           <span className="nav-icon">💼</span>
-          {!isCollapsed && <span className="nav-label">Gig Economy</span>}
+          {!isCollapsed && <span className="nav-label">Gigs</span>}
         </Link>
 
         {/* Community Features */}

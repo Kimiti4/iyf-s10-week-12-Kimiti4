@@ -6,9 +6,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
-import { FaArrowUp } from 'react-icons/fa';
-import EnhancedPostCard from '../components/EnhancedPostCard';
-import ReelsSection from '../components/ReelsSection';
+import { FaArrowUp, FaComment, FaRetweet, FaHeart } from 'react-icons/fa';
 import { FeedSkeleton } from '../../components/SkeletonLoader';
 import { postsAPI } from '../../services/api';
 import { fetchWithRetry } from '../../utils/apiRetry';
@@ -256,39 +254,53 @@ export default function EnhancedFeedPage() {
         setSearchParams(feedId === 'all' ? {} : { feed: feedId });
     };
 
+    const FEED_TABS = [
+        { id: 'all', label: 'For You' },
+        { id: 'mtaani', label: 'Mtaani' },
+        { id: 'skills', label: 'Skills' },
+        { id: 'farm', label: 'Farm' },
+        { id: 'gigs', label: 'Gigs' }
+    ];
+
+    const trending = [
+        { topic: '#Nairobi', meta: '2.1K posts' },
+        { topic: '#Skills', meta: '1.4K posts' },
+        { topic: '#FreshProduce', meta: '986 posts' },
+        { topic: '#Gigs', meta: '752 posts' },
+        { topic: '#Community', meta: '540 posts' }
+    ];
+
+    const formatTime = (dateString) => {
+        const date = new Date(dateString);
+        const diff = Math.floor((Date.now() - date) / 1000);
+        if (diff < 60) return 'now';
+        if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+        if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
+        return date.toLocaleDateString();
+    };
+
     return (
-        <div className="ig-app">
-            <header className="ig-header">
-                <div className="ig-logo">JamiiLink</div>
-                <div className="ig-header__actions">
-                    <button className="ig-icon-btn" aria-label="Notifications">
-                        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7 3 9 3 9h6s3-2 3-9z"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                    </button>
+        <div className="social-layout">
+            <section className="feed" aria-label="Community feed">
+                <div className="feed-tabs" role="tablist" aria-label="Feed categories">
+                    {FEED_TABS.map((tab) => (
+                        <button
+                            key={tab.id}
+                            role="tab"
+                            aria-selected={activeFeed === tab.id}
+                            className={`feed-tab ${activeFeed === tab.id ? 'active' : ''}`}
+                            onClick={() => handleFeedChange(tab.id)}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
-            </header>
 
-            {activeFeed === 'all' && (
-                <section className="ig-stories" aria-label="Community feeds" tabIndex={0}>
-                    <div className="ig-stories__track">
-                        {['Nairobi', 'Mtaani', 'Skills', 'Farm', 'Gigs'].map((name) => (
-                            <div key={name} className="ig-story">
-                                <div className="ig-story__ring"><div className="ig-story__img" style={{ background: '#e0e0e0' }} /></div>
-                                <span className="ig-story__name">{name}</span>
-                            </div>
-                        ))}
-                        <div className="ig-story">
-                            <div className="ig-story__ring ig-story__ring--add"><div className="ig-story__img" style={{ background: '#e0e0e0' }} /></div>
-                            <span className="ig-story__name">Add</span>
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            <section className="ig-feed" aria-label="Community feed">
                 {loading ? (
                     <FeedSkeleton count={3} />
                 ) : filteredPosts.length === 0 ? (
-                    <div className="empty-feed" style={{ padding: '2rem', textAlign: 'center', color: 'var(--ig-text-secondary)' }}>
+                    <div className="empty-feed" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                         <p>No posts in this feed yet. Check back later!</p>
                     </div>
                 ) : (
@@ -296,63 +308,84 @@ export default function EnhancedFeedPage() {
                         {filteredPosts.map((post, index) => (
                             <motion.article
                                 key={post.id}
-                                className="ig-post"
-                                initial={{ opacity: 0, y: 20 }}
+                                className="post"
+                                initial={{ opacity: 0, y: 12 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                transition={{ delay: index * 0.05 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ delay: Math.min(index * 0.03, 0.3) }}
                             >
-                                <div className="ig-post__header">
-                                    <div className="ig-post__user">
-                                        <div className="ig-avatar" style={{ backgroundImage: post.author.avatar ? `url(${post.author.avatar})` : 'none', backgroundSize: 'cover' }} />
-                                        <div className="ig-post__meta">
-                                            <span className="ig-post__username">{post.author.username}</span>
-                                            <span className="ig-post__location">{post.category}</span>
+                                <div className="post-header">
+                                    <div className="avatar" aria-hidden="true">
+                                        {post.author.avatar ? (
+                                            <img src={post.author.avatar} alt="" />
+                                        ) : (
+                                            <span>{post.author.username.slice(0, 1).toUpperCase()}</span>
+                                        )}
+                                    </div>
+                                    <div className="post-meta">
+                                        <div className="post-author">
+                                            <span className="post-name">{post.author.username}</span>
+                                            <span className="post-handle">@{post.author.username.toLowerCase().replace(/\s+/g, '')}</span>
+                                            <span className="post-time">&middot; {formatTime(post.createdAt)}</span>
+                                        </div>
+                                        <div className="post-tags">
+                                            {post.tags.slice(0, 3).map((tag, i) => (
+                                                <span key={i} className="tag">#{tag}</span>
+                                            ))}
                                         </div>
                                     </div>
-                                    <button className="ig-post__more">⋯</button>
+                                </div>
+
+                                <div className="post-body">
+                                    {post.title && <strong className="post-title">{post.title}</strong>}
+                                    {"\n"}{post.content}
                                 </div>
 
                                 {post.image && (
-                                    <img className="ig-post__media" src={post.image} alt={post.title} loading="lazy" />
+                                    <div className="post-media">
+                                        <img src={post.image} alt={post.title || 'post image'} loading="lazy" />
+                                    </div>
                                 )}
 
-                                <div className="ig-post__actions">
-                                    <div className="ig-post__actions-left">
-                                        <button className="ig-action" aria-label="Like"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-                                        <button className="ig-action" aria-label="Comment"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-                                        <button className="ig-action" aria-label="Share"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-                                    </div>
-                                    <button className="ig-action" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
-                                </div>
-
-                                <div className="ig-post__info">
-                                    <div className="ig-likes">{post.likes + post.downvotes + post.reblogs} likes</div>
-                                    <div className="ig-caption"><strong>{post.author.username}</strong> {post.content}</div>
-                                    {post.comments > 0 && <div className="ig-comments-link">View all {post.comments} comments</div>}
-                                    <div className="ig-timestamp">{new Date(post.createdAt).toLocaleDateString()}</div>
+                                <div className="post-actions">
+                                    <button className="post-action" aria-label="Comment"><FaComment /> {post.comments}</button>
+                                    <button className="post-action" aria-label="Reblog"><FaRetweet /> {post.reblogs}</button>
+                                    <button className="post-action" aria-label="Like"><FaHeart /> {post.likes}</button>
+                                    <span className="post-action">{post.downvotes} &darr;</span>
                                 </div>
                             </motion.article>
                         ))}
                     </AnimatePresence>
                 )}
+
+                <AnimatePresence>
+                    {showBackToTop && (
+                        <motion.button
+                            className="back-to-top-button"
+                            onClick={scrollToTop}
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0 }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                        >
+                            <FaArrowUp />
+                        </motion.button>
+                    )}
+                </AnimatePresence>
             </section>
 
-            <AnimatePresence>
-                {showBackToTop && (
-                    <motion.button
-                        className="back-to-top-button"
-                        onClick={scrollToTop}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0 }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                    >
-                        <FaArrowUp />
-                    </motion.button>
-                )}
-            </AnimatePresence>
+            <aside className="right-rail" aria-label="Discover">
+                <div className="discovery-card">
+                    <h3 className="discovery-title">Trending in JamiiLink</h3>
+                    {trending.map((item) => (
+                        <div key={item.topic} className="trending-item">
+                            <div className="trending-topic">{item.topic}</div>
+                            <div className="trending-meta">{item.meta}</div>
+                        </div>
+                    ))}
+                </div>
+            </aside>
         </div>
     );
 }
