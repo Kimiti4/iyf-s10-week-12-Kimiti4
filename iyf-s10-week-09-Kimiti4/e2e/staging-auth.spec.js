@@ -3,7 +3,14 @@ import { test, expect } from '@playwright/test';
 const MOCK_TOKEN = 'mock-jwt-token-staging';
 
 test.describe('Staging Authenticated Flow', () => {
-  test.beforeEach(async ({ context }) => {
+  test.beforeEach(async ({ context, page }) => {
+    await context.route('**/api/auth/me', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, user: { id: 'test-user-id', email: 'test@jamii.link', username: 'testuser', role: 'user' } })
+      })
+    );
     await context.route('**/api/posts**', (route) => {
       const method = route.request().method();
       if (method === 'GET') {
@@ -22,7 +29,7 @@ test.describe('Staging Authenticated Flow', () => {
       }
       return route.continue();
     });
-    await context.addInitScript(() => {
+    await page.addInitScript(() => {
       localStorage.setItem('token', MOCK_TOKEN);
       localStorage.setItem('user', JSON.stringify({ id: 'test-user-id', email: 'test@jamii.link', username: 'testuser', role: 'user' }));
     });
