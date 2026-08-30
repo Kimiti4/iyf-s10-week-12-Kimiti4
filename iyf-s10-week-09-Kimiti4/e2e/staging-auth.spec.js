@@ -43,7 +43,7 @@ test.describe('Staging Authenticated Flow', () => {
   });
 
   test('auth flow works end-to-end with mocked API', async ({ page, context }) => {
-    await page.goto('/posts/create');
+    await page.goto('/original/posts/create');
     await expect(page.locator('input[name="title"], h1, form').first()).toBeVisible({ timeout: 10000 });
     if (await page.locator('input[name="title"]').isVisible()) {
       await page.fill('input[name="title"]', 'Staging validation post');
