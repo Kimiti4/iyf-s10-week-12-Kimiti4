@@ -12,6 +12,9 @@
         "skipAudits": ["uses-http2", "offscreen-images", "render-blocking-resources"]
       }
     },
+    "upload": {
+      "target": "temporary-public-storage"
+    },
     "assert": {
       "assertions": {
         "categories:performance": ["warn", { "minScore": 0.8 }],
