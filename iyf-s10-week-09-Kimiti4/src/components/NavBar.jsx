@@ -69,7 +69,6 @@ function NavBar() {
         {/* Right: Navigation Links */}
         <div 
           className={`navbar-right ${mobileMenuOpen ? 'active' : ''}`}
-          aria-hidden={!mobileMenuOpen}
           style={{
             transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
             visibility: mobileMenuOpen ? 'visible' : 'hidden',
