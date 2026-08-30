@@ -44,6 +44,11 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
       - run: npx playwright install --with-deps chromium
         working-directory: iyf-s10-week-09-Kimiti4
+      # Build the static bundle first: the e2e suite serves dist via `vite
+      # preview` (deterministic, no cold dev-server compile) and mocks every
+      # API call, so it passes with any backend or none.
+      - run: npm run build
+        working-directory: iyf-s10-week-09-Kimiti4
       - run: npx playwright test e2e/ --reporter=html
         working-directory: iyf-s10-week-09-Kimiti4
       - uses: actions/upload-artifact@v4
