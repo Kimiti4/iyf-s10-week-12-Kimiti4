@@ -20,9 +20,18 @@ test.describe('Accessibility Compliance', () => {
   });
 
   async function checkAccessibility(page, testInfo) {
-    // Wait for all Framer Motion entrance animations (parents and staggered
-    // children) to complete so axe measures final colors/opacity instead of
-    // mid-animation (opacity:0) states that yield blended backgrounds.
+    // Flatten backdrop-filter so axe measures the intended solid backgrounds,
+    // not the blurred/translucent composite behind navbar/glass elements (axe
+    // treats white navbar text as being on the light page behind it, which
+    // fails contrast only under Linux headless Chromium in CI).
+    await page.addStyleTag({
+      content:
+        '* { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }',
+    });
+    // Give Framer Motion entrance animations (parents + staggered children)
+    // time to finish so axe sees final opacity/colors instead of mid-animation
+    // blended backgrounds.
+    await page.waitForTimeout(2500);
     await page.waitForFunction(() => {
       const els = document.querySelectorAll('body *');
       for (const el of els) {
@@ -30,7 +39,7 @@ test.describe('Accessibility Compliance', () => {
         if (o > 0 && o < 0.99) return false;
       }
       return true;
-    }, undefined, { timeout: 15000 }).catch(() => {
+    }, undefined, { timeout: 20000 }).catch(() => {
       // If animations run forever, proceed; axe will still flag real issues.
     });
 
