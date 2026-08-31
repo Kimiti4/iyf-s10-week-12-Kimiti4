@@ -56,6 +56,7 @@ const JamFeedPage = lazy(() => import('./pages/JamFeedPage'))
 const JamDetailPage = lazy(() => import('./pages/JamDetailPage'))
 const PostPage = lazy(() => import('./pages/PostPage'))
 const FollowingPage = lazy(() => import('./pages/FollowingPage'))
+const ReelDetailPage = lazy(() => import('./pages/ReelDetailPage'))
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -166,6 +167,16 @@ function AppRoutes() {
               <FollowingPage />
             </Suspense>
           </ProtectedRoute>
+        } 
+      />
+
+      {/* Reel Detail Route */}
+      <Route 
+        path="/reels/:id" 
+        element={
+          <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+            <ReelDetailPage />
+          </Suspense>
         } 
       />
       
