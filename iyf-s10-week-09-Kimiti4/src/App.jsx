@@ -57,6 +57,7 @@ const JamDetailPage = lazy(() => import('./pages/JamDetailPage'))
 const PostPage = lazy(() => import('./pages/PostPage'))
 const FollowingPage = lazy(() => import('./pages/FollowingPage'))
 const ReelDetailPage = lazy(() => import('./pages/ReelDetailPage'))
+const UnifiedFeed = lazy(() => import('./components/feed/UnifiedFeed'))
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -79,7 +80,14 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Main Routes - Now Using Enhanced Pages */}
-      <Route path="/" element={<EnhancedFeedPage />} />
+      <Route 
+        path="/" 
+        element={
+          <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+            <UnifiedFeed />
+          </Suspense>
+        } 
+      />
       <Route path="/login" element={<EnhancedLoginPage />} />
       <Route path="/register" element={<EnhancedRegisterPage />} />
       <Route path="/reels" element={<ReelsPage />} />
