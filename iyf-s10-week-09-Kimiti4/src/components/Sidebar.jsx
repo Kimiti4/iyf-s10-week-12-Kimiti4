@@ -66,13 +66,21 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
           <span className="nav-icon">🔥</span>
           {!isCollapsed && <span className="nav-label">Jams</span>}
         </Link>
-        <Link 
-          to="/alerts" 
+        <Link
+          to="/alerts"
           className={`nav-item ${isActive('/alerts') ? 'active' : ''}`}
           title={isCollapsed ? 'Alerts' : ''}
         >
           <span className="nav-icon">🚨</span>
           {!isCollapsed && <span className="nav-label">Alerts</span>}
+        </Link>
+        <Link
+          to="/creator/studio"
+          className={`nav-item ${isActive('/creator/studio') ? 'active' : ''}`}
+          title={isCollapsed ? 'Creator Studio' : ''}
+        >
+          <span className="nav-icon">📊</span>
+          {!isCollapsed && <span className="nav-label">Creator Studio</span>}
         </Link>
 
         {/* Feed Categories */}
