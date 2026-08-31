@@ -3,6 +3,7 @@ import ReelPlayer from './ReelPlayer';
 import ReelCaption from './ReelCaption';
 import ReelActions from './ReelActions';
 import ReelJamCTA from './ReelJamCTA';
+import ReelJamOverlay from '../jam-signature/ReelJamOverlay';
 import ShareReelSheet from './ShareReelSheet';
 import { reelsAPI } from '../../services/reelApi';
 import { trackLike, trackUnlike, trackShare, trackSave, trackUnsave } from '../../contracts/socialEventContract';
@@ -84,6 +85,8 @@ export default function ReelCard({ reel, isActive, updateReel }) {
         <ReelCaption reel={reel} />
         <ReelJamCTA jamId={reel.jamId} jamTitle={reel.jamTitle} jamCTA={reel.jamCTA} />
       </div>
+
+      <ReelJamOverlay jamId={reel.jamId} jamTitle={reel.jamTitle} jamCTA={reel.jamCTA} />
 
       <ShareReelSheet reel={reel} isOpen={shareOpen} onClose={() => setShareOpen(false)} />
     </article>

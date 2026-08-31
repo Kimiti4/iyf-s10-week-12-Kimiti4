@@ -8,6 +8,7 @@ import FeedItem from './FeedItem';
 import FeedSkeleton from './FeedSkeleton';
 import FeedEmptyState from './FeedEmptyState';
 import FeedErrorState from './FeedErrorState';
+import FeedJamBanner from '../jam-signature/FeedJamBanner';
 import { FEED_TAB } from '../../domain/feed/feedTypes';
 
 export default function UnifiedFeed() {
@@ -57,6 +58,8 @@ export default function UnifiedFeed() {
           hint={emptyMessages[activeTab]?.hint}
         />
       )}
+
+      {activeTab === FEED_TAB.JAMS && <FeedJamBanner jams={items.filter(i => i.type === 'jam')} />}
 
       <div className="unified-feed-list">
         {items.map((item) => (

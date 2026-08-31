@@ -4,6 +4,7 @@ import PostAuthor from './PostAuthor';
 import PostMedia from './PostMedia';
 import PostActions from './PostActions';
 import PostEngagement from './PostEngagement';
+import PostJamConnector from '../jam-signature/PostJamConnector';
 
 function formatTime(dateString) {
   const date = new Date(dateString);
@@ -48,6 +49,8 @@ export default function PostCard({ post, actions, showAuthor = true }) {
       </Link>
 
       <PostEngagement post={post} />
+
+      {post.jam && <PostJamConnector jam={post.jam} contribution={post.jamContribution} />}
 
       {actions && (
         <div className="post-card-actions">
