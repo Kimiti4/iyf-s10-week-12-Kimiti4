@@ -6,12 +6,15 @@ import OrganizationSelector from './OrganizationSelector'
 import DarkModeToggle from './DarkModeToggle'
 import { FaHome, FaStore, FaCalendarAlt, FaRobot, FaBell, FaComments, FaChartLine, FaPalette, FaTrophy, FaVoteYea, FaBullseye, FaUserShield, FaCrown, FaSignOutAlt, FaFire } from 'react-icons/fa'
 import CreateMenu from './jam/CreateMenu'
+import NotificationBell from './notifications/NotificationBell'
+import { useNotifications } from '../hooks/useNotifications'
 import './NavBar.css'
 
 function NavBar() {
   const { user, isAuthenticated, logout } = useAuth()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { unreadCount } = useNotifications()
 
   const isActive = (path) => location.pathname === path
 
@@ -123,13 +126,13 @@ function NavBar() {
               <span className="nav-icon"><FaRobot /></span>
               <span className="nav-text">Tiannara</span>
             </Link>
-            <Link 
-              to="/alerts" 
-              className={`nav-item nav-alert ${isActive('/alerts') ? 'active' : ''}`}
+            <Link
+              to="/notifications"
+              className={`nav-item nav-notifications ${isActive('/notifications') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="nav-icon"><FaBell /></span>
-              <span className="nav-text">Alerts</span>
+              <NotificationBell unreadCount={unreadCount} onClick={(e) => e.preventDefault()} />
+              <span className="nav-text">Notifications</span>
             </Link>
             {/* Chat Icon with Notification Badge */}
             <Link 
