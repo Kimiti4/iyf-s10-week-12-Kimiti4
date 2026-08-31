@@ -1,12 +1,14 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import ReelPlayer from './ReelPlayer';
 import ReelCaption from './ReelCaption';
 import ReelActions from './ReelActions';
 import ReelJamCTA from './ReelJamCTA';
+import ShareReelSheet from './ShareReelSheet';
 import { reelsAPI } from '../../services/reelApi';
 import { trackLike, trackUnlike, trackShare, trackSave, trackUnsave } from '../../contracts/socialEventContract';
 
 export default function ReelCard({ reel, isActive, updateReel }) {
+  const [shareOpen, setShareOpen] = useState(false);
   const handleLike = useCallback(async () => {
     updateReel(reel.id, { isLiked: true, likeCount: reel.likeCount + 1 });
     trackLike('reel', reel.id);
@@ -59,7 +61,7 @@ export default function ReelCard({ reel, isActive, updateReel }) {
         });
       } catch { /* cancelled */ }
     } else {
-      await navigator.clipboard.writeText(`${window.location.origin}/reels/${reel.id}`);
+      setShareOpen(true);
     }
   }, [reel]);
 
@@ -82,6 +84,8 @@ export default function ReelCard({ reel, isActive, updateReel }) {
         <ReelCaption reel={reel} />
         <ReelJamCTA jamId={reel.jamId} jamTitle={reel.jamTitle} jamCTA={reel.jamCTA} />
       </div>
+
+      <ShareReelSheet reel={reel} isOpen={shareOpen} onClose={() => setShareOpen(false)} />
     </article>
   );
 }
