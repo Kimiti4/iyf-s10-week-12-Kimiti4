@@ -193,7 +193,7 @@ export default function EnhancedRegisterPage() {
                         exit={{ opacity: 0 }}
                     >
                         <div className="input-group">
-                            <FaUser className="input-icon" />
+                            <FaUser className="input-icon" aria-hidden="true" />
                             <input
                                 type="text"
                                 name="name"
@@ -202,12 +202,13 @@ export default function EnhancedRegisterPage() {
                                 placeholder="Full Name"
                                 required
                                 className={formErrors.username ? 'input-error' : ''}
+                                aria-label="Full name"
                             />
                             {formErrors.username && <span className="field-error">{formErrors.username}</span>}
                         </div>
                         
                         <div className="input-group">
-                            <FaEnvelope className="input-icon" />
+                            <FaEnvelope className="input-icon" aria-hidden="true" />
                             <input
                                 type="email"
                                 name="email"
@@ -216,34 +217,37 @@ export default function EnhancedRegisterPage() {
                                 placeholder="Email Address"
                                 required
                                 className={formErrors.email ? 'input-error' : ''}
+                                aria-label="Email address"
                             />
                             {formErrors.email && <span className="field-error">{formErrors.email}</span>}
                         </div>
                         
                         <div className="input-group">
-                            <FaPhone className="input-icon" />
+                            <FaPhone className="input-icon" aria-hidden="true" />
                             <input
                                 type="tel"
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
                                 placeholder="Phone Number (+254...)"
+                                aria-label="Phone number"
                             />
                         </div>
                         
                         <div className="input-group">
-                            <FaMapMarkerAlt className="input-icon" />
+                            <FaMapMarkerAlt className="input-icon" aria-hidden="true" />
                             <input
                                 type="text"
                                 name="location"
                                 value={formData.location}
                                 onChange={handleChange}
                                 placeholder="Location (Optional)"
+                                aria-label="Location"
                             />
                         </div>
                         
                         <div className="input-group password-group">
-                            <FaLock className="input-icon" />
+                            <FaLock className="input-icon" aria-hidden="true" />
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 name="password"
@@ -253,6 +257,7 @@ export default function EnhancedRegisterPage() {
                                 required
                                 minLength="8"
                                 className={formErrors.password ? 'input-error' : ''}
+                                aria-label="Password"
                             />
                             <button
                                 type="button"
@@ -266,7 +271,7 @@ export default function EnhancedRegisterPage() {
                         </div>
                         
                         <div className="input-group">
-                            <FaLock className="input-icon" />
+                            <FaLock className="input-icon" aria-hidden="true" />
                             <input
                                 type="password"
                                 name="confirmPassword"
@@ -275,6 +280,7 @@ export default function EnhancedRegisterPage() {
                                 placeholder="Confirm Password"
                                 required
                                 className={formErrors.confirmPassword ? 'input-error' : ''}
+                                aria-label="Confirm password"
                             />
                             {formErrors.confirmPassword && <span className="field-error">{formErrors.confirmPassword}</span>}
                         </div>
@@ -357,6 +363,7 @@ export default function EnhancedRegisterPage() {
                                     placeholder="Enter 6-digit code"
                                     maxLength="6"
                                     className="code-input"
+                                    aria-label="Verification code"
                                 />
                                 <motion.button
                                     className="btn-verify"

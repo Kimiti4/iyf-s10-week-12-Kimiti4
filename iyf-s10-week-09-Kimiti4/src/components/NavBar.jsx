@@ -58,7 +58,7 @@ function NavBar() {
             </span>
           </button>
           <Link to="/" className="navbar-logo">
-            <span className="logo-icon">🌍</span>
+            <span className="logo-icon" aria-hidden="true">🌍</span>
             <span className="logo-text">
               Jamii<span className="logo-highlight">Link</span>
             </span>

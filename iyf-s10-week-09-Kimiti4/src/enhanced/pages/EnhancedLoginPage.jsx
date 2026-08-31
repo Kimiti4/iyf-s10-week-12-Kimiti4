@@ -147,7 +147,7 @@ export default function EnhancedLoginPage() {
                                 exit={{ opacity: 0, x: 20 }}
                                 className="input-group"
                             >
-                                <FaEnvelope className="input-icon" />
+                                <FaEnvelope className="input-icon" aria-hidden="true" />
                                 <input
                                     type="email"
                                     value={email}
@@ -155,6 +155,7 @@ export default function EnhancedLoginPage() {
                                     placeholder="Email address"
                                     required
                                     autoComplete="email"
+                                    aria-label="Email address"
                                 />
                             </motion.div>
                         ) : (
@@ -165,7 +166,7 @@ export default function EnhancedLoginPage() {
                                 exit={{ opacity: 0, x: 20 }}
                                 className="input-group"
                             >
-                                <FaPhone className="input-icon" />
+                                <FaPhone className="input-icon" aria-hidden="true" />
                                 <input
                                     type="tel"
                                     value={phone}
@@ -173,13 +174,14 @@ export default function EnhancedLoginPage() {
                                     placeholder="Phone number (+254...)"
                                     required
                                     autoComplete="tel"
+                                    aria-label="Phone number"
                                 />
                             </motion.div>
                         )}
                     </AnimatePresence>
                     
                     <div className="input-group password-group">
-                        <FaLock className="input-icon" />
+                        <FaLock className="input-icon" aria-hidden="true" />
                         <input
                             type={showPassword ? 'text' : 'password'}
                             value={password}
@@ -187,6 +189,7 @@ export default function EnhancedLoginPage() {
                             placeholder="Password"
                             required
                             autoComplete="current-password"
+                            aria-label="Password"
                         />
                         <button
                             type="button"

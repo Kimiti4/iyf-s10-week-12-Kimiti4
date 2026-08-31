@@ -13,7 +13,6 @@ let socket = null;
  */
 export function initializeSocket(backendUrl) {
   if (socket) {
-    console.warn('Socket already initialized');
     return socket;
   }
 
@@ -28,17 +27,11 @@ export function initializeSocket(backendUrl) {
   });
 
   // Connection events
-  socket.on('connect', () => {
-    console.log('✅ Socket connected:', socket.id);
-  });
+  socket.on('connect', () => {});
 
-  socket.on('disconnect', (reason) => {
-    console.log('❌ Socket disconnected:', reason);
-  });
+  socket.on('disconnect', () => {});
 
-  socket.on('connect_error', (error) => {
-    console.error('Socket connection error:', error);
-  });
+  socket.on('connect_error', () => {});
 
   return socket;
 }
@@ -60,7 +53,6 @@ export function getSocket() {
 export function joinRoom(roomId) {
   const sock = getSocket();
   sock.emit('join-room', roomId);
-  console.log(`Joined room: ${roomId}`);
 }
 
 /**
@@ -70,7 +62,6 @@ export function joinRoom(roomId) {
 export function leaveRoom(roomId) {
   const sock = getSocket();
   sock.emit('leave-room', roomId);
-  console.log(`Left room: ${roomId}`);
 }
 
 /**
@@ -133,7 +124,6 @@ export function disconnectSocket() {
   if (socket) {
     socket.disconnect();
     socket = null;
-    console.log('Socket disconnected');
   }
 }
 
