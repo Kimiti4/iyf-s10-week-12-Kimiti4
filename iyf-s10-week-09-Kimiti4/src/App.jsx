@@ -59,6 +59,7 @@ const FollowingPage = lazy(() => import('./pages/FollowingPage'))
 const ReelDetailPage = lazy(() => import('./pages/ReelDetailPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
 const CreatorStudioPage = lazy(() => import('./pages/CreatorStudioPage'))
+const DiscoveryPage = lazy(() => import('./pages/DiscoveryPage'))
 const UnifiedFeed = lazy(() => import('./components/feed/UnifiedFeed'))
 
 function AppRoutes() {
@@ -95,6 +96,7 @@ function AppRoutes() {
       <Route path="/reels" element={<ReelsPage />} />
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/creator/studio" element={<CreatorStudioPage />} />
+      <Route path="/discover" element={<DiscoveryPage />} />
 <Route path="/mtaani" element={<MtaaniPage />} />
 <Route path="/skills" element={<SkillsPage />} />
 <Route path="/farm" element={<FarmPage />} />
