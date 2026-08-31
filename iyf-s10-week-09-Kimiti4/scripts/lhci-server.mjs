@@ -43,14 +43,20 @@ const MIME = {
 const EMPTY_OK = {
   success: true,
   posts: [],
+  reels: [],
+  jams: [],
   data: [],
   items: [],
   alerts: [],
   drafts: [],
   notifications: [],
   organizations: [],
+  conversations: [],
+  channels: [],
   user: null,
   total: 0,
+  hasMore: false,
+  page: 1,
 };
 
 function sendJson(res, body, status = 200) {
@@ -64,11 +70,55 @@ function sendFile(res, filePath) {
   fs.createReadStream(filePath).pipe(res);
 }
 
+function handleApiRequest(req, res) {
+  const urlPath = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+
+  if (req.method !== 'GET') {
+    return sendJson(res, { success: true });
+  }
+
+  if (urlPath.startsWith('/api/auth/me') || urlPath.startsWith('/api/users/me')) {
+    return sendJson(res, { success: true, user: null });
+  }
+  if (urlPath.startsWith('/api/auth')) {
+    return sendJson(res, { success: true });
+  }
+  if (urlPath.startsWith('/api/notifications')) {
+    return sendJson(res, { success: true, notifications: [], total: 0, unreadCount: 0 });
+  }
+  if (urlPath.startsWith('/api/posts')) {
+    return sendJson(res, { success: true, posts: [], total: 0, hasMore: false });
+  }
+  if (urlPath.startsWith('/api/reels')) {
+    return sendJson(res, { success: true, reels: [], total: 0, hasMore: false });
+  }
+  if (urlPath.startsWith('/api/jams')) {
+    return sendJson(res, { success: true, jams: [], total: 0, hasMore: false });
+  }
+  if (urlPath.startsWith('/api/search')) {
+    return sendJson(res, { success: true, results: [], total: 0 });
+  }
+  if (urlPath.startsWith('/api/trending')) {
+    return sendJson(res, { success: true, trending: [], hashtags: [] });
+  }
+  if (urlPath.startsWith('/api/users')) {
+    return sendJson(res, { success: true, users: [], total: 0 });
+  }
+  if (urlPath.startsWith('/api/feed')) {
+    return sendJson(res, { success: true, posts: [], reels: [], jams: [], total: 0, hasMore: false });
+  }
+  if (urlPath.startsWith('/api/organizations')) {
+    return sendJson(res, { success: true, organizations: [], total: 0 });
+  }
+
+  return sendJson(res, EMPTY_OK);
+}
+
 const server = http.createServer((req, res) => {
   const urlPath = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
 
   if (urlPath.startsWith('/api/')) {
-    return sendJson(res, EMPTY_OK);
+    return handleApiRequest(req, res);
   }
 
   // Resolve the request inside dist/ only — never escape the directory.
