@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBadgeCheck } from 'react-icons/fa';
+import { FaCheckCircle } from 'react-icons/fa';
 import AvatarIcon from '../AvatarIcon';
 import { useFollow } from '../../hooks/useFollow';
 
@@ -21,7 +21,7 @@ export default function ReelCaption({ reel }) {
         />
         <Link to={`/profile/${reel.author.id}`} className="reel-caption-username">
           {reel.author.username}
-          {reel.author.isVerified && <FaBadgeCheck className="reel-caption-badge" aria-label="Verified" />}
+          {reel.author.isVerified && <FaCheckCircle className="reel-caption-badge" aria-label="Verified" />}
         </Link>
         <button
           className={`reel-caption-follow ${isFollowed ? 'following' : ''}`}

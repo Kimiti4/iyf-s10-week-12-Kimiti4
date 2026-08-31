@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FaBadgeCheck } from 'react-icons/fa';
+import { FaCheckCircle } from 'react-icons/fa';
 import AvatarIcon from '../AvatarIcon';
 import { useFollow } from '../../hooks/useFollow';
 
@@ -16,7 +16,7 @@ export default function PostAuthor({ author, showFollow = true, size = 'normal' 
         <Link to={`/profile/${author.id}`} className="post-author-name">
           {author.username}
           {author.isVerified && (
-            <FaBadgeCheck className="post-author-badge" aria-label="Verified" />
+            <FaCheckCircle className="post-author-badge" aria-label="Verified" />
           )}
         </Link>
       </div>
