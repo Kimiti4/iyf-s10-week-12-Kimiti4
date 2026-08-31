@@ -59,6 +59,14 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
           {!isCollapsed && <span className="nav-label">Events</span>}
         </Link>
         <Link 
+          to="/jams" 
+          className={`nav-item ${isActive('/jams') ? 'active' : ''}`}
+          title={isCollapsed ? 'Jams' : ''}
+        >
+          <span className="nav-icon">🔥</span>
+          {!isCollapsed && <span className="nav-label">Jams</span>}
+        </Link>
+        <Link 
           to="/alerts" 
           className={`nav-item ${isActive('/alerts') ? 'active' : ''}`}
           title={isCollapsed ? 'Alerts' : ''}
