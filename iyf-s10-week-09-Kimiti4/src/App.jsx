@@ -51,6 +51,7 @@ const CommunityEvents = lazy(() => import('./components/CommunityEvents'))
 const EnhancedEmergencyAlerts = lazy(() => import('./components/EnhancedEmergencyAlerts'))
 const AlertFeedPage = lazy(() => import('./pages/AlertFeedPage'))
 const DraftsPage = lazy(() => import('./pages/DraftsPage'))
+const JamCreationPage = lazy(() => import('./pages/JamCreationPage'))
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -108,6 +109,16 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <DraftsPage />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Jam Creation Route */}
+      <Route 
+        path="/create/jam" 
+        element={
+          <ProtectedRoute>
+            <JamCreationPage />
           </ProtectedRoute>
         } 
       />

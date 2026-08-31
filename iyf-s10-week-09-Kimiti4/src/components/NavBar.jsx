@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext'
 import SearchBar from './SearchBar'
 import OrganizationSelector from './OrganizationSelector'
 import DarkModeToggle from './DarkModeToggle'
-import { FaHome, FaStore, FaCalendarAlt, FaRobot, FaBell, FaComments, FaChartLine, FaPalette, FaTrophy, FaVoteYea, FaBullseye, FaUserShield, FaCrown, FaPlus, FaSignOutAlt } from 'react-icons/fa'
+import { FaHome, FaStore, FaCalendarAlt, FaRobot, FaBell, FaComments, FaChartLine, FaPalette, FaTrophy, FaVoteYea, FaBullseye, FaUserShield, FaCrown, FaSignOutAlt } from 'react-icons/fa'
+import CreateMenu from './jam/CreateMenu'
 import './NavBar.css'
 
 function NavBar() {
@@ -202,14 +203,7 @@ function NavBar() {
                   </Link>
                 ) : null)}
                 
-                <Link 
-                  to="/original/posts/create" 
-                  className="nav-btn btn-create"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <span className="btn-icon"><FaPlus /></span>
-                  <span className="btn-text">Create</span>
-                </Link>
+                <CreateMenu />
 
                 <div className="user-profile-group">
                   <Link 
