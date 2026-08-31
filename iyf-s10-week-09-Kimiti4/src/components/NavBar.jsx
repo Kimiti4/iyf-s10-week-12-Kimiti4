@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import SearchBar from './SearchBar'
 import OrganizationSelector from './OrganizationSelector'
 import DarkModeToggle from './DarkModeToggle'
-import { FaHome, FaStore, FaCalendarAlt, FaRobot, FaBell, FaComments, FaChartLine, FaPalette, FaTrophy, FaVoteYea, FaBullseye, FaUserShield, FaCrown, FaSignOutAlt } from 'react-icons/fa'
+import { FaHome, FaStore, FaCalendarAlt, FaRobot, FaBell, FaComments, FaChartLine, FaPalette, FaTrophy, FaVoteYea, FaBullseye, FaUserShield, FaCrown, FaSignOutAlt, FaFire } from 'react-icons/fa'
 import CreateMenu from './jam/CreateMenu'
 import './NavBar.css'
 
@@ -102,6 +102,14 @@ function NavBar() {
             >
               <span className="nav-icon"><FaCalendarAlt /></span>
               <span className="nav-text">Events</span>
+            </Link>
+            <Link 
+              to="/jams" 
+              className={`nav-item ${isActive('/jams') ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <span className="nav-icon"><FaFire /></span>
+              <span className="nav-text">Jams</span>
             </Link>
           </div>
 

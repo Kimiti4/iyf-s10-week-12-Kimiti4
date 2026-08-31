@@ -52,6 +52,7 @@ const EnhancedEmergencyAlerts = lazy(() => import('./components/EnhancedEmergenc
 const AlertFeedPage = lazy(() => import('./pages/AlertFeedPage'))
 const DraftsPage = lazy(() => import('./pages/DraftsPage'))
 const JamCreationPage = lazy(() => import('./pages/JamCreationPage'))
+const JamFeedPage = lazy(() => import('./pages/JamFeedPage'))
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -120,6 +121,16 @@ function AppRoutes() {
           <ProtectedRoute>
             <JamCreationPage />
           </ProtectedRoute>
+        } 
+      />
+
+      {/* Jam Feed Route */}
+      <Route 
+        path="/jams" 
+        element={
+          <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+            <JamFeedPage />
+          </Suspense>
         } 
       />
       
