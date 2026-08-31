@@ -16,18 +16,8 @@ import './index.css' // Unified whimsical design system
 import Sidebar from './components/Sidebar'
 import NavBar from './components/NavBar'
 import MobileBottomNav from './components/MobileBottomNav'
-const HomePage = lazy(() => import('./pages/HomePage'))
-const PostListPage = lazy(() => import('./pages/PostListPage'))
-const PostDetailPage = lazy(() => import('./pages/PostDetailPage'))
-const AboutPage = lazy(() => import('./pages/AboutPage'))
-const OriginalLoginPage = lazy(() => import('./pages/LoginPage'))
-const OriginalRegisterPage = lazy(() => import('./pages/RegisterPage'))
-const ProfilePage = lazy(() => import('./pages/ProfilePage'))
-const CreatePostPage = lazy(() => import('./pages/CreatePostPage'))
-const SearchResultsPage = lazy(() => import('./pages/SearchResultsPage'))
 const EnhancedLoginPage = lazy(() => import('./enhanced/pages/EnhancedLoginPage'))
 const EnhancedRegisterPage = lazy(() => import('./enhanced/pages/EnhancedRegisterPage'))
-import EnhancedFeedPage from './enhanced/pages/EnhancedFeedPage'
 const ReelsPage = lazy(() => import('./enhanced/pages/ReelsPage'))
 const MtaaniPage = lazy(() => import('./enhanced/pages/MtaaniPage'))
 const SkillsPage = lazy(() => import('./enhanced/pages/SkillsPage'))
@@ -37,7 +27,6 @@ const AdminDashboard = lazy(() => import('./enhanced/pages/AdminDashboard'))
 const FounderDashboard = lazy(() => import('./pages/FounderDashboard'))
 const OrganizationPage = lazy(() => import('./pages/OrganizationPage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
-const SkillExchange = lazy(() => import('./pages/SkillExchange'))
 const MarketplacePage = lazy(() => import('./pages/MarketplacePage'))
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'))
 const ChatPage = lazy(() => import('./pages/ChatPage'))
@@ -280,24 +269,6 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
-      
-      {/* Original Pages (Backup for Debugging) */}
-      <Route path="/original/home" element={<HomePage />} />
-      <Route path="/original/login" element={<OriginalLoginPage />} />
-      <Route path="/original/register" element={<OriginalRegisterPage />} />
-      <Route path="/original/posts" element={<PostListPage />} />
-      <Route path="/original/posts/:id" element={<PostDetailPage />} />
-      <Route path="/original/search" element={<SearchResultsPage />} />
-      <Route path="/original/profile/:id?" element={<ProfilePage />} />
-      <Route 
-        path="/original/posts/create" 
-        element={
-          <ProtectedRoute>
-            <CreatePostPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route path="/original/about" element={<AboutPage />} />
     </Routes>
   );
 }

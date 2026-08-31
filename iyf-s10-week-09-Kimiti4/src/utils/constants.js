@@ -3,6 +3,14 @@
  * Centralized constants to replace magic numbers throughout the codebase
  */
 
+// ===== ASYNC STATUS CONSTANTS =====
+export const STATUS = {
+  IDLE: 'idle',
+  LOADING: 'loading',
+  LOADED: 'loaded',
+  ERROR: 'error',
+};
+
 // ===== TIME CONSTANTS (milliseconds) =====
 export const TIME = {
   SECOND: 1000,
@@ -159,6 +167,7 @@ export const FONT_SIZES = {
 };
 
 export default {
+  STATUS,
   TIME,
   DELAY,
   PAGINATION,

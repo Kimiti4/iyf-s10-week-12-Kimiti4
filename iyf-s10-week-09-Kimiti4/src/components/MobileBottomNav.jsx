@@ -14,7 +14,7 @@ export default function MobileBottomNav() {
     const navItems = [
         { path: '/', icon: <FaHome />, label: 'Home' },
         { path: '/marketplace', icon: <FaCompass />, label: 'Explore' },
-        { path: '/original/posts/create', icon: <FaPlus />, label: 'Create', highlight: true },
+        { path: '/create/jam', icon: <FaPlus />, label: 'Create', highlight: true },
         { path: '/alerts', icon: <FaBell />, label: 'Alerts' },
         { path: '/profile', icon: <FaUser />, label: 'Profile' }
     ];

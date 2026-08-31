@@ -4,41 +4,8 @@
  * @module services/discoveryApi
  */
 
+import { request } from './apiClient';
 import { normalizePosts } from './postApi';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-const request = async (endpoint, options = {}) => {
-  const url = `${API_URL}${endpoint}`;
-  const config = {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeaders(),
-      ...options.headers,
-    },
-  };
-
-  const response = await fetch(url, config);
-  if (response.status === 401) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('auth:expired'));
-    }
-    throw new Error('Session expired. Please login again.');
-  }
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || data.message || 'Request failed');
-  }
-  return data;
-};
 
 export const discoveryAPI = {
   search: async (query, type = 'all', page = 1) => {

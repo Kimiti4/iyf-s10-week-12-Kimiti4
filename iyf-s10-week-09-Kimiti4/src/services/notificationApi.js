@@ -4,48 +4,10 @@
  * @module services/notificationApi
  */
 
+import { request } from './apiClient';
 import { normalizeNotifications } from '../domain/notifications/normalizeNotification';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-const request = async (endpoint, options = {}) => {
-  const url = `${API_URL}${endpoint}`;
-  const config = {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeaders(),
-      ...options.headers,
-    },
-  };
-
-  const response = await fetch(url, config);
-
-  if (response.status === 401) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('auth:expired'));
-    }
-    throw new Error('Session expired. Please login again.');
-  }
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || data.message || 'Request failed');
-  }
-  return data;
-};
-
 export const notificationsAPI = {
-  /**
-   * Get notifications for the current user.
-   */
   getAll: async (params = {}) => {
     const query = new URLSearchParams(params).toString();
     try {
@@ -57,14 +19,10 @@ export const notificationsAPI = {
         hasMore: data.hasMore ?? false,
       };
     } catch {
-      // Graceful fallback — backend may not have notifications endpoint yet
       return { notifications: [], unreadCount: 0, hasMore: false };
     }
   },
 
-  /**
-   * Get unread count only.
-   */
   getUnreadCount: async () => {
     try {
       const data = await request('/notifications/unread-count');
@@ -74,9 +32,6 @@ export const notificationsAPI = {
     }
   },
 
-  /**
-   * Mark a notification as read.
-   */
   markRead: async (notificationId) => {
     try {
       await request(`/notifications/${notificationId}/read`, { method: 'PATCH' });
@@ -85,9 +40,6 @@ export const notificationsAPI = {
     }
   },
 
-  /**
-   * Mark all notifications as read.
-   */
   markAllRead: async () => {
     try {
       await request('/notifications/read-all', { method: 'PATCH' });
