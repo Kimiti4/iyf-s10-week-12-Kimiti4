@@ -54,6 +54,8 @@ const DraftsPage = lazy(() => import('./pages/DraftsPage'))
 const JamCreationPage = lazy(() => import('./pages/JamCreationPage'))
 const JamFeedPage = lazy(() => import('./pages/JamFeedPage'))
 const JamDetailPage = lazy(() => import('./pages/JamDetailPage'))
+const PostPage = lazy(() => import('./pages/PostPage'))
+const FollowingPage = lazy(() => import('./pages/FollowingPage'))
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -142,6 +144,28 @@ function AppRoutes() {
           <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
             <JamDetailPage />
           </Suspense>
+        } 
+      />
+
+      {/* Post Detail Route */}
+      <Route 
+        path="/posts/:id" 
+        element={
+          <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+            <PostPage />
+          </Suspense>
+        } 
+      />
+
+      {/* Following Feed Route */}
+      <Route 
+        path="/following" 
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+              <FollowingPage />
+            </Suspense>
+          </ProtectedRoute>
         } 
       />
       

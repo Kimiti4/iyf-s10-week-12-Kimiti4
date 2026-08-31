@@ -1,0 +1,89 @@
+.post-page {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.post-page-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  background: var(--surface-elevated, #fff);
+  z-index: 10;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.post-page-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  color: var(--text-primary, #1f2937);
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.post-page-back:hover {
+  background: var(--surface-hover, #f3f4f6);
+}
+
+.post-page-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.post-page-loading {
+  display: flex;
+  justify-content: center;
+  padding: 4rem;
+}
+
+.post-page-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color, #e5e7eb);
+  border-top-color: #ff6b6b;
+  border-radius: 50%;
+  animation: postSpin 0.8s linear infinite;
+}
+
+@keyframes postSpin {
+  to { transform: rotate(360deg); }
+}
+
+.post-page-error {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.post-page-error button {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  background: none;
+  color: #ff6b6b;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.post-page-content {
+  padding: 1rem;
+}
+
+.post-page-comments {
+  margin-top: 1.5rem;
+}
+
+.post-page-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
