@@ -8,10 +8,12 @@
  * @module services/apiClient
  */
 
+import { authStorage } from '../utils/storage';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
+  const token = authStorage.getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -31,8 +33,7 @@ export const request = async (endpoint, options = {}) => {
   const response = await fetch(url, config);
 
   if (response.status === 401) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    authStorage.clearAuth();
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('auth:expired'));
     }

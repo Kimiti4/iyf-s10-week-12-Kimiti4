@@ -2,13 +2,14 @@
  * Feed Item Normalizer
  *
  * Converts raw API responses from posts/reels/jams into a unified
- * NormalizedFeedItem shape. This is the single source of truth for
- * how content enters the feed.
+ * NormalizedFeedItem shape. Uses the contract normalizers for inner data.
  *
  * @module domain/feed/normalizeFeedItem
  */
 
 import { FEED_CONTENT_TYPE } from './feedTypes';
+import { normalizePost as normalizePostContract } from '../../contracts/postContract';
+import { normalizeReel as normalizeReelContract } from '../../contracts/reelContract';
 
 /**
  * Normalize a raw item into a feed item.
@@ -21,84 +22,45 @@ export function normalizeFeedItem(type, raw) {
 
   switch (type) {
     case FEED_CONTENT_TYPE.POST:
-      return normalizePost(raw);
+      return wrapPost(raw);
     case FEED_CONTENT_TYPE.REEL:
-      return normalizeReel(raw);
+      return wrapReel(raw);
     case FEED_CONTENT_TYPE.JAM:
-      return normalizeJam(raw);
+      return wrapJam(raw);
     default:
       return null;
   }
 }
 
-function normalizePost(raw) {
-  const author = raw.author || {};
+function wrapPost(raw) {
+  const post = normalizePostContract(raw);
+  if (!post) return null;
   return {
-    id: `post_${raw.id || raw._id}`,
+    id: `post_${post.id}`,
     type: FEED_CONTENT_TYPE.POST,
-    data: {
-      id: raw.id || raw._id,
-      title: raw.title || '',
-      content: raw.content || '',
-      image: raw.image || raw.imageUrl || null,
-      author: {
-        id: author._id || author.id || '',
-        username: author.username || 'Anonymous',
-        avatar: author.profile?.avatar || author.avatar || null,
-        isVerified: author.verification?.isVerified || false,
-      },
-      category: raw.category || 'all',
-      likeCount: raw.likes ?? raw.likeCount ?? 0,
-      commentCount: raw.comments ?? raw.commentCount ?? 0,
-      repostCount: raw.reblogs ?? raw.repostCount ?? 0,
-      saveCount: raw.saves ?? raw.saveCount ?? 0,
-      isLiked: raw.liked ?? raw.isLiked ?? false,
-      isReposted: raw.reblogged ?? raw.isReposted ?? false,
-      isSaved: raw.bookmarked ?? raw.isSaved ?? false,
-      createdAt: raw.createdAt || new Date().toISOString(),
-    },
-    createdAt: raw.createdAt || new Date().toISOString(),
-    authorId: author._id || author.id || raw.authorId || '',
-    category: raw.category || 'all',
+    data: post,
+    createdAt: post.createdAt,
+    authorId: post.author?.id || '',
+    category: post.category || 'all',
     engagementScore: computePostEngagement(raw),
   };
 }
 
-function normalizeReel(raw) {
-  const author = raw.author || {};
+function wrapReel(raw) {
+  const reel = normalizeReelContract(raw);
+  if (!reel) return null;
   return {
-    id: `reel_${raw.id || raw._id}`,
+    id: `reel_${reel.id}`,
     type: FEED_CONTENT_TYPE.REEL,
-    data: {
-      id: raw.id || raw._id,
-      videoUrl: raw.videoUrl || raw.url || '',
-      posterUrl: raw.posterUrl || raw.thumbnail || null,
-      caption: raw.caption || raw.content || '',
-      author: {
-        id: author._id || author.id || '',
-        username: author.username || 'Creator',
-        avatar: author.profile?.avatar || author.avatar || null,
-        isVerified: author.verification?.isVerified || false,
-      },
-      jamId: raw.jamId || null,
-      jamTitle: raw.jamTitle || null,
-      jamCTA: raw.jamCTA || null,
-      likeCount: raw.likes ?? raw.likeCount ?? 0,
-      commentCount: raw.comments ?? raw.commentCount ?? 0,
-      shareCount: raw.shares ?? raw.shareCount ?? 0,
-      viewCount: raw.views ?? raw.viewCount ?? 0,
-      isLiked: raw.liked ?? raw.isLiked ?? false,
-      isSaved: raw.bookmarked ?? raw.isSaved ?? false,
-      createdAt: raw.createdAt || new Date().toISOString(),
-    },
-    createdAt: raw.createdAt || new Date().toISOString(),
-    authorId: author._id || author.id || raw.authorId || '',
+    data: reel,
+    createdAt: reel.createdAt,
+    authorId: reel.author?.id || '',
     category: 'reels',
     engagementScore: computeReelEngagement(raw),
   };
 }
 
-function normalizeJam(raw) {
+function wrapJam(raw) {
   const creator = raw.creator || {};
   return {
     id: `jam_${raw.id || raw._id}`,

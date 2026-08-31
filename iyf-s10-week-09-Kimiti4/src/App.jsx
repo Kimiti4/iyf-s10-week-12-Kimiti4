@@ -31,7 +31,6 @@ const MarketplacePage = lazy(() => import('./pages/MarketplacePage'))
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'))
 const ChatPage = lazy(() => import('./pages/ChatPage'))
 const ActivityHistory = lazy(() => import('./pages/ActivityHistory'))
-const CreatorDashboard = lazy(() => import('./pages/CreatorDashboard'))
 const ReputationSystem = lazy(() => import('./pages/ReputationSystem'))
 const CommunityGovernance = lazy(() => import('./pages/CommunityGovernance'))
 const CollaborativeQuests = lazy(() => import('./pages/CollaborativeQuests'))
@@ -189,16 +188,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <ActivityHistory />
-          </ProtectedRoute>
-        } 
-      />
-      
-      {/* Creator Dashboard Route */}
-      <Route 
-        path="/creator" 
-        element={
-          <ProtectedRoute>
-            <CreatorDashboard />
           </ProtectedRoute>
         } 
       />

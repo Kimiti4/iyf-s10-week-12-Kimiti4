@@ -151,9 +151,9 @@ function NavBar() {
               <span className="nav-icon activity-icon"><FaChartLine /></span>
               <span className="nav-text">Activity</span>
             </Link>
-            <Link 
-              to="/creator" 
-              className={`nav-item nav-creator ${isActive('/creator') ? 'active' : ''}`}
+            <Link
+              to="/creator/studio"
+              className={`nav-item nav-creator ${isActive('/creator/studio') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="nav-icon creator-icon"><FaPalette /></span>
