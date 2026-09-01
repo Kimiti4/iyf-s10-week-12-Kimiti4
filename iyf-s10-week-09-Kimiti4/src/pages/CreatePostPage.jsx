@@ -46,7 +46,7 @@ export default function CreatePostPage() {
       window.removeEventListener('online', updateOnlineStatus)
       window.removeEventListener('offline', updateOnlineStatus)
     }
-  })
+  }, [])
 
   const handleChange = (e) => {
     const { name, value } = e.target

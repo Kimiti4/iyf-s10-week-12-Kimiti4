@@ -7,25 +7,10 @@ import PostEngagement from './PostEngagement';
 import PostJamConnector from '../jam-signature/PostJamConnector';
 import ContentStatusNotice from '../trust/ContentStatusNotice';
 import ModerationBadge from '../trust/ModerationBadge';
-
-function formatTime(dateString) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now - date;
-  const seconds = Math.floor(diffMs / 1000);
-
-  if (seconds < 60) return 'Just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d`;
-  return date.toLocaleDateString();
-}
+import { formatRelativeTime } from '../../utils/formatTime';
 
 export default function PostCard({ post, actions, showAuthor = true, contentStatus, currentUserId }) {
-  const timeText = useMemo(() => formatTime(post.createdAt), [post.createdAt]);
+  const timeText = useMemo(() => formatRelativeTime(post.createdAt), [post.createdAt]);
 
   if (post.deletedAt || contentStatus === 'removed') {
     return (

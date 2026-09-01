@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import AvatarIcon from '../AvatarIcon';
 import { NOTIFICATION_TYPE } from '../../domain/notifications/notificationTypes';
+import { formatRelativeTime } from '../../utils/formatTime';
 
 const TYPE_ICONS = {
   [NOTIFICATION_TYPE.LIKE]: '❤️',
@@ -45,26 +46,11 @@ export default function NotificationItem({ notification, onMarkRead }) {
       <div className="notification-item-body">
         <p className="notification-item-message">{notification.message}</p>
         <span className="notification-item-time">
-          {formatTime(notification.createdAt)}
+          {formatRelativeTime(notification.createdAt)}
         </span>
       </div>
 
       {isUnread && <span className="notification-item-dot" aria-label="Unread" />}
     </Link>
   );
-}
-
-function formatTime(dateString) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now - date;
-  const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 60) return 'Just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d`;
-  return date.toLocaleDateString();
 }

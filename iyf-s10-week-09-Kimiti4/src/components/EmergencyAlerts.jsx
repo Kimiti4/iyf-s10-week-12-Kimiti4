@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { formatRelativeTime } from '../utils/formatTime';
 import './EmergencyAlerts.css';
 
 /**
@@ -155,7 +156,7 @@ export default function EmergencyAlerts({ currentUser }) {
               <p>{alert.message}</p>
               <div className="alert-footer">
                 <span className="location">📍 {alert.location}</span>
-                <span className="time">{formatTime(alert.timestamp)}</span>
+                <span className="time">{formatRelativeTime(alert.timestamp)}</span>
               </div>
             </div>
           </motion.div>
@@ -191,15 +192,4 @@ export default function EmergencyAlerts({ currentUser }) {
       </div>
     </div>
   );
-}
-
-function formatTime(timestamp) {
-  const now = new Date();
-  const diff = now - new Date(timestamp);
-  const minutes = Math.floor(diff / 60000);
-  
-  if (minutes < 1) return 'Just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
-  return `${Math.floor(minutes / 1440)}d ago`;
 }

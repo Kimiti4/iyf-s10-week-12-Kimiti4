@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatRelativeTime } from '../utils/formatTime';
 import './EmergencyAlerts.css';
 
 /**
@@ -260,7 +261,7 @@ export default function EnhancedEmergencyAlerts({ currentUser }) {
                   <div className="alert-meta">
                     <span className="alert-location"> {alert.location}</span>
                     <span className="alert-source">📢 {alert.source}</span>
-                    <span className="alert-time">{formatTime(alert.timestamp)}</span>
+                    <span className="alert-time">{formatRelativeTime(alert.timestamp)}</span>
                   </div>
                   <div className="alert-actions">
                     <button className="btn-share-alert" title="Share Alert" aria-label="Share this alert">🔗 Share</button>
@@ -403,15 +404,4 @@ export default function EnhancedEmergencyAlerts({ currentUser }) {
       </div>
     </div>
   );
-}
-
-function formatTime(timestamp) {
-  const now = new Date();
-  const diff = now - new Date(timestamp);
-  const minutes = Math.floor(diff / 60000);
-  
-  if (minutes < 1) return 'Just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
-  return `${Math.floor(minutes / 1440)}d ago`;
 }

@@ -6,6 +6,7 @@ import { useState, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { colors } from '../styles/designSystem'
+import { formatRelativeTime } from '../utils/formatTime'
 import './ChatPage.css'
 
 const ChatPage = () => {
@@ -81,17 +82,6 @@ const ChatPage = () => {
     setMessageInput('')
   }
 
-  const formatTime = (timestamp) => {
-    const date = new Date(timestamp)
-    const now = new Date()
-    const diff = now - date
-
-    if (diff < 60000) return 'Just now'
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`
-    return date.toLocaleDateString()
-  }
-
   return (
     <div className="chat-page">
       <motion.div 
@@ -135,7 +125,7 @@ const ChatPage = () => {
               <div className="conv-info">
                 <div className="conv-header">
                   <h3>{conv.participant.name}</h3>
-                  <span className="conv-time">{formatTime(conv.timestamp)}</span>
+                  <span className="conv-time">{formatRelativeTime(conv.timestamp)}</span>
                 </div>
                 <p className="conv-last-message">{conv.lastMessage}</p>
               </div>

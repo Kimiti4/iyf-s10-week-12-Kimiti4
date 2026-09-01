@@ -7,9 +7,10 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import { FaArrowUp, FaComment, FaRetweet, FaHeart } from 'react-icons/fa';
-import { FeedSkeleton } from '../../components/SkeletonLoader';
+import { FeedSkeleton } from '../../components/feed/FeedSkeleton';
 import { postsAPI } from '../../services/api';
 import { fetchWithRetry } from '../../utils/apiRetry';
+import { formatRelativeTime } from '../../utils/formatTime';
 import './EnhancedFeedPage.css';
 
 function normalizePost(p) {
@@ -270,16 +271,6 @@ export default function EnhancedFeedPage() {
         { topic: '#Community', meta: '540 posts' }
     ];
 
-    const formatTime = (dateString) => {
-        const date = new Date(dateString);
-        const diff = Math.floor((Date.now() - date) / 1000);
-        if (diff < 60) return 'now';
-        if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-        if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
-        return date.toLocaleDateString();
-    };
-
     return (
         <div className="social-layout">
             <section className="feed" aria-label="Community feed">
@@ -326,7 +317,7 @@ export default function EnhancedFeedPage() {
                                         <div className="post-author">
                                             <span className="post-name">{post.author.username}</span>
                                             <span className="post-handle">@{post.author.username.toLowerCase().replace(/\s+/g, '')}</span>
-                                            <span className="post-time">&middot; {formatTime(post.createdAt)}</span>
+                                            <span className="post-time">&middot; {formatRelativeTime(post.createdAt)}</span>
                                         </div>
                                         <div className="post-tags">
                                             {post.tags.slice(0, 3).map((tag, i) => (

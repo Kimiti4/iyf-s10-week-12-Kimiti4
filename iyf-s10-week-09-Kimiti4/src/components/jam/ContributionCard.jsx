@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { FaFire, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import AvatarIcon from '../AvatarIcon';
 import { CONTRIBUTION_STATUS } from '../../models/jam';
+import { formatRelativeTime } from '../../utils/formatTime';
 
 const STATUS_LABELS = {
   [CONTRIBUTION_STATUS.PENDING]: 'Pending review',
@@ -17,22 +18,6 @@ const STATUS_COLORS = {
   [CONTRIBUTION_STATUS.FEATURED]: { color: '#ff6b6b', bg: 'rgba(255, 107, 107, 0.12)' },
 };
 
-function formatTime(dateString) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now - date;
-  const seconds = Math.floor(diffMs / 1000);
-
-  if (seconds < 60) return 'Just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString();
-}
-
 export default function ContributionCard({ contribution }) {
   const author = contribution.user || {
     _id: contribution.userId,
@@ -44,7 +29,7 @@ export default function ContributionCard({ contribution }) {
   const statusColor = STATUS_COLORS[contribution.status];
 
   const createdText = useMemo(
-    () => formatTime(contribution.createdAt),
+    () => formatRelativeTime(contribution.createdAt),
     [contribution.createdAt]
   );
 

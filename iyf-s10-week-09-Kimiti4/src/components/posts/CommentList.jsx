@@ -1,21 +1,7 @@
 import AvatarIcon from '../AvatarIcon';
 import CommentComposer from './CommentComposer';
 import { FaHeart, FaTrash } from 'react-icons/fa';
-
-function formatTime(dateString) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now - date;
-  const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 60) return 'Just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d`;
-  return date.toLocaleDateString();
-}
+import { formatRelativeTime } from '../../utils/formatTime';
 
 function CommentItem({ comment, onReply, onLike, onDelete, currentUserId }) {
   const isOwn = comment.author.id === currentUserId;
@@ -29,7 +15,7 @@ function CommentItem({ comment, onReply, onLike, onDelete, currentUserId }) {
       <div className="comment-body">
         <div className="comment-header">
           <span className="comment-author">{comment.author.username}</span>
-          <span className="comment-time">{formatTime(comment.createdAt)}</span>
+          <span className="comment-time">{formatRelativeTime(comment.createdAt)}</span>
         </div>
         <p className="comment-text">{comment.content}</p>
         <div className="comment-footer">

@@ -9,6 +9,7 @@ import confetti from 'canvas-confetti';
 import { FaHeart, FaRegHeart, FaThumbsDown, FaRetweet, FaComment, FaShare, FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import VerificationBadge from '../../components/VerificationBadge';
 import AvatarIcon from '../../components/AvatarIcon';
+import { formatRelativeTime } from '../../utils/formatTime';
 import './EnhancedPostCard.css';
 
 export default function EnhancedPostCard({ post, currentUser }) {
@@ -107,7 +108,7 @@ export default function EnhancedPostCard({ post, currentUser }) {
                                 />
                             )}
                         </div>
-                        <span className="post-time">{formatTime(post.createdAt)}</span>
+                        <span className="post-time">{formatRelativeTime(post.createdAt)}</span>
                     </div>
                 </div>
             </div>
@@ -198,18 +199,4 @@ export default function EnhancedPostCard({ post, currentUser }) {
             </div>
         </motion.article>
     );
-}
-
-// Helper function to format time
-function formatTime(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
-    
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    
-    return date.toLocaleDateString();
 }

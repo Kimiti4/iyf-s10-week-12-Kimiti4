@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { colors } from '../styles/designSystem'
+import { formatRelativeTime } from '../utils/formatTime'
 import './ActivityHistory.css'
 
 const ActivityHistory = () => {
@@ -56,16 +57,6 @@ const ActivityHistory = () => {
   const filteredActivities = activeFilter === 'all' 
     ? activities 
     : activities.filter(a => a.type === activeFilter)
-
-  const formatTime = (timestamp) => {
-    const diff = Date.now() - timestamp
-    const hours = Math.floor(diff / 3600000)
-    const days = Math.floor(diff / 86400000)
-
-    if (hours < 1) return 'Just now ⏱️'
-    if (hours < 24) return `${hours}h ago 🕐`
-    return `${days}d ago 📅`
-  }
 
   if (loading) {
     return (
@@ -143,7 +134,7 @@ const ActivityHistory = () => {
                   {activity.comment && (
                     <p className="activity-comment">💭 "{activity.comment}"</p>
                   )}
-                  <span className="activity-time">{formatTime(activity.timestamp)}</span>
+                  <span className="activity-time">{formatRelativeTime(activity.timestamp)}</span>
                 </div>
               </motion.div>
             ))
