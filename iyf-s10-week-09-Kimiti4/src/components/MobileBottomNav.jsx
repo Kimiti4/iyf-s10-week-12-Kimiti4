@@ -1,63 +1,37 @@
-/**
- * 🔹 Mobile Bottom Navigation
- * JamiiLink 2.0 mobile bottom bar — primary destinations only.
- */
-
 import { memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { FaHome, FaCompass, FaPlus, FaBell, FaUser } from 'react-icons/fa';
-import { triggerHaptic } from '../utils/hapticFeedback';
 
 const MobileBottomNav = memo(function MobileBottomNav() {
-    const location = useLocation();
+  const location = useLocation();
 
-    const navItems = [
-        { path: '/', icon: <FaHome />, label: 'Home' },
-        { path: '/marketplace', icon: <FaCompass />, label: 'Explore' },
-        { path: '/create/jam', icon: <FaPlus />, label: 'Create', highlight: true },
-        { path: '/alerts', icon: <FaBell />, label: 'Alerts' },
-        { path: '/profile', icon: <FaUser />, label: 'Profile' }
-    ];
+  const navItems = [
+    { path: '/', icon: <FaHome />, label: 'Home' },
+    { path: '/discover', icon: <FaCompass />, label: 'Discover' },
+    { path: '/create/jam', icon: <FaPlus />, label: 'Create', highlight: true },
+    { path: '/alerts', icon: <FaBell />, label: 'Alerts' },
+    { path: '/profile', icon: <FaUser />, label: 'Profile' },
+  ];
 
-    return (
-        <div className="mobile-bottom-nav" role="navigation" aria-label="Mobile navigation">
-            {navItems.map((item) => {
-                const isActive = location.pathname === item.path;
-
-                return (
-                    <Link
-                        key={item.path}
-                        to={item.path}
-                        aria-label={item.label}
-                        className={`mobile-nav-item ${isActive ? 'active' : ''} ${item.highlight ? 'mobile-create' : ''}`}
-                        onClick={() => triggerHaptic('click')}
-                    >
-                        {item.highlight ? (
-                            <motion.div
-                                whileTap={{ scale: 0.9 }}
-                                className="mobile-create-icon"
-                            >
-                                {item.icon}
-                            </motion.div>
-                        ) : (
-                            <motion.span
-                                initial={false}
-                                animate={{
-                                    scale: isActive ? 1.15 : 1
-                                }}
-                                transition={{ type: 'spring', stiffness: 300 }}
-                                className="mobile-nav-item-icon"
-                            >
-                                {item.icon}
-                            </motion.span>
-                        )}
-                        <span className="mobile-nav-item-label">{item.label}</span>
-                    </Link>
-                );
-            })}
-        </div>
-    );
+  return (
+    <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
+      {navItems.map((item) => {
+        const isActive = location.pathname === item.path;
+        return (
+          <Link
+            key={item.path}
+            to={item.path}
+            aria-label={item.label}
+            aria-current={isActive ? 'page' : undefined}
+            className={`mobile-nav-item ${isActive ? 'active' : ''} ${item.highlight ? 'mobile-nav-item--create' : ''}`}
+          >
+            <span className="mobile-nav-item__icon">{item.icon}</span>
+            <span className="mobile-nav-item__label">{item.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
 });
 
 export default MobileBottomNav;
