@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import CreatorStats from '../components/analytics/CreatorStats';
 import './UserProfilePage.css';
 
 const UserProfilePage = () => {
@@ -162,6 +163,9 @@ const UserProfilePage = () => {
           </div>
         </div>
       </div>
+
+      {/* Creator Analytics (own profile only) */}
+      {isOwnProfile && <CreatorStats userId={userId || currentUser?._id} compact />}
 
       {/* Stories Section */}
       <div className="stories-section">

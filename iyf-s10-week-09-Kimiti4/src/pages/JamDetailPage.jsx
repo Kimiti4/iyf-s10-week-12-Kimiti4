@@ -7,6 +7,7 @@ import JamParticipantsPanel from '../components/jam/JamParticipantsPanel';
 import JamLeaderboard from '../components/jam/JamLeaderboard';
 import ContributionComposer from '../components/jam/ContributionComposer';
 import ContributionCard from '../components/jam/ContributionCard';
+import ParticipationStats from '../components/analytics/ParticipationStats';
 import JoinJamModal from '../components/jam/JoinJamModal';
 import { jamsAPI, participationAPI, contributionAPI } from '../services/jamApi';
 import { JAM_STATUS, isJamOpen, isJamEnded } from '../models/jam';
@@ -195,6 +196,9 @@ export default function JamDetailPage() {
           <JamParticipantsPanel jamId={id} participantCount={jam.participantCount} />
           <JamLeaderboard jamId={id} />
         </div>
+
+        {/* Analytics */}
+        <ParticipationStats jamId={id} />
 
         {/* Contributions */}
         <section className="jam-detail-contributions">

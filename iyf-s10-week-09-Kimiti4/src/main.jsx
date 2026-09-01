@@ -10,6 +10,7 @@ import './styles/Navigation.css'
 import './styles/Feed.css'
 import './styles/Features.css'
 import './styles/Trust.css'
+import './styles/Analytics.css'
 import './index.css'
 import './components/ErrorBoundary.css'
 
