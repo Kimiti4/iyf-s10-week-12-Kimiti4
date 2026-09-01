@@ -59,17 +59,17 @@ export function AuthProvider({ children }) {
             }
         };
 
-        window.addEventListener('storage', handleStorageChange);
-        
-        // Also listen for custom logout event
-        window.addEventListener('auth:logout', () => {
+        const handleLogout = () => {
             setUser(null);
             setError(null);
-        });
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('auth:logout', handleLogout);
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
-            window.removeEventListener('auth:logout', () => {});
+            window.removeEventListener('auth:logout', handleLogout);
         };
     }, [navigate]);
     

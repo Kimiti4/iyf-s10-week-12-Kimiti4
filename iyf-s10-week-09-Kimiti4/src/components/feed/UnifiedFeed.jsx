@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useUnifiedFeed } from '../../hooks/useUnifiedFeed';
 import { usePosts } from '../../hooks/usePosts';
@@ -14,7 +14,7 @@ import { FEED_TAB } from '../../domain/feed/feedTypes';
 export default function UnifiedFeed() {
   const { user } = useAuth();
   const userId = user?.id || user?._id;
-  const followedIds = user?.following || [];
+  const followedIds = useMemo(() => user?.following || [], [user?.following]);
 
   const {
     items,

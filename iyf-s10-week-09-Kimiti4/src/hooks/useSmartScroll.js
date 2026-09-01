@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 /**
  * 🎯 Smart Scroll Hook for Mobile Sidebar
@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
  */
 export function useSmartScroll(threshold = 100) {
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,15 +19,15 @@ export function useSmartScroll(threshold = 100) {
       }
 
       // Show sidebar when scrolling UP past threshold
-      if (currentScrollY > threshold && currentScrollY < lastScrollY) {
+      if (currentScrollY > threshold && currentScrollY < lastScrollYRef.current) {
         setIsVisible(true);
       } 
       // Hide when scrolling DOWN aggressively
-      else if (currentScrollY > lastScrollY + 50) {
+      else if (currentScrollY > lastScrollYRef.current + 50) {
         setIsVisible(false);
       }
 
-      setLastScrollY(currentScrollY);
+      lastScrollYRef.current = currentScrollY;
     };
 
     // Use passive listener for better performance
@@ -36,7 +36,7 @@ export function useSmartScroll(threshold = 100) {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [lastScrollY, threshold]);
+  }, [threshold]);
 
   return isVisible;
 }
