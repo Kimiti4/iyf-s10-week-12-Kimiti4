@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SearchBar from './SearchBar'
@@ -10,7 +10,7 @@ import NotificationBell from './notifications/NotificationBell'
 import { useNotifications } from '../hooks/useNotifications'
 import './NavBar.css'
 
-function NavBar() {
+const NavBar = memo(function NavBar() {
   const { user, isAuthenticated, logout } = useAuth()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -267,6 +267,6 @@ function NavBar() {
     </nav>
     </>
   )
-}
+})
 
 export default NavBar

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useUnifiedFeed } from '../../hooks/useUnifiedFeed';
 import { usePosts } from '../../hooks/usePosts';
@@ -9,6 +9,7 @@ import FeedSkeleton from './FeedSkeleton';
 import FeedEmptyState from './FeedEmptyState';
 import FeedErrorState from './FeedErrorState';
 import FeedJamBanner from '../jam-signature/FeedJamBanner';
+import IntersectionSentinel from './IntersectionSentinel';
 import { FEED_TAB } from '../../domain/feed/feedTypes';
 
 export default function UnifiedFeed() {
@@ -33,6 +34,20 @@ export default function UnifiedFeed() {
   useEffect(() => {
     fetchFeed();
   }, [fetchFeed]);
+
+  const [visibleCount, setVisibleCount] = useState(10);
+  const loadMoreRef = useRef(null);
+
+  const handleLoadMore = useCallback(() => {
+    if (hasMore && status !== 'loading') {
+      loadMore();
+    }
+  }, [hasMore, status, loadMore]);
+
+  // Virtualization: only render visible items + buffer
+  const visibleItems = useMemo(() => {
+    return items.slice(0, visibleCount);
+  }, [items, visibleCount]);
 
   const handleRetry = useCallback(() => {
     fetchFeed();
@@ -62,15 +77,16 @@ export default function UnifiedFeed() {
       {activeTab === FEED_TAB.JAMS && <FeedJamBanner jams={items.filter(i => i.type === 'jam')} />}
 
       <div className="unified-feed-list">
-        {items.map((item) => (
+        {visibleItems.map((item) => (
           <FeedItem key={item.id} item={item} postActions={postActions} currentUserId={userId} />
         ))}
       </div>
 
-      {hasMore && status !== 'loading' && (
-        <button className="unified-feed-load-more" onClick={loadMore}>
-          Load more
-        </button>
+      {hasMore && (
+        <IntersectionSentinel
+          onIntersect={handleLoadMore}
+          disabled={status === 'loading'}
+        />
       )}
 
       {status === 'loading' && items.length > 0 && (

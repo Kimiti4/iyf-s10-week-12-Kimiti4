@@ -3,12 +3,13 @@
  * JamiiLink 2.0 mobile bottom bar — primary destinations only.
  */
 
+import { memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaHome, FaCompass, FaPlus, FaBell, FaUser } from 'react-icons/fa';
 import { triggerHaptic } from '../utils/hapticFeedback';
 
-export default function MobileBottomNav() {
+const MobileBottomNav = memo(function MobileBottomNav() {
     const location = useLocation();
 
     const navItems = [
@@ -57,4 +58,6 @@ export default function MobileBottomNav() {
             })}
         </div>
     );
-}
+});
+
+export default MobileBottomNav;

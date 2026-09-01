@@ -1,10 +1,11 @@
+import { memo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useSidebar } from '../context/SidebarContext'
 import OfflineBadge from './OfflineBadge'
 import './Sidebar.css'
 
-function Sidebar({ isOpen = false, onClose = () => {} }) {
+const Sidebar = memo(function Sidebar({ isOpen = false, onClose = () => {} }) {
   const { user, isAuthenticated, logout } = useAuth()
   const location = useLocation()
   const { isCollapsed, setIsCollapsed } = useSidebar()
@@ -227,6 +228,6 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
       </div>
     </aside>
   )
-}
+})
 
 export default Sidebar
