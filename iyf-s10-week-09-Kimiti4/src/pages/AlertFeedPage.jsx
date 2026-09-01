@@ -1,19 +1,21 @@
-/**
- * 🔹 Alert Feed Page
- * Displays all community alerts with filtering and realtime updates
- */
-
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '../components/Toast';
 import AlertCard from '../components/AlertCard';
 import CreateAlertForm from '../components/CreateAlertForm';
 import { initializeSocket, onNewAlert, onAlertUpdate, onAlertDelete, disconnectSocket } from '../services/socketClient';
-import api, { alertsAPI } from '../services/api';
+import { alertsAPI } from '../services/api';
 import './AlertFeedPage.css';
 
+const SEVERITY_FILTERS = [
+  { value: 'all', label: 'All', icon: '📋' },
+  { value: 'critical', label: 'Emergency', icon: '🔴' },
+  { value: 'warning', label: 'Warning', icon: '🟠' },
+  { value: 'info', label: 'Info', icon: '🔵' },
+  { value: 'official', label: 'Official', icon: '🟣' },
+];
+
 const CATEGORIES = [
-  { value: 'all', label: 'All Alerts' },
+  { value: 'all', label: 'All Categories' },
   { value: 'emergency', label: 'Emergency' },
   { value: 'security', label: 'Security' },
   { value: 'scam_warning', label: 'Scam Warning' },
@@ -23,26 +25,15 @@ const CATEGORIES = [
   { value: 'utility_outage', label: 'Utilities' },
   { value: 'campus_notice', label: 'Campus' },
   { value: 'marketplace_fraud', label: 'Fraud' },
-  { value: 'weather', label: 'Weather' }
-];
-
-const VERIFICATION_LEVELS = [
-  { value: 'all', label: 'All Levels' },
-  { value: 'unverified', label: 'Unverified' },
-  { value: 'community_verified', label: 'Community Verified' },
-  { value: 'mod_verified', label: 'Moderator Verified' },
-  { value: 'official', label: 'Official' }
+  { value: 'weather', label: 'Weather' },
 ];
 
 export default function AlertFeedPage() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [filters, setFilters] = useState({
-    category: 'all',
-    verificationLevel: 'all',
-    severity: 'all'
-  });
+  const [severityFilter, setSeverityFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   const toast = useToast();
   const toastRef = useRef(toast);
@@ -55,19 +46,8 @@ export default function AlertFeedPage() {
     try {
       setLoading(true);
       const params = {};
-
-      if (filters.category !== 'all') {
-        params.category = filters.category;
-      }
-
-      if (filters.verificationLevel !== 'all') {
-        params.verificationLevel = filters.verificationLevel;
-      }
-
-      if (filters.severity !== 'all') {
-        params.severity = filters.severity;
-      }
-
+      if (severityFilter !== 'all') params.severity = severityFilter;
+      if (categoryFilter !== 'all') params.category = categoryFilter;
       const response = await alertsAPI.getAll(params);
       setAlerts(response.data || []);
     } catch {
@@ -75,47 +55,30 @@ export default function AlertFeedPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [severityFilter, categoryFilter]);
 
   useEffect(() => {
     const socket = initializeSocket();
-
-    const cleanupNewAlert = onNewAlert((newAlert) => {
+    const cleanupNew = onNewAlert((newAlert) => {
       setAlerts(prev => [newAlert, ...prev]);
-      toastRef.current.info(`New ${newAlert.category.replace('_', ' ')} alert!`);
+      toastRef.current.info(`New alert: ${newAlert.title}`);
     });
-
-    const cleanupUpdate = onAlertUpdate((updatedAlert) => {
-      setAlerts(prev =>
-        prev.map(alert =>
-          alert._id === updatedAlert._id ? updatedAlert : alert
-        )
-      );
+    const cleanupUpdate = onAlertUpdate((updated) => {
+      setAlerts(prev => prev.map(a => a._id === updated._id ? updated : a));
     });
-
     const cleanupDelete = onAlertDelete(({ alertId }) => {
-      setAlerts(prev => prev.filter(alert => alert._id !== alertId));
+      setAlerts(prev => prev.filter(a => a._id !== alertId));
     });
-
     fetchAlerts();
-
-    return () => {
-      cleanupNewAlert();
-      cleanupUpdate();
-      cleanupDelete();
-      disconnectSocket();
-    };
+    return () => { cleanupNew(); cleanupUpdate(); cleanupDelete(); disconnectSocket(); };
   }, [fetchAlerts]);
 
   const handleCreateAlert = async (formData) => {
     try {
       const response = await alertsAPI.create(formData);
-      toastRef.current.success('Alert created successfully!');
+      toastRef.current.success('Alert published');
       setShowCreateForm(false);
-
-      if (response.data) {
-        setAlerts(prev => [response.data, ...prev]);
-      }
+      if (response.data) setAlerts(prev => [response.data, ...prev]);
     } catch (error) {
       toastRef.current.error(error.response?.data?.message || 'Failed to create alert');
       throw error;
@@ -125,126 +88,97 @@ export default function AlertFeedPage() {
   const handleConfirmAlert = async (alertId) => {
     try {
       await alertsAPI.confirm(alertId);
-      toastRef.current.success('Alert confirmed!');
+      toastRef.current.success('Alert confirmed');
     } catch {
       toastRef.current.error('Failed to confirm alert');
     }
   };
 
-  const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({ ...prev, [filterType]: value }));
-  };
+  const severityCounts = alerts.reduce((acc, a) => {
+    acc[a.severity] = (acc[a.severity] || 0) + 1;
+    return acc;
+  }, {});
 
   return (
-    <div className="alert-feed-page">
-      <div className="page-header">
+    <div className="alert-feed-page" role="main">
+      {/* Header */}
+      <header className="page-header">
         <div className="header-content">
-          <h1>Community Alerts</h1>
-          <p>Stay informed with verified community alerts</p>
+          <h1>Alerts</h1>
+          <p>Community safety and activity alerts</p>
         </div>
-        <motion.button
+        <button
           className="btn-create-alert"
           onClick={() => setShowCreateForm(!showCreateForm)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          aria-expanded={showCreateForm}
         >
-          {showCreateForm ? 'Cancel' : '+ Create Alert'}
-        </motion.button>
+          {showCreateForm ? 'Cancel' : 'Create Alert'}
+        </button>
+      </header>
+
+      {/* Severity Summary */}
+      {!loading && alerts.length > 0 && (
+        <div className="severity-summary" role="region" aria-label="Alert summary">
+          {SEVERITY_FILTERS.slice(1).map(s => (
+            <button
+              key={s.value}
+              className={`severity-chip severity-chip--${s.value} ${severityFilter === s.value ? 'active' : ''}`}
+              onClick={() => setSeverityFilter(severityFilter === s.value ? 'all' : s.value)}
+              aria-pressed={severityFilter === s.value}
+            >
+              <span className="severity-chip__icon" aria-hidden="true">{s.icon}</span>
+              <span className="severity-chip__label">{s.label}</span>
+              <span className="severity-chip__count">{severityCounts[s.value] || 0}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Create Form */}
+      {showCreateForm && (
+        <div className="create-form-wrapper">
+          <CreateAlertForm onSubmit={handleCreateAlert} onCancel={() => setShowCreateForm(false)} />
+        </div>
+      )}
+
+      {/* Category Filter */}
+      <div className="filter-bar">
+        <label htmlFor="alert-category-filter" className="filter-bar__label">Category</label>
+        <select
+          id="alert-category-filter"
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="filter-select"
+        >
+          {CATEGORIES.map(c => (
+            <option key={c.value} value={c.value}>{c.label}</option>
+          ))}
+        </select>
       </div>
 
-      <AnimatePresence>
-        {showCreateForm && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="create-form-wrapper"
-          >
-            <CreateAlertForm
-              onSubmit={handleCreateAlert}
-              onCancel={() => setShowCreateForm(false)}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="filters-bar">
-        <div className="filter-group">
-          <label>Category:</label>
-          <select
-            value={filters.category}
-            onChange={(e) => handleFilterChange('category', e.target.value)}
-            className="filter-select"
-          >
-            {CATEGORIES.map(cat => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <label>Verification:</label>
-          <select
-            value={filters.verificationLevel}
-            onChange={(e) => handleFilterChange('verificationLevel', e.target.value)}
-            className="filter-select"
-          >
-            {VERIFICATION_LEVELS.map(level => (
-              <option key={level.value} value={level.value}>
-                {level.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <label>Severity:</label>
-          <select
-            value={filters.severity}
-            onChange={(e) => handleFilterChange('severity', e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Severities</option>
-            <option value="info">Info</option>
-            <option value="warning">Warning</option>
-            <option value="critical">Critical</option>
-            <option value="official">Official</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="alerts-container">
+      {/* Alert List */}
+      <section className="alerts-container" aria-label="Alerts">
         {loading ? (
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
+          <div className="loading-state" role="status">
+            <div className="loading-spinner" aria-hidden="true" />
             <p>Loading alerts...</p>
           </div>
         ) : alerts.length === 0 ? (
           <div className="empty-state">
-            <p>No alerts found</p>
-            <p className="empty-hint">Be the first to create an alert for your community!</p>
+            <div className="empty-state__icon" aria-hidden="true">📭</div>
+            <p>No alerts</p>
+            <p className="empty-hint">Nothing to report right now</p>
           </div>
         ) : (
-          <AnimatePresence>
-            {alerts.map((alert) => (
-              <motion.div
-                key={alert._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                layout
-              >
-                <AlertCard
-                  alert={alert}
-                  onConfirm={() => handleConfirmAlert(alert._id)}
-                />
-              </motion.div>
+          <ul className="alerts-list" role="list">
+            {alerts.map(alert => (
+              <li key={alert._id}>
+                <AlertCard alert={alert} onConfirm={() => handleConfirmAlert(alert._id)} />
+              </li>
             ))}
-          </AnimatePresence>
+          </ul>
         )}
-      </div>
+      </section>
     </div>
   );
 }
