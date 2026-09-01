@@ -1,6 +1,8 @@
-import { FaHeart, FaRegHeart, FaRetweet, FaRegComment, FaShare, FaBookmark, FaRegBookmark } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaHeart, FaRegHeart, FaRetweet, FaRegComment, FaShare, FaBookmark, FaRegBookmark, FaExchangeAlt } from 'react-icons/fa';
+import ShareSheet from '../distribution/ShareSheet';
 
-export default function PostActions({ post, actions }) {
+export default function PostActions({ post, actions, currentUserId }) {
   const {
     handleLike,
     handleUnlike,
@@ -10,6 +12,8 @@ export default function PostActions({ post, actions }) {
     handleUnsave,
     handleShare,
   } = actions;
+
+  const [shareOpen, setShareOpen] = useState(false);
 
   return (
     <div className="post-actions">
@@ -41,7 +45,7 @@ export default function PostActions({ post, actions }) {
 
       <button
         className="post-action-btn"
-        onClick={() => handleShare(post)}
+        onClick={() => setShareOpen(true)}
         aria-label="Share"
       >
         <FaShare />
@@ -54,6 +58,8 @@ export default function PostActions({ post, actions }) {
       >
         {post.isSaved ? <FaBookmark /> : <FaRegBookmark />}
       </button>
+
+      <ShareSheet item={post} isOpen={shareOpen} onClose={() => setShareOpen(false)} />
     </div>
   );
 }

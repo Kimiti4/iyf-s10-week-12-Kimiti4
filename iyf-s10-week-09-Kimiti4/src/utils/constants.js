@@ -144,6 +144,8 @@ export const NOTIFICATION_TYPES = {
   FOLLOW: 'follow',
   MENTION: 'mention',
   SYSTEM: 'system',
+  REPOST: 'repost',
+  REMIX: 'remix',
 };
 
 // ===== THEME CONSTANTS =====
@@ -151,6 +153,13 @@ export const THEMES = {
   LIGHT: 'light',
   DARK: 'dark',
   AUTO: 'auto',
+};
+
+// ===== DISTRIBUTION CONSTANTS =====
+export const DISTRIBUTION = {
+  SHARE: 'share',
+  REPOST: 'repost',
+  REMIX: 'remix',
 };
 
 // ===== LANGUAGE CONSTANTS =====

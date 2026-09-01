@@ -35,6 +35,9 @@ export function normalizeFeedItem(type, raw) {
 function wrapPost(raw) {
   const post = normalizePostContract(raw);
   if (!post) return null;
+
+  const distributionKind = raw.distributionKind || (raw.isRepost ? 'repost' : raw.isRemix ? 'remix' : 'original');
+
   return {
     id: `post_${post.id}`,
     type: FEED_CONTENT_TYPE.POST,
@@ -43,12 +46,23 @@ function wrapPost(raw) {
     authorId: post.author?.id || '',
     category: post.category || 'all',
     engagementScore: computePostEngagement(raw),
+    distribution: {
+      kind: distributionKind,
+      repostActorId: raw.repostActorId || null,
+      sourceContentId: raw.sourceContentId || null,
+      sourceCreatorId: raw.sourceCreatorId || null,
+      sourceCreatorName: raw.sourceCreatorName || null,
+      sourceCreatorAvatar: raw.sourceCreatorAvatar || null,
+    },
   };
 }
 
 function wrapReel(raw) {
   const reel = normalizeReelContract(raw);
   if (!reel) return null;
+
+  const distributionKind = raw.distributionKind || (raw.isRepost ? 'repost' : raw.isRemix ? 'remix' : 'original');
+
   return {
     id: `reel_${reel.id}`,
     type: FEED_CONTENT_TYPE.REEL,
@@ -57,6 +71,14 @@ function wrapReel(raw) {
     authorId: reel.author?.id || '',
     category: 'reels',
     engagementScore: computeReelEngagement(raw),
+    distribution: {
+      kind: distributionKind,
+      repostActorId: raw.repostActorId || null,
+      sourceContentId: raw.sourceContentId || null,
+      sourceCreatorId: raw.sourceCreatorId || null,
+      sourceCreatorName: raw.sourceCreatorName || null,
+      sourceCreatorAvatar: raw.sourceCreatorAvatar || null,
+    },
   };
 }
 

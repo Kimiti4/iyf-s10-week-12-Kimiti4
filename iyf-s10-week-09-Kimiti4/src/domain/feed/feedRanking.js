@@ -78,6 +78,15 @@ function computeScore(item, context, weights, followedIds) {
     score += 0.7 * weights.participation;
   }
 
+  // Distribution: reposts get a slight penalty vs original content
+  // but still appear in feed (they represent social signal)
+  const distKind = item.distribution?.kind;
+  if (distKind === 'repost') {
+    score *= 0.85;
+  } else if (distKind === 'remix') {
+    score *= 0.95; // Remixes are creative derivatives, slight penalty
+  }
+
   // Diversity: starts at full, reduced by the ranking pass
   score += 1 * weights.diversity;
 
@@ -129,10 +138,15 @@ export function deduplicateItems(items) {
 
 /**
  * Detect and remove duplicate author-type combinations (same content reposted).
+ * Reposts are excluded from dedup — they represent social distribution, not duplication.
  */
 export function deduplicateContent(items) {
   const seen = new Set();
   return items.filter((item) => {
+    // Reposts and remixes are social signals, not duplicates
+    if (item.distribution?.kind === 'repost' || item.distribution?.kind === 'remix') {
+      return true;
+    }
     const key = `${item.authorId}_${item.type}_${item.data?.title || item.data?.caption || ''}`;
     if (seen.has(key)) return false;
     seen.add(key);
