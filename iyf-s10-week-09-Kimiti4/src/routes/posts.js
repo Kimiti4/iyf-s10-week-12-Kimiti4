@@ -27,17 +27,14 @@ router.post('/', async (req, res) => {
       likes: 0
     }
     
-    if (isOffline) {
-      console.log('Offline post synced:', post.id)
-    }
+    // Post synced (offline posts handled silently)
     
     // Simulate database save
     res.status(201).json({
       success: true,
       data: post
     })
-  } catch (error) {
-    console.error('Post creation error:', error)
+  } catch {
     res.status(500).json({ error: 'Failed to create post' })
   }
 })

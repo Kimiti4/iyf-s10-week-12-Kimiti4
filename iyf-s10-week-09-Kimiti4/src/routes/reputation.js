@@ -70,8 +70,6 @@ router.post('/track', async (req, res) => {
     const { event_type, impact_value, reference_id, description } = req.body
     
     // TODO: Store in database for real implementation
-    console.log('Impact tracked:', { event_type, impact_value, reference_id })
-    
     res.json({ success: true, message: 'Impact recorded' })
   } catch (error) {
     res.status(500).json({ error: 'Failed to track impact' })

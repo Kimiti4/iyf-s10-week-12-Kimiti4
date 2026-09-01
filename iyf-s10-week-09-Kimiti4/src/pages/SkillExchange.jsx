@@ -28,8 +28,8 @@ export default function SkillExchange() {
       ]);
       if (profRes.data) setProfile(profRes.data);
       if (matchRes.data) setMatches(matchRes.data);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      // Fetch data failed silently
     } finally {
       setLoading(false);
     }
@@ -40,8 +40,8 @@ export default function SkillExchange() {
       await api.skills.saveProfile(profile);
       toast.success('Profile updated! We will recalculate your matches.');
       fetchData();
-    } catch (err) {
-      console.error(err);
+    } catch {
+      // Save profile failed silently
     }
   };
 

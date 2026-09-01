@@ -70,8 +70,7 @@ export default function AlertFeedPage() {
 
       const response = await alertsAPI.getAll(params);
       setAlerts(response.data || []);
-    } catch (error) {
-      console.error('Error fetching alerts:', error);
+    } catch {
       toastRef.current.error('Failed to load alerts');
     } finally {
       setLoading(false);
@@ -82,13 +81,11 @@ export default function AlertFeedPage() {
     const socket = initializeSocket();
 
     const cleanupNewAlert = onNewAlert((newAlert) => {
-      console.log('🔔 New alert received:', newAlert);
       setAlerts(prev => [newAlert, ...prev]);
       toastRef.current.info(`New ${newAlert.category.replace('_', ' ')} alert!`);
     });
 
     const cleanupUpdate = onAlertUpdate((updatedAlert) => {
-      console.log('🔄 Alert updated:', updatedAlert);
       setAlerts(prev =>
         prev.map(alert =>
           alert._id === updatedAlert._id ? updatedAlert : alert
@@ -97,7 +94,6 @@ export default function AlertFeedPage() {
     });
 
     const cleanupDelete = onAlertDelete(({ alertId }) => {
-      console.log('🗑️ Alert deleted:', alertId);
       setAlerts(prev => prev.filter(alert => alert._id !== alertId));
     });
 
@@ -121,7 +117,6 @@ export default function AlertFeedPage() {
         setAlerts(prev => [response.data, ...prev]);
       }
     } catch (error) {
-      console.error('Error creating alert:', error);
       toastRef.current.error(error.response?.data?.message || 'Failed to create alert');
       throw error;
     }
@@ -131,8 +126,7 @@ export default function AlertFeedPage() {
     try {
       await alertsAPI.confirm(alertId);
       toastRef.current.success('Alert confirmed!');
-    } catch (error) {
-      console.error('Error confirming alert:', error);
+    } catch {
       toastRef.current.error('Failed to confirm alert');
     }
   };

@@ -94,8 +94,8 @@ async function processDraftQueue() {
     // Tell all open tabs the queue changed so the /drafts UI can refresh
     const clients = await self.clients.matchAll({ type: 'window' })
     clients.forEach((client) => client.postMessage({ type: 'SYNC_COMPLETE' }))
-  } catch (err) {
-    console.error('[sw] draft sync failed:', err)
+  } catch {
+    // Draft sync failed silently
   }
 }
 

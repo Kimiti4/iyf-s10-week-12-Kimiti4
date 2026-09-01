@@ -25,8 +25,8 @@ export default function DraftsPage() {
     try {
       const pending = await getPendingPosts();
       setDrafts(pending.sort((a, b) => b.createdAt - a.createdAt));
-    } catch (err) {
-      console.error('Failed to load drafts:', err);
+    } catch {
+      // Load drafts failed silently
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,6 @@ export default function DraftsPage() {
       await loadDrafts();
     } catch (err) {
       toast.error('Sync failed. Please try again.');
-      console.error('Sync error:', err);
     } finally {
       setSyncing(false);
     }

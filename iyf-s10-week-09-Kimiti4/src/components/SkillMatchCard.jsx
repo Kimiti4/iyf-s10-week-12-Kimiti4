@@ -10,8 +10,8 @@ export default function SkillMatchCard({ match, onComplete }) {
     try {
       // Mock initiating a chat/connection
       toast.success(`Connection request sent to ${match.user.name}!`);
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // Connect failed silently
     }
   };
 
@@ -23,8 +23,7 @@ export default function SkillMatchCard({ match, onComplete }) {
       });
       toast.success('Exchange completed!');
       if (onComplete) onComplete(match.match_id);
-    } catch (error) {
-      console.error('Failed to complete exchange:', error);
+    } catch {
       toast.error('Failed to complete exchange');
     }
   };

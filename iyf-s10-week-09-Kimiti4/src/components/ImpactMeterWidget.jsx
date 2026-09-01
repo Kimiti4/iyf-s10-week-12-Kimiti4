@@ -12,8 +12,8 @@ export default function ImpactMeterWidget({ userId }) {
       try {
         const res = await api.impact.getDashboard(userId);
         if (res.data) setData(res.data);
-      } catch (err) {
-        console.error('Failed to fetch impact', err);
+      } catch {
+        // Fetch impact failed silently
       } finally {
         setLoading(false);
       }

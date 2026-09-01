@@ -34,8 +34,8 @@ const ReputationSystem = () => {
           const res = await api.reputation.getProfile(user.id);
           if (res.data) setReputationData(res.data);
         }
-      } catch (err) {
-        console.error('Failed to fetch reputation data:', err);
+      } catch {
+        // Fetch reputation data failed silently
       } finally {
         setLoading(false);
       }
@@ -69,8 +69,7 @@ const ReputationSystem = () => {
       } else if (format === 'pdf') {
         generatePDFPassport(passport)
       }
-    } catch (error) {
-      console.error('Failed to export passport:', error);
+    } catch {
       toast.error('Failed to generate export.');
     }
   }

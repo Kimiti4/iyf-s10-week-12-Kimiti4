@@ -75,8 +75,8 @@ export default function AlertCard({ alert, onConfirm, currentUser }) {
       await onConfirm(alert._id);
       setConfirmed(!confirmed);
       setConfirmationCount(prev => confirmed ? prev - 1 : prev + 1);
-    } catch (error) {
-      console.error('Failed to confirm alert:', error);
+    } catch {
+      // Confirm alert failed silently
     }
   };
 

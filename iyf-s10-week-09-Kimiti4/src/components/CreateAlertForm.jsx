@@ -162,8 +162,8 @@ export default function CreateAlertForm({ onSubmit, onCancel }) {
         expiresAt: ''
       });
       setSelectedCategory(null);
-    } catch (error) {
-      console.error('Error submitting alert:', error);
+    } catch {
+      // Submit alert failed silently
     } finally {
       setIsSubmitting(false);
     }

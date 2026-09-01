@@ -70,7 +70,6 @@ function TrendingChip({ topic = '#JamiiLink', count = 42 }) {
     if (isDragging) return;
     
     // Navigate to trending topic or open modal
-    console.log(`Clicked trending: ${topic}`);
     
     // Haptic feedback
     if (navigator.vibrate) {

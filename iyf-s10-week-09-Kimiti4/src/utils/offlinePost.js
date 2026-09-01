@@ -67,8 +67,8 @@ export const queueOfflinePost = async (postData, userToken = null) => {
     try {
       const registration = await navigator.serviceWorker.ready
       await registration.sync.register('sync-jamii-posts')
-    } catch (err) {
-      console.warn('Background sync registration failed:', err)
+    } catch {
+      // Background sync registration failed silently
     }
   }
   
@@ -84,8 +84,7 @@ export const getPendingPosts = async () => {
     const db = await openOfflineDB()
     const tx = db.transaction(STORE_NAME, 'readonly')
     return await tx.objectStore(STORE_NAME).getAll()
-  } catch (err) {
-    console.error('Failed to get pending posts:', err)
+  } catch {
     return []
   }
 }
@@ -160,8 +159,7 @@ export const flushPendingPosts = async () => {
     }
 
     return { synced, failed }
-  } catch (err) {
-    console.error('Failed to flush pending posts:', err)
+  } catch {
     return { synced: 0, failed: 0 }
   }
 }
@@ -174,10 +172,9 @@ export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js')
-      console.log('SW registered:', registration)
       return registration
-    } catch (err) {
-      console.error('SW registration failed:', err)
+    } catch {
+      // SW registration failed silently
     }
   }
 }
