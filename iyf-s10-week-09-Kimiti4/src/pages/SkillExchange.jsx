@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
 import SkillMatchCard from '../components/SkillMatchCard';
@@ -15,11 +15,7 @@ export default function SkillExchange() {
   const [newOffer, setNewOffer] = useState('');
   const [newSeek, setNewSeek] = useState('');
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [profRes, matchRes] = await Promise.all([
@@ -33,7 +29,11 @@ export default function SkillExchange() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSaveProfile = async () => {
     try {

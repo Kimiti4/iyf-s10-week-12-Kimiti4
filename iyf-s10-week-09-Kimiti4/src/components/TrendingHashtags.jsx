@@ -3,23 +3,17 @@
  * Shows popular hashtags with real-time trending indicators
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
+import logger from '../utils/logger';
 import './TrendingHashtags.css';
 
 export default function TrendingHashtags({ limit = 10 }) {
   const [hashtags, setHashtags] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchTrendingHashtags();
-    // Refresh every 5 minutes
-    const interval = setInterval(fetchTrendingHashtags, 300000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchTrendingHashtags = async () => {
+  const fetchTrendingHashtags = useCallback(async () => {
     try {
       const res = await api.posts.getTrending({ limit });
       if (res.data && res.data.length > 0) {
@@ -38,7 +32,14 @@ export default function TrendingHashtags({ limit = 10 }) {
       logger.error('Error fetching trending hashtags:', error);
       setLoading(false);
     }
-  };
+  }, [limit]);
+
+  useEffect(() => {
+    fetchTrendingHashtags();
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchTrendingHashtags, 300000);
+    return () => clearInterval(interval);
+  }, [fetchTrendingHashtags]);
 
   const getTrendIcon = (trend) => {
     switch (trend) {

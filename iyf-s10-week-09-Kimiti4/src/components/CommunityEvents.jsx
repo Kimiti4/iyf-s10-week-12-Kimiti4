@@ -3,7 +3,7 @@
  * Organize and discover local community events with full details
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaCalendarAlt, 
@@ -151,11 +151,7 @@ export default function CommunityEvents({ currentUser }) {
   const [rsvpedEvents, setRsvpedEvents] = useState(new Set());
   const [viewMode, setViewMode] = useState('grid');
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/events');
@@ -174,7 +170,11 @@ export default function CommunityEvents({ currentUser }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const handleBookmark = (eventId) => {
     setBookmarked(prev => {

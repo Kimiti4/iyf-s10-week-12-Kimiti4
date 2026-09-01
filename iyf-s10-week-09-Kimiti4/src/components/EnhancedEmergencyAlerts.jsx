@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatRelativeTime } from '../utils/formatTime';
 import './EmergencyAlerts.css';
@@ -45,17 +45,7 @@ export default function EnhancedEmergencyAlerts({ currentUser }) {
     source: ''
   });
 
-  // Simulate real-time alerts
-  useEffect(() => {
-    loadAlerts();
-    const interval = setInterval(() => {
-      // Auto-refresh every 5 minutes
-      loadAlerts();
-    }, 300000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const loadAlerts = () => {
+  const loadAlerts = useCallback(() => {
     const realTimeAlerts = [
       {
         id: 1,
@@ -147,7 +137,17 @@ export default function EnhancedEmergencyAlerts({ currentUser }) {
       }
     ];
     setAlerts(realTimeAlerts);
-  };
+  }, []);
+
+  // Simulate real-time alerts
+  useEffect(() => {
+    loadAlerts();
+    const interval = setInterval(() => {
+      // Auto-refresh every 5 minutes
+      loadAlerts();
+    }, 300000);
+    return () => clearInterval(interval);
+  }, [loadAlerts]);
 
   const handleCreateAlert = () => {
     const alert = {

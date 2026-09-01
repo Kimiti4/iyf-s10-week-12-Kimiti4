@@ -2,7 +2,7 @@
  * 📰 Community Posts Feed - Where Stories Come Alive!
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { colors } from '../styles/designSystem'
@@ -21,11 +21,7 @@ export default function PostListPage() {
     { id: 'mtaani', label: '🏘️ Alerts', color: colors.danger }
   ]
   
-  useEffect(() => {
-    fetchPosts()
-  }, [])
-  
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       setLoading(true)
       const mockPosts = [
@@ -79,7 +75,11 @@ export default function PostListPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchPosts()
+  }, [fetchPosts])
   
   const filteredPosts = activeFilter === 'all' 
     ? posts 
