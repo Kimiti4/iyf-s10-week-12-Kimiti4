@@ -79,23 +79,83 @@ function AppRoutes() {
           </Suspense>
         } 
       />
-      <Route path="/login" element={<EnhancedLoginPage />} />
-      <Route path="/register" element={<EnhancedRegisterPage />} />
-      <Route path="/reels" element={<ReelsPage />} />
-      <Route path="/notifications" element={<NotificationsPage />} />
-      <Route path="/creator/studio" element={<CreatorStudioPage />} />
-      <Route path="/discover" element={<DiscoveryPage />} />
-<Route path="/mtaani" element={<MtaaniPage />} />
-<Route path="/skills" element={<SkillsPage />} />
-<Route path="/farm" element={<FarmPage />} />
-<Route path="/gigs" element={<GigsPage />} />
-      <Route path="/org/:slug" element={<OrganizationPage />} />
+      <Route path="/login" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <EnhancedLoginPage />
+        </Suspense>
+      } />
+      <Route path="/register" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <EnhancedRegisterPage />
+        </Suspense>
+      } />
+      <Route path="/reels" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <ReelsPage />
+        </Suspense>
+      } />
+      <Route path="/notifications" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <NotificationsPage />
+        </Suspense>
+      } />
+      <Route path="/creator/studio" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <CreatorStudioPage />
+        </Suspense>
+      } />
+      <Route path="/discover" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <DiscoveryPage />
+        </Suspense>
+      } />
+      <Route path="/mtaani" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <MtaaniPage />
+        </Suspense>
+      } />
+      <Route path="/skills" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <SkillsPage />
+        </Suspense>
+      } />
+      <Route path="/farm" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <FarmPage />
+        </Suspense>
+      } />
+      <Route path="/gigs" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <GigsPage />
+        </Suspense>
+      } />
+      <Route path="/org/:slug" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <OrganizationPage />
+        </Suspense>
+      } />
       
       {/* New Unique Feature Routes */}
-      <Route path="/tiannara" element={<TiannaraAssistant currentUser={user} />} />
-      <Route path="/events" element={<CommunityEvents currentUser={user} />} />
-      <Route path="/alerts" element={<AlertFeedPage />} />
-      <Route path="/emergency-alerts" element={<EnhancedEmergencyAlerts currentUser={user} />} />
+      <Route path="/tiannara" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <TiannaraAssistant currentUser={user} />
+        </Suspense>
+      } />
+      <Route path="/events" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <CommunityEvents currentUser={user} />
+        </Suspense>
+      } />
+      <Route path="/alerts" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <AlertFeedPage />
+        </Suspense>
+      } />
+      <Route path="/emergency-alerts" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <EnhancedEmergencyAlerts currentUser={user} />
+        </Suspense>
+      } />
       
       {/* User Profile Route */}
       <Route path="/profile/:userId?" element={<UserProfilePage />} />
@@ -187,7 +247,9 @@ function AppRoutes() {
         path="/activity" 
         element={
           <ProtectedRoute>
-            <ActivityHistory />
+            <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+              <ActivityHistory />
+            </Suspense>
           </ProtectedRoute>
         } 
       />
@@ -197,7 +259,9 @@ function AppRoutes() {
         path="/reputation" 
         element={
           <ProtectedRoute>
-            <ReputationSystem />
+            <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+              <ReputationSystem />
+            </Suspense>
           </ProtectedRoute>
         } 
       />
@@ -207,7 +271,9 @@ function AppRoutes() {
         path="/governance" 
         element={
           <ProtectedRoute>
-            <CommunityGovernance />
+            <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+              <CommunityGovernance />
+            </Suspense>
           </ProtectedRoute>
         } 
       />
@@ -217,7 +283,9 @@ function AppRoutes() {
         path="/quests" 
         element={
           <ProtectedRoute>
-            <CollaborativeQuests />
+            <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+              <CollaborativeQuests />
+            </Suspense>
           </ProtectedRoute>
         } 
       />
@@ -227,7 +295,9 @@ function AppRoutes() {
         path="/marketplace" 
         element={
           <ProtectedRoute>
-            <MarketplacePage />
+            <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+              <MarketplacePage />
+            </Suspense>
           </ProtectedRoute>
         } 
       />
@@ -237,7 +307,9 @@ function AppRoutes() {
         path="/settings" 
         element={
           <ProtectedRoute>
-            <SettingsPage />
+            <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+              <SettingsPage />
+            </Suspense>
           </ProtectedRoute>
         } 
       />
@@ -246,7 +318,9 @@ function AppRoutes() {
         path="/admin" 
         element={
           <ProtectedRoute>
-            <AdminDashboard />
+            <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+              <AdminDashboard />
+            </Suspense>
           </ProtectedRoute>
         } 
       />
@@ -254,7 +328,9 @@ function AppRoutes() {
         path="/admin/founder" 
         element={
           <ProtectedRoute>
-            <FounderDashboard />
+            <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+              <FounderDashboard />
+            </Suspense>
           </ProtectedRoute>
         } 
       />

@@ -22,6 +22,7 @@ export function useUnifiedFeed(userId = null, followedIds = []) {
   userIdRef.current = userId;
 
   const fetchFeed = useCallback(async (tab, reset = true) => {
+    const controller = new AbortController();
     const currentTab = tab || activeTab;
     if (reset) {
       setStatus(LOADING);
@@ -31,7 +32,7 @@ export function useUnifiedFeed(userId = null, followedIds = []) {
     setError('');
 
     try {
-      const result = await fetchFeedByTab(currentTab, 1);
+      const result = await fetchFeedByTab(currentTab, 1, { signal: controller.signal });
       let items = deduplicateItems(result.items);
       items = deduplicateContent(items);
       items = rankFeedItems(items, { userId: userIdRef.current, followedIds: followedIdsRef.current });
@@ -41,18 +42,22 @@ export function useUnifiedFeed(userId = null, followedIds = []) {
       pageRef.current = 1;
       setStatus(LOADED);
     } catch (err) {
+      if (err.name === 'AbortError') return;
       setError(err.message || 'Failed to load feed');
       setStatus(ERROR);
     }
+
+    return () => controller.abort();
   }, [activeTab]);
 
   const loadMore = useCallback(async () => {
     if (status === LOADING || !hasMore) return;
+    const controller = new AbortController();
     setStatus(LOADING);
 
     try {
       const nextPage = pageRef.current + 1;
-      const result = await fetchFeedByTab(activeTab, nextPage);
+      const result = await fetchFeedByTab(activeTab, nextPage, { signal: controller.signal });
       let newItems = deduplicateItems([...items, ...result.items]);
       newItems = deduplicateContent(newItems);
       newItems = rankFeedItems(newItems, { userId: userIdRef.current, followedIds: followedIdsRef.current });
@@ -62,19 +67,23 @@ export function useUnifiedFeed(userId = null, followedIds = []) {
       pageRef.current = nextPage;
       setStatus(LOADED);
     } catch (err) {
+      if (err.name === 'AbortError') return;
       setError(err.message);
       setStatus(ERROR);
     }
+
+    return () => controller.abort();
   }, [status, hasMore, items, activeTab]);
 
   const switchTab = useCallback(async (tab) => {
+    const controller = new AbortController();
     setActiveTab(tab);
     pageRef.current = 1;
     setHasMore(true);
 
     try {
       setStatus(LOADING);
-      const result = await fetchFeedByTab(tab, 1);
+      const result = await fetchFeedByTab(tab, 1, { signal: controller.signal });
       let items = deduplicateItems(result.items);
       items = deduplicateContent(items);
       items = rankFeedItems(items, { userId: userIdRef.current, followedIds: followedIdsRef.current });
@@ -83,9 +92,12 @@ export function useUnifiedFeed(userId = null, followedIds = []) {
       setHasMore(result.hasMore);
       setStatus(LOADED);
     } catch (err) {
+      if (err.name === 'AbortError') return;
       setError(err.message);
       setStatus(ERROR);
     }
+
+    return () => controller.abort();
   }, []);
 
   return {

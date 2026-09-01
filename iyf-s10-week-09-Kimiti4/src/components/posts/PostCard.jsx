@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import PostAuthor from './PostAuthor';
 import PostMedia from './PostMedia';
@@ -9,7 +9,7 @@ import ContentStatusNotice from '../trust/ContentStatusNotice';
 import ModerationBadge from '../trust/ModerationBadge';
 import { formatRelativeTime } from '../../utils/formatTime';
 
-export default function PostCard({ post, actions, showAuthor = true, contentStatus, currentUserId }) {
+export default React.memo(function PostCard({ post, actions, showAuthor = true, contentStatus, currentUserId }) {
   const timeText = useMemo(() => formatRelativeTime(post.createdAt), [post.createdAt]);
 
   if (post.deletedAt || contentStatus === 'removed') {
@@ -60,4 +60,4 @@ export default function PostCard({ post, actions, showAuthor = true, contentStat
       )}
     </article>
   );
-}
+})

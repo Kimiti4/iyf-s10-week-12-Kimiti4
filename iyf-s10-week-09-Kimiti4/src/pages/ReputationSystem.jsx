@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { colors } from '../styles/designSystem'
 import api from '../services/api'
-import html2pdf from 'html2pdf.js'
+
 import ImpactMeterWidget from '../components/ImpactMeterWidget'
 import { useToast } from '../components/Toast'
 import './ReputationSystem.css'
@@ -74,7 +74,8 @@ const ReputationSystem = () => {
     }
   }
 
-  const generatePDFPassport = (passport) => {
+  const generatePDFPassport = async (passport) => {
+    const html2pdf = (await import('html2pdf.js')).default;
     const html = `
       <div style="font-family: 'Inter var', sans-serif; padding: 40px; background: #f0fdf4; width: 600px; border-radius: 12px;">
         <h1 style="color: #16a34a; text-align: center;">🏆 JamiiLink Reputation Passport</h1>

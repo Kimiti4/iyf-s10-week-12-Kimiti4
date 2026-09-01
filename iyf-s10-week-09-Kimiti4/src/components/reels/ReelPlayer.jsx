@@ -46,7 +46,7 @@ export default function ReelPlayer({ reel, isActive, onPause }) {
         loop
         muted={isMuted}
         playsInline
-        preload={isActive ? 'auto' : 'metadata'}
+        preload="metadata"
         onLoadedData={onLoadedData}
       />
 
