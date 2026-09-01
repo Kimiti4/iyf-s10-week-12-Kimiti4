@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { FaHeart, FaRegHeart, FaRetweet, FaRegComment, FaShare, FaBookmark, FaRegBookmark, FaExchangeAlt } from 'react-icons/fa';
 import ShareSheet from '../distribution/ShareSheet';
+import ModerationReportButton from '../trust/ModerationReportButton';
 
-export default function PostActions({ post, actions, currentUserId }) {
+export default function PostActions({ post, actions, currentUserId, contentStatus }) {
   const {
     handleLike,
     handleUnlike,
@@ -38,6 +39,7 @@ export default function PostActions({ post, actions, currentUserId }) {
         className={`post-action-btn ${post.isReposted ? 'active reposted' : ''}`}
         onClick={() => post.isReposted ? handleUnrepost(post) : handleRepost(post)}
         aria-label={post.isReposted ? 'Undo repost' : 'Repost'}
+        disabled={contentStatus === 'removed'}
       >
         <FaRetweet />
         <span className="post-action-count">{post.repostCount || ''}</span>
@@ -58,6 +60,12 @@ export default function PostActions({ post, actions, currentUserId }) {
       >
         {post.isSaved ? <FaBookmark /> : <FaRegBookmark />}
       </button>
+
+      <ModerationReportButton
+        targetType="post"
+        targetId={post.id}
+        currentUserId={currentUserId}
+      />
 
       <ShareSheet item={post} isOpen={shareOpen} onClose={() => setShareOpen(false)} />
     </div>

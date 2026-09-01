@@ -1,4 +1,9 @@
 {
-  "buildCommand": "cd iyf-s10-week-09-Kimiti4 && npm install && npm run build",
-  "outputDirectory": "iyf-s10-week-09-Kimiti4/dist"
+  "framework": "vite",
+  "installCommand": "cd iyf-s10-week-09-Kimiti4 && npm install",
+  "buildCommand": "cd iyf-s10-week-09-Kimiti4 && npm run build",
+  "outputDirectory": "iyf-s10-week-09-Kimiti4/dist",
+  "rewrites": [
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+  ]
 }

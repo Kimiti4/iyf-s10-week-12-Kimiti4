@@ -146,6 +146,12 @@ export const NOTIFICATION_TYPES = {
   SYSTEM: 'system',
   REPOST: 'repost',
   REMIX: 'remix',
+  CONTENT_REPORTED: 'content_reported',
+  CONTENT_REMOVED: 'content_removed',
+  CONTENT_RESTORED: 'content_restored',
+  ACCOUNT_WARNED: 'account_warned',
+  ACCOUNT_SUSPENDED: 'account_suspended',
+  REPORT_RESOLVED: 'report_resolved',
 };
 
 // ===== THEME CONSTANTS =====
@@ -160,6 +166,44 @@ export const DISTRIBUTION = {
   SHARE: 'share',
   REPOST: 'repost',
   REMIX: 'remix',
+};
+
+// ===== TRUST & SAFETY CONSTANTS =====
+export const CONTENT_STATUS = {
+  ACTIVE: 'active',
+  UNDER_REVIEW: 'under_review',
+  LIMITED: 'limited',
+  REMOVED: 'removed',
+  RESTORED: 'restored',
+};
+
+export const REPORT_REASON = {
+  SPAM: 'spam',
+  HARASSMENT: 'harassment',
+  HATE: 'hate',
+  VIOLENCE: 'violence',
+  SEXUAL_CONTENT: 'sexual_content',
+  MISINFORMATION: 'misinformation',
+  SCAM: 'scam',
+  COPYRIGHT: 'copyright',
+  IMPERSONATION: 'impersonation',
+  OTHER: 'other',
+};
+
+export const REPORT_STATUS = {
+  PENDING: 'pending',
+  REVIEWING: 'reviewing',
+  RESOLVED: 'resolved',
+  DISMISSED: 'dismissed',
+};
+
+export const MODERATION_ACTION = {
+  DISMISS: 'dismiss',
+  WARN: 'warn',
+  LIMIT: 'limit',
+  REMOVE: 'remove',
+  RESTORE: 'restore',
+  ESCALATE: 'escalate',
 };
 
 // ===== LANGUAGE CONSTANTS =====
@@ -192,4 +236,8 @@ export default {
   THEMES,
   LANGUAGES,
   FONT_SIZES,
+  CONTENT_STATUS,
+  REPORT_REASON,
+  REPORT_STATUS,
+  MODERATION_ACTION,
 };

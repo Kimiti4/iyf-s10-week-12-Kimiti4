@@ -8,6 +8,7 @@
  */
 
 import { DISTRIBUTION_ACTION } from './distributionTypes';
+import { CONTENT_STATUS } from '../trust/trustTypes';
 
 /**
  * Check whether a user can repost a given item.
@@ -18,6 +19,14 @@ import { DISTRIBUTION_ACTION } from './distributionTypes';
 export function canRepost(item, currentUserId) {
   if (!item || !currentUserId) {
     return { allowed: false, reason: 'Authentication required' };
+  }
+
+  const contentStatus = item.contentStatus || CONTENT_STATUS.ACTIVE;
+  if (contentStatus === CONTENT_STATUS.REMOVED) {
+    return { allowed: false, reason: 'Content has been removed' };
+  }
+  if (contentStatus === CONTENT_STATUS.LIMITED) {
+    return { allowed: false, reason: 'Content has been limited' };
   }
 
   const authorId = item.author?.id || item.authorId || item.creatorId;
@@ -45,6 +54,14 @@ export function canRepost(item, currentUserId) {
 export function canRemix(item, currentUserId) {
   if (!item || !currentUserId) {
     return { allowed: false, reason: 'Authentication required' };
+  }
+
+  const contentStatus = item.contentStatus || CONTENT_STATUS.ACTIVE;
+  if (contentStatus === CONTENT_STATUS.REMOVED) {
+    return { allowed: false, reason: 'Content has been removed' };
+  }
+  if (contentStatus === CONTENT_STATUS.LIMITED) {
+    return { allowed: false, reason: 'Content has been limited' };
   }
 
   if (item.type === 'jam') {

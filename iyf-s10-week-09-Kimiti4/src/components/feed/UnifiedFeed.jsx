@@ -63,7 +63,7 @@ export default function UnifiedFeed() {
 
       <div className="unified-feed-list">
         {items.map((item) => (
-          <FeedItem key={item.id} item={item} postActions={postActions} />
+          <FeedItem key={item.id} item={item} postActions={postActions} currentUserId={userId} />
         ))}
       </div>
 

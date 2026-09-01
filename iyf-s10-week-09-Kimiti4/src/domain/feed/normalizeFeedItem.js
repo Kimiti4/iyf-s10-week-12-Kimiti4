@@ -10,6 +10,7 @@
 import { FEED_CONTENT_TYPE } from './feedTypes';
 import { normalizePost as normalizePostContract } from '../../contracts/postContract';
 import { normalizeReel as normalizeReelContract } from '../../contracts/reelContract';
+import { CONTENT_STATUS } from '../trust/trustTypes';
 
 /**
  * Normalize a raw item into a feed item.
@@ -46,6 +47,8 @@ function wrapPost(raw) {
     authorId: post.author?.id || '',
     category: post.category || 'all',
     engagementScore: computePostEngagement(raw),
+    contentStatus: raw.contentStatus || (post.deletedAt ? CONTENT_STATUS.REMOVED : CONTENT_STATUS.ACTIVE),
+    reportCount: raw.reportCount || 0,
     distribution: {
       kind: distributionKind,
       repostActorId: raw.repostActorId || null,
@@ -71,6 +74,8 @@ function wrapReel(raw) {
     authorId: reel.author?.id || '',
     category: 'reels',
     engagementScore: computeReelEngagement(raw),
+    contentStatus: raw.contentStatus || (reel.deletedAt ? CONTENT_STATUS.REMOVED : CONTENT_STATUS.ACTIVE),
+    reportCount: raw.reportCount || 0,
     distribution: {
       kind: distributionKind,
       repostActorId: raw.repostActorId || null,
@@ -110,6 +115,8 @@ function wrapJam(raw) {
     authorId: creator._id || creator.id || raw.creatorId || '',
     category: raw.category || 'other',
     engagementScore: computeJamEngagement(raw),
+    contentStatus: raw.contentStatus || CONTENT_STATUS.ACTIVE,
+    reportCount: raw.reportCount || 0,
   };
 }
 

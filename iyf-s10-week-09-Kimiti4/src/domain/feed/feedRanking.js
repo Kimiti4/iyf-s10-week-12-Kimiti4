@@ -8,6 +8,7 @@
  */
 
 import { FEED_CONTENT_TYPE } from './feedTypes';
+import { CONTENT_STATUS } from '../trust/trustTypes';
 
 // ===== RANKING WEIGHTS =====
 
@@ -54,6 +55,9 @@ export function rankFeedItems(items, context = {}) {
 function computeScore(item, context, weights, followedIds) {
   let score = 0;
 
+  // Moderation: removed content gets zero score (should be filtered before reaching here)
+  if (item.contentStatus === CONTENT_STATUS.REMOVED) return 0;
+
   // Freshness: recency decay (items within 24h get full score, then decay)
   const ageMs = Date.now() - new Date(item.createdAt).getTime();
   const ageHours = ageMs / (1000 * 60 * 60);
@@ -85,6 +89,13 @@ function computeScore(item, context, weights, followedIds) {
     score *= 0.85;
   } else if (distKind === 'remix') {
     score *= 0.95; // Remixes are creative derivatives, slight penalty
+  }
+
+  // Moderation: under-review content gets demoted, limited content gets heavily demoted
+  if (item.contentStatus === CONTENT_STATUS.UNDER_REVIEW) {
+    score *= 0.5;
+  } else if (item.contentStatus === CONTENT_STATUS.LIMITED) {
+    score *= 0.2;
   }
 
   // Diversity: starts at full, reduced by the ranking pass

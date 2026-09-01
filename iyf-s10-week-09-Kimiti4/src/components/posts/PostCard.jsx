@@ -5,6 +5,8 @@ import PostMedia from './PostMedia';
 import PostActions from './PostActions';
 import PostEngagement from './PostEngagement';
 import PostJamConnector from '../jam-signature/PostJamConnector';
+import ContentStatusNotice from '../trust/ContentStatusNotice';
+import ModerationBadge from '../trust/ModerationBadge';
 
 function formatTime(dateString) {
   const date = new Date(dateString);
@@ -22,10 +24,10 @@ function formatTime(dateString) {
   return date.toLocaleDateString();
 }
 
-export default function PostCard({ post, actions, showAuthor = true }) {
+export default function PostCard({ post, actions, showAuthor = true, contentStatus, currentUserId }) {
   const timeText = useMemo(() => formatTime(post.createdAt), [post.createdAt]);
 
-  if (post.deletedAt) {
+  if (post.deletedAt || contentStatus === 'removed') {
     return (
       <article className="post-card post-card--deleted">
         <p className="post-card-deleted-notice">This post has been deleted</p>
@@ -35,10 +37,24 @@ export default function PostCard({ post, actions, showAuthor = true }) {
 
   return (
     <article className="post-card" data-post-id={post.id}>
+      {contentStatus && contentStatus !== 'active' && (
+        <ContentStatusNotice
+          status={contentStatus}
+          isOwner={currentUserId === post.author?.id}
+          authorId={post.author?.id}
+          currentUserId={currentUserId}
+        />
+      )}
+
       {showAuthor && (
         <div className="post-card-header">
           <PostAuthor author={post.author} />
-          <span className="post-card-time">{timeText}</span>
+          <div className="post-card-header-right">
+            {contentStatus && contentStatus !== 'active' && (
+              <ModerationBadge status={contentStatus} />
+            )}
+            <span className="post-card-time">{timeText}</span>
+          </div>
         </div>
       )}
 
@@ -54,7 +70,7 @@ export default function PostCard({ post, actions, showAuthor = true }) {
 
       {actions && (
         <div className="post-card-actions">
-          <PostActions post={post} actions={actions} />
+          <PostActions post={post} actions={actions} contentStatus={contentStatus} currentUserId={currentUserId} />
         </div>
       )}
     </article>
