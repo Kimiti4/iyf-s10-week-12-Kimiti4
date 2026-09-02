@@ -2,33 +2,103 @@
   "version": "1.0.0",
   "mission": "J-025",
   "baseline": "3cfe995",
-  "created": "2026-09-02",
-  "coreWebVitals": {
-    "LCP": { "good": 2500, "poor": 4000, "unit": "ms", "description": "Largest Contentful Paint" },
-    "FID": { "good": 100, "poor": 300, "unit": "ms", "description": "First Input Delay" },
-    "CLS": { "good": 0.1, "poor": 0.25, "unit": "", "description": "Cumulative Layout Shift" },
-    "INP": { "good": 200, "poor": 500, "unit": "ms", "description": "Interaction to Next Paint" },
-    "TTFB": { "good": 800, "poor": 1800, "unit": "ms", "description": "Time to First Byte" },
-    "FCP": { "good": 1800, "poor": 3000, "unit": "ms", "description": "First Contentful Paint" }
-  },
-  "bundleBudgets": {
-    "totalJs": { "limit": 2048000, "unit": "bytes", "description": "Total JavaScript transfer size (includes lazy chunks)" },
-    "totalCss": { "limit": 307200, "unit": "bytes", "description": "Total CSS transfer size" },
-    "largestChunk": { "limit": 1024000, "unit": "bytes", "description": "Largest single JS chunk (html2pdf lazy-loaded)" },
-    "chunkCount": { "limit": 60, "unit": "count", "description": "Total number of JS chunks" }
-  },
-  "routeBudgets": {
-    "loadTime": { "good": 1000, "poor": 3000, "unit": "ms" },
-    "tti": { "good": 2000, "poor": 5000, "unit": "ms" }
+  "created": "2026-09-03",
+  "budgets": {
+    "webVitals": {
+      "LCP": {
+        "target": 2500,
+        "warning": 3000,
+        "failure": 4000,
+        "unit": "ms",
+        "rationale": "Google recommends LCP < 2.5s for good UX"
+      },
+      "INP": {
+        "target": 200,
+        "warning": 300,
+        "failure": 500,
+        "unit": "ms",
+        "rationale": "INP < 200ms ensures responsive interactions"
+      },
+      "CLS": {
+        "target": 0.1,
+        "warning": 0.15,
+        "failure": 0.25,
+        "unit": "score",
+        "rationale": "CLS < 0.1 prevents jarring layout shifts"
+      },
+      "FCP": {
+        "target": 1800,
+        "warning": 2500,
+        "failure": 3000,
+        "unit": "ms",
+        "rationale": "FCP < 1.8s provides fast initial render"
+      },
+      "TTFB": {
+        "target": 800,
+        "warning": 1200,
+        "failure": 1800,
+        "unit": "ms",
+        "rationale": "TTFB < 800ms ensures fast server response"
+      }
+    },
+    "bundle": {
+      "initialJS": {
+        "target": 250,
+        "warning": 350,
+        "failure": 500,
+        "unit": "kb",
+        "rationale": "Initial JS < 250KB for fast first load"
+      },
+      "initialCSS": {
+        "target": 50,
+        "warning": 75,
+        "failure": 100,
+        "unit": "kb",
+        "rationale": "Initial CSS < 50KB to minimize render blocking"
+      },
+      "largestChunk": {
+        "target": 200,
+        "warning": 300,
+        "failure": 500,
+        "unit": "kb",
+        "rationale": "No single chunk should exceed 200KB"
+      }
+    },
+    "network": {
+      "requestCount": {
+        "target": 30,
+        "warning": 50,
+        "failure": 100,
+        "unit": "requests",
+        "rationale": "Limit concurrent requests to avoid waterfall"
+      },
+      "totalTransfer": {
+        "target": 1000,
+        "warning": 1500,
+        "failure": 2000,
+        "unit": "kb",
+        "rationale": "Total transfer < 1MB for fast page load"
+      }
+    },
+    "runtime": {
+      "longTaskCount": {
+        "target": 5,
+        "warning": 10,
+        "failure": 20,
+        "unit": "tasks",
+        "rationale": "Minimize long tasks (>50ms) for responsiveness"
+      },
+      "totalBlockingTime": {
+        "target": 200,
+        "warning": 300,
+        "failure": 500,
+        "unit": "ms",
+        "rationale": "TBT < 200ms for smooth interactions"
+      }
+    }
   },
   "criticalRoutes": [
     "/", "/login", "/register", "/discover", "/alerts",
     "/profile", "/jams", "/reels", "/settings"
-  ],
-  "regressionPolicy": {
-    "threshold": 0.20,
-    "description": "Metrics >20% worse than baseline trigger FAIL",
-    "allowedWarnings": 2,
-    "zeroTolerance": ["LCP", "CLS"]
-  }
+  ]
 }

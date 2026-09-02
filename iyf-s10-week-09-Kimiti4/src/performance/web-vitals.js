@@ -1,75 +1,69 @@
-import { evaluateMetric } from './budgets.js';
+/**
+ * Web Vitals Collection — Core Web Vitals instrumentation
+ * Uses the official web-vitals library for accurate measurement
+ */
 
-const vitals = {};
-const callbacks = [];
+import { onCLS, onFCP, onLCP, onINP, onTTFB } from 'web-vitals';
+import registry from './registry';
 
-function notify() {
-  callbacks.forEach(cb => cb({ ...vitals }));
+const METRIC_THRESHOLDS = {
+  CLS: { good: 0.1, poor: 0.25 },
+  FCP: { good: 1800, poor: 3000 },
+  LCP: { good: 2500, poor: 4000 },
+  INP: { good: 200, poor: 500 },
+  TTFB: { good: 800, poor: 1800 }
+};
+
+function classify(metric, value) {
+  const thresholds = METRIC_THRESHOLDS[metric];
+  if (!thresholds) return 'unknown';
+  if (value <= thresholds.good) return 'good';
+  if (value <= thresholds.poor) return 'needs-improvement';
+  return 'poor';
 }
 
-export function onWebVitals(cb) {
-  callbacks.push(cb);
-  if (Object.keys(vitals).length > 0) cb({ ...vitals });
+function recordVital(metric, data) {
+  const entry = registry.record({
+    metric: metric,
+    value: data.value,
+    unit: metric === 'CLS' ? 'score' : 'ms',
+    rating: data.rating || classify(metric, data.value),
+    navigationType: data.navigationType,
+    delta: data.delta,
+    id: data.id,
+    attribution: data.attribution || null
+  });
+
+  if (import.meta?.env?.MODE === 'development') {
+    console.log(`[Perf] ${metric}: ${data.value.toFixed(2)} (${entry.rating})`);
+  }
+
+  return entry;
 }
 
-let lcpValue = 0;
-const lcpObserver = new PerformanceObserver((list) => {
-  const entries = list.getEntries();
-  const last = entries[entries.length - 1];
-  if (last) {
-    lcpValue = last.startTime;
-    vitals.LCP = { value: lcpValue, ...evaluateMetric('LCP', lcpValue) };
-    notify();
-  }
-});
-try { lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true }); } catch {}
+export function initWebVitals(options = {}) {
+  const { reportAllChanges = false } = options;
 
-let clsValue = 0;
-let clsSessionValue = 0;
-const clsObserver = new PerformanceObserver((list) => {
-  for (const entry of list.getEntries()) {
-    if (!entry.hadRecentInput) {
-      clsSessionValue += entry.value;
-      if (clsSessionValue > clsValue) {
-        clsValue = clsSessionValue;
-        vitals.CLS = { value: clsValue, ...evaluateMetric('CLS', clsValue) };
-        notify();
-      }
-    }
-  }
-});
-try { clsObserver.observe({ type: 'layout-shift', buffered: true }); } catch {}
-
-const paintObserver = new PerformanceObserver((list) => {
-  for (const entry of list.getEntries()) {
-    if (entry.name === 'first-contentful-paint') {
-      vitals.FCP = { value: entry.startTime, ...evaluateMetric('FCP', entry.startTime) };
-      notify();
-    }
-  }
-});
-try { paintObserver.observe({ type: 'paint', buffered: true }); } catch {}
-
-const navEntries = performance.getEntriesByType('navigation');
-if (navEntries.length > 0) {
-  const nav = navEntries[0];
-  const ttfb = nav.responseStart - nav.requestStart;
-  vitals.TTFB = { value: ttfb, ...evaluateMetric('TTFB', ttfb) };
+  onCLS(recordVital, { reportAllChanges });
+  onFCP(recordVital, { reportAllChanges });
+  onLCP(recordVital, { reportAllChanges });
+  onINP(recordVital, { reportAllChanges });
+  onTTFB(recordVital, { reportAllChanges });
 }
 
-let maxINP = 0;
-const inpObserver = new PerformanceObserver((list) => {
-  for (const entry of list.getEntries()) {
-    const duration = entry.duration;
-    if (duration > maxINP) {
-      maxINP = duration;
-      vitals.INP = { value: maxINP, ...evaluateMetric('INP', maxINP) };
-      notify();
-    }
-  }
-});
-try { inpObserver.observe({ type: 'event', buffered: true, durationThreshold: 40 }); } catch {}
+export function getWebVitalsSummary() {
+  const metrics = ['CLS', 'FCP', 'LCP', 'INP', 'TTFB'];
 
-export function getWebVitals() {
-  return { ...vitals };
+  return metrics.reduce((summary, metric) => {
+    const stats = registry.aggregate(metric);
+    summary[metric] = stats ? {
+      p75: stats.p75,
+      median: stats.median,
+      count: stats.count,
+      rating: classify(metric, stats.p75)
+    } : null;
+    return summary;
+  }, {});
 }
+
+export default { init: initWebVitals, getSummary: getWebVitalsSummary, thresholds: METRIC_THRESHOLDS };

@@ -1,104 +1,50 @@
-import { BUDGETS, evaluateMetric } from './budgets.js';
+/**
+ * Performance Collector — unified entry point
+ * Initializes all performance measurement systems
+ */
 
-const metrics = {};
-const observers = [];
+import { initWebVitals, getWebVitalsSummary } from './web-vitals';
+import { initNetworkTracking, getNetworkSummary } from './network';
+import { initRuntimeTracking, getRuntimeSummary } from './runtime';
+import registry from './registry';
 
-export function collectNavigationTiming() {
-  const nav = performance.getEntriesByType('navigation')[0];
-  if (!nav) return null;
+export function initPerformanceTracking(options = {}) {
+  const {
+    webVitals = true,
+    network = true,
+    runtime = true,
+    reportAllChanges = false
+  } = options;
+
+  if (webVitals) initWebVitals({ reportAllChanges });
+  if (network) initNetworkTracking();
+  if (runtime) initRuntimeTracking();
+}
+
+export function getPerformanceSummary() {
   return {
-    ttfb: nav.responseStart - nav.requestStart,
-    fcp: 0,
-    domContentLoaded: nav.domContentLoadedEventEnd - nav.startTime,
-    load: nav.loadEventEnd - nav.startTime,
-    transferSize: nav.transferSize,
-    encodedBodySize: nav.encodedBodySize,
-    decodedBodySize: nav.decodedBodySize,
+    timestamp: new Date().toISOString(),
+    webVitals: getWebVitalsSummary(),
+    network: getNetworkSummary(),
+    runtime: getRuntimeSummary(),
+    registrySize: registry.entries.length
   };
 }
 
-export function collectPaintTiming() {
-  const paints = performance.getEntriesByType('paint');
-  const fcp = paints.find(p => p.name === 'first-contentful-paint');
-  return fcp ? { fcp: fcp.startTime } : null;
-}
-
-export function collectLargestContentfulPaint() {
-  return new Promise((resolve) => {
-    let lcp = 0;
-    const observer = new PerformanceObserver((list) => {
-      const entries = list.getEntries();
-      const last = entries[entries.length - 1];
-      if (last) lcp = last.startTime;
-    });
-    observer.observe({ type: 'largest-contentful-paint', buffered: true });
-    observers.push(observer);
-    setTimeout(() => {
-      observer.disconnect();
-      resolve({ lcp });
-    }, 10000);
-  });
-}
-
-export function collectCumulativeLayoutShift() {
-  let cls = 0;
-  let sessionValue = 0;
-  let sessionEntries = [];
-  const observer = new PerformanceObserver((list) => {
-    for (const entry of list.getEntries()) {
-      if (!entry.hadRecentInput) {
-        const value = entry.value;
-        if (sessionValue + value < cls) {
-          sessionEntries.push(entry);
-          sessionValue += value;
-        } else {
-          sessionValue = value;
-          sessionEntries = [entry];
-        }
-        if (sessionValue > cls) {
-          cls = sessionValue;
-        }
-      }
-    }
-  });
-  observer.observe({ type: 'layout-shift', buffered: true });
-  observers.push(observer);
-  return { cls, getSessionEntries: () => sessionEntries };
-}
-
-export function collectBundleMetrics() {
-  const scripts = performance.getEntriesByType('resource').filter(r => r.initiatorType === 'script');
-  const styles = performance.getEntriesByType('resource').filter(r => r.initiatorType === 'link' || r.initiatorType === 'css');
-  const totalJsTransfer = scripts.reduce((sum, s) => sum + (s.transferSize || 0), 0);
-  const totalCssTransfer = styles.reduce((sum, s) => sum + (s.transferSize || 0), 0);
-  const largestScript = Math.max(...scripts.map(s => s.transferSize || 0), 0);
+export function exportPerformanceData() {
   return {
-    totalJsTransfer,
-    totalCssTransfer,
-    largestScript,
-    scriptCount: scripts.length,
-    styleCount: styles.length,
+    summary: getPerformanceSummary(),
+    entries: registry.export()
   };
 }
 
-export function collectAllMetrics() {
-  const nav = collectNavigationTiming();
-  const paint = collectPaintTiming();
-  const bundle = collectBundleMetrics();
-  const result = {
-    timestamp: Date.now(),
-    url: window.location.href,
-    ...nav,
-    ...paint,
-    ...bundle,
-  };
-  result.evaluations = {};
-  if (result.ttfb) result.evaluations.ttfb = evaluateMetric('TTFB', result.ttfb);
-  if (result.fcp) result.evaluations.fcp = evaluateMetric('FCP', result.fcp);
-  return result;
+export function clearPerformanceData() {
+  registry.clear();
 }
 
-export function cleanup() {
-  observers.forEach(o => { try { o.disconnect(); } catch {} });
-  observers.length = 0;
-}
+export default {
+  init: initPerformanceTracking,
+  getSummary: getPerformanceSummary,
+  export: exportPerformanceData,
+  clear: clearPerformanceData
+};
