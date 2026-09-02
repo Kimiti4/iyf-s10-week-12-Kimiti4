@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { FaHeart, FaRegHeart, FaRetweet, FaRegComment, FaShare, FaBookmark, FaRegBookmark, FaExchangeAlt } from 'react-icons/fa';
-import ShareSheet from '../distribution/ShareSheet';
+import ActionBar from '../primitives/ActionBar';
 import ModerationReportButton from '../trust/ModerationReportButton';
 
 export default function PostActions({ post, actions, currentUserId, contentStatus }) {
@@ -11,63 +9,31 @@ export default function PostActions({ post, actions, currentUserId, contentStatu
     handleUnrepost,
     handleSave,
     handleUnsave,
-    handleShare,
   } = actions;
 
-  const [shareOpen, setShareOpen] = useState(false);
-
   return (
-    <div className="post-actions">
-      <button
-        className={`post-action-btn ${post.isLiked ? 'active liked' : ''}`}
-        onClick={() => post.isLiked ? handleUnlike(post) : handleLike(post)}
-        aria-label={post.isLiked ? 'Unlike' : 'Like'}
-      >
-        {post.isLiked ? <FaHeart /> : <FaRegHeart />}
-        <span className="post-action-count">{post.likeCount || ''}</span>
-      </button>
-
-      <button
-        className="post-action-btn"
-        aria-label="Comment"
-      >
-        <FaRegComment />
-        <span className="post-action-count">{post.commentCount || ''}</span>
-      </button>
-
-      <button
-        className={`post-action-btn ${post.isReposted ? 'active reposted' : ''}`}
-        onClick={() => post.isReposted ? handleUnrepost(post) : handleRepost(post)}
-        aria-label={post.isReposted ? 'Undo repost' : 'Repost'}
-        disabled={contentStatus === 'removed'}
-      >
-        <FaRetweet />
-        <span className="post-action-count">{post.repostCount || ''}</span>
-      </button>
-
-      <button
-        className="post-action-btn"
-        onClick={() => setShareOpen(true)}
-        aria-label="Share"
-      >
-        <FaShare />
-      </button>
-
-      <button
-        className={`post-action-btn ${post.isSaved ? 'active saved' : ''}`}
-        onClick={() => post.isSaved ? handleUnsave(post) : handleSave(post)}
-        aria-label={post.isSaved ? 'Unsave' : 'Save'}
-      >
-        {post.isSaved ? <FaBookmark /> : <FaRegBookmark />}
-      </button>
-
-      <ModerationReportButton
-        targetType="post"
-        targetId={post.id}
-        currentUserId={currentUserId}
-      />
-
-      <ShareSheet item={post} isOpen={shareOpen} onClose={() => setShareOpen(false)} />
-    </div>
+    <ActionBar
+      isLiked={post.isLiked}
+      likeCount={post.likeCount}
+      onLike={() => handleLike(post)}
+      onUnlike={() => handleUnlike(post)}
+      isReposted={post.isReposted}
+      repostCount={post.repostCount}
+      onRepost={() => handleRepost(post)}
+      onUndoRepost={() => handleUnrepost(post)}
+      commentCount={post.commentCount}
+      isSaved={post.isSaved}
+      onToggleSave={() => post.isSaved ? handleUnsave(post) : handleSave(post)}
+      shareableItem={post}
+      showReport
+      reportButton={
+        <ModerationReportButton
+          targetType="post"
+          targetId={post.id}
+          currentUserId={currentUserId}
+        />
+      }
+      className="post-actions"
+    />
   );
 }

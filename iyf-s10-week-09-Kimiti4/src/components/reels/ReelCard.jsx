@@ -4,7 +4,7 @@ import ReelCaption from './ReelCaption';
 import ReelActions from './ReelActions';
 import ReelJamCTA from './ReelJamCTA';
 import ReelJamOverlay from '../jam-signature/ReelJamOverlay';
-import ShareReelSheet from './ShareReelSheet';
+import ShareSheet from '../distribution/ShareSheet';
 import { useEngagement } from '../../hooks/useEngagement';
 
 export default function ReelCard({ reel, isActive, updateReel }) {
@@ -45,7 +45,7 @@ export default function ReelCard({ reel, isActive, updateReel }) {
 
       <ReelJamOverlay jamId={reel.jamId} jamTitle={reel.jamTitle} jamCTA={reel.jamCTA} />
 
-      <ShareReelSheet reel={reel} isOpen={shareOpen} onClose={() => setShareOpen(false)} />
+      <ShareSheet item={{ ...reel, type: 'reel' }} isOpen={shareOpen} onClose={() => setShareOpen(false)} />
     </article>
   );
 }

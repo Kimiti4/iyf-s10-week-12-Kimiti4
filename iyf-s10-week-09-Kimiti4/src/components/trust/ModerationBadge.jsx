@@ -2,13 +2,14 @@
  * ModerationBadge
  *
  * Small inline badge showing content moderation status.
- * Used in feed items, post headers, and moderation queue.
+ * Uses canonical StatusBadge primitive.
  *
  * @module components/trust/ModerationBadge
  */
 
 import { CONTENT_STATUS } from '../../domain/trust/trustTypes';
 import { getContentStatusLabel, getContentStatusColor } from '../../domain/trust/trustUtils';
+import StatusBadge from '../primitives/StatusBadge';
 
 export default function ModerationBadge({ status, size = 'small' }) {
   if (!status || status === CONTENT_STATUS.ACTIVE || status === CONTENT_STATUS.RESTORED) {
@@ -19,12 +20,13 @@ export default function ModerationBadge({ status, size = 'small' }) {
   const color = getContentStatusColor(status);
 
   return (
-    <span
-      className={`moderation-badge moderation-badge--${size}`}
-      style={{ color, borderColor: color }}
+    <StatusBadge
+      label={label}
+      color={color}
+      variant="outlined"
+      size={size}
+      className="moderation-badge"
       aria-label={`Content status: ${label}`}
-    >
-      {label}
-    </span>
+    />
   );
 }

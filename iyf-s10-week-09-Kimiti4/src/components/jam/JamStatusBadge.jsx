@@ -1,4 +1,5 @@
 import { JAM_STATUS } from '../../models/jam';
+import StatusBadge from '../primitives/StatusBadge';
 
 const STATUS_CONFIG = {
   [JAM_STATUS.DRAFT]: {
@@ -32,14 +33,12 @@ export default function JamStatusBadge({ status }) {
   const config = STATUS_CONFIG[status] || STATUS_CONFIG[JAM_STATUS.DRAFT];
 
   return (
-    <span
+    <StatusBadge
+      label={config.label}
+      color={config.color}
+      bg={config.bg}
+      dot={status === JAM_STATUS.ACTIVE}
       className="jam-status-badge"
-      style={{ color: config.color, background: config.bg }}
-    >
-      {status === JAM_STATUS.ACTIVE && (
-        <span className="jam-status-dot" style={{ background: config.color }} />
-      )}
-      {config.label}
-    </span>
+    />
   );
 }
