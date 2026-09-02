@@ -59,7 +59,7 @@
 
 .reaction-button.has-reaction {
   background: rgba(59, 130, 246, 0.3);
-  border-color: #3b82f6;
+  border-color: var(--info);
   color: #60a5fa;
 }
 
@@ -103,7 +103,7 @@
 }
 
 .reaction-option.selected {
-  border-color: #3b82f6;
+  border-color: var(--info);
   background: rgba(59, 130, 246, 0.2);
 }
 
@@ -119,7 +119,7 @@
   min-width: 18px;
   height: 18px;
   padding: 2px 4px;
-  background: #3b82f6;
+  background: var(--info);
   color: white;
   font-size: 11px;
   font-weight: 600;
@@ -175,4 +175,11 @@
   .reaction-breakdown {
     gap: 8px;
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

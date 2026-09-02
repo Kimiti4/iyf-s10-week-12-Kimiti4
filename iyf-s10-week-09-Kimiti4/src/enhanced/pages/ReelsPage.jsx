@@ -153,7 +153,7 @@ export default function ReelsPage() {
     };
 
     return (
-        <div className="reels-page">
+        <main className="reels-page" role="main" aria-label="Reels">
             {/* Header */}
             <header className="reels-page-header">
                 <motion.button 
@@ -313,6 +313,6 @@ export default function ReelsPage() {
             <div className="reel-counter">
                 {currentReelIndex + 1} / {MOCK_REELS.length}
             </div>
-        </div>
+        </main>
     );
 }

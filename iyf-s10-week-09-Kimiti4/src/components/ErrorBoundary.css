@@ -194,3 +194,10 @@
     justify-content: center;
   }
 }
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
+}

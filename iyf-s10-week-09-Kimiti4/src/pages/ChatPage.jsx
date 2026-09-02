@@ -83,7 +83,7 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="chat-page">
+    <main className="chat-page" role="main" aria-label="Chat">
       <motion.div 
         className="chat-sidebar"
         initial={{ x: -50, opacity: 0 }}
@@ -211,7 +211,7 @@ const ChatPage = () => {
           </div>
         )}
       </div>
-    </div>
+    </main>
   )
 }
 

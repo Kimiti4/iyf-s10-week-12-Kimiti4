@@ -11,7 +11,7 @@
   transition: border-color 0.15s;
 }
 .alert-card:hover {
-  border-color: var(--border-strong, #d0d5dd);
+  border-color: var(--border-strong, var(--border-strong));
 }
 
 /* Severity stripe */
@@ -67,7 +67,7 @@
   align-items: center;
   gap: 4px;
 }
-.badge--unverified { background: var(--surface-soft, #f2f4f7); color: var(--text-tertiary); }
+.badge--unverified { background: var(--surface-soft, var(--surface-soft)); color: var(--text-tertiary); }
 .badge--community  { background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); }
 .badge--mod        { background: color-mix(in srgb, var(--info) 12%, transparent); color: var(--info); }
 .badge--official   { background: color-mix(in srgb, #8b5cf6 12%, transparent); color: #7c3aed; }
@@ -158,8 +158,8 @@
   transition: background 0.12s, color 0.12s, border-color 0.12s;
 }
 .alert-action-btn:hover {
-  background: var(--surface-soft, #f2f4f7);
-  border-color: var(--border-strong, #d0d5dd);
+  background: var(--surface-soft, var(--surface-soft));
+  border-color: var(--border-strong, var(--border-strong));
 }
 .alert-action-btn:focus-visible {
   outline: 2px solid var(--brand-500);
@@ -187,7 +187,7 @@
   height: 24px;
   border-radius: var(--radius-full);
   background: var(--brand-500);
-  color: #fff;
+  color: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -220,4 +220,11 @@
     flex: 1;
     justify-content: center;
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

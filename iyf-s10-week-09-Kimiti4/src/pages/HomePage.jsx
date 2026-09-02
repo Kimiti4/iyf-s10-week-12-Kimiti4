@@ -26,7 +26,7 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="home-page">
+    <main className="home-page" role="main" aria-label="Home">
       <motion.div 
         className="hero-section"
         initial={{ opacity: 0, scale: 0.95 }}
@@ -98,6 +98,6 @@ export default function HomePage() {
           🎈 Sign Up - It's Free!
         </Link>
       </motion.div>
-    </div>
+    </main>
   )
 }

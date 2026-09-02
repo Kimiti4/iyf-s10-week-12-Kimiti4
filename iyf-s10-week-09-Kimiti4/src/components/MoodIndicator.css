@@ -61,7 +61,7 @@
 
 .mood-change-btn:hover {
   background: rgba(59, 130, 246, 0.2);
-  border-color: #3b82f6;
+  border-color: var(--info);
 }
 
 .mood-picker {
@@ -96,7 +96,7 @@
 }
 
 .mood-option.selected {
-  border-color: #3b82f6;
+  border-color: var(--info);
   background: rgba(59, 130, 246, 0.2);
 }
 
@@ -157,4 +157,11 @@
   .celebration-emoji {
     font-size: 48px;
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

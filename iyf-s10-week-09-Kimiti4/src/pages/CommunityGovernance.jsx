@@ -76,7 +76,7 @@ const CommunityGovernance = () => {
   }
 
   return (
-    <div className="community-governance">
+    <main className="community-governance" role="main" aria-label="Community governance">
       <motion.div 
         className="governance-header"
         initial={{ opacity: 0, y: -20 }}
@@ -216,7 +216,7 @@ const CommunityGovernance = () => {
           </motion.div>
         </motion.div>
       )}
-    </div>
+    </main>
   )
 }
 

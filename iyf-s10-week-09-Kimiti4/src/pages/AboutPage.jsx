@@ -21,8 +21,9 @@ export default function AboutPage() {
   ]
 
   return (
-    <motion.div 
+    <motion.main 
       className="about-page"
+      role="main" aria-label="About"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
@@ -133,6 +134,6 @@ export default function AboutPage() {
           </div>
         </motion.div>
       </div>
-    </motion.div>
+    </motion.main>
   )
 }

@@ -36,12 +36,12 @@
 }
 
 .org-page-error h2 {
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
 .org-page-error p {
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 24px;
 }
 
@@ -157,7 +157,7 @@
 .org-nav-tabs a {
   display: block;
   padding: 16px 24px;
-  color: #666;
+  color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
   border-bottom: 3px solid transparent;
@@ -200,7 +200,7 @@
 .feed-header h2 {
   margin: 0;
   font-size: 24px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .btn-create-post {
@@ -230,13 +230,13 @@
 
 .empty-feed h3 {
   margin: 0 0 8px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 20px;
 }
 
 .empty-feed p {
   margin: 0 0 24px 0;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .btn-primary {
@@ -277,14 +277,14 @@
 .sidebar-card h3 {
   margin: 0 0 12px 0;
   font-size: 18px;
-  color: #333;
+  color: var(--text-primary);
   padding-bottom: 8px;
   border-bottom: 2px solid #f0f0f0;
 }
 
 .sidebar-card p {
   margin: 0 0 12px 0;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
@@ -327,7 +327,7 @@
 .stat-label {
   display: block;
   font-size: 12px;
-  color: #666;
+  color: var(--text-secondary);
   text-transform: uppercase;
 }
 
@@ -335,7 +335,7 @@
   display: block;
   padding: 10px 16px;
   background: #f0f0f0;
-  color: #333;
+  color: var(--text-primary);
   text-decoration: none;
   border-radius: 6px;
   text-align: center;
@@ -385,4 +385,11 @@
   .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

@@ -29,7 +29,7 @@ const ACTIVITY = [
 
 function GigsPage() {
     return (
-        <div className="feature-page">
+        <main className="feature-page" role="main" aria-label="Gigs">
             <div className="feature-hero">
                 <div className="feature-eyebrow">
                     <span className="feature-emoji">💼</span> Earn &amp; Contribute
@@ -77,7 +77,7 @@ function GigsPage() {
                     </motion.div>
                 ))}
             </div>
-        </div>
+        </main>
     )
 }
 

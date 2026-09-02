@@ -75,7 +75,7 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="admin-dashboard loading">
+      <div className="admin-dashboard loading" aria-live="polite">
         <div className="spinner"></div>
         <p>Loading dashboard...</p>
       </div>
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="admin-dashboard">
+    <main className="admin-dashboard" role="main" aria-label="Admin dashboard">
       {/* Header */}
       <header className="admin-header">
         <button onClick={() => navigate('/')} className="back-button">
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
           />
         )}
       </AnimatePresence>
-    </div>
+    </main>
   );
 }
 

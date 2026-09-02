@@ -51,7 +51,7 @@
 .avatar-image {
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -96,4 +96,11 @@
   50% {
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

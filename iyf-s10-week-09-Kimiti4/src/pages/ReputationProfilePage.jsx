@@ -25,7 +25,7 @@ export default function ReputationProfilePage() {
 
   if (loading) {
     return (
-      <div className="loading-state">
+      <div className="loading-state" aria-live="polite">
         <div className="loading-spinner"></div>
         <p>Loading achievements... 🏆</p>
       </div>
@@ -40,7 +40,7 @@ export default function ReputationProfilePage() {
   }
 
   return (
-    <div className="reputation-profile-page">
+    <main className="reputation-profile-page" role="main" aria-label="Reputation profile">
       <motion.div 
         className="profile-header"
         initial={{ opacity: 0, y: -20 }}
@@ -83,6 +83,6 @@ export default function ReputationProfilePage() {
       >
         Share Achievements 📤
       </motion.button>
-    </div>
+    </main>
   )
 }

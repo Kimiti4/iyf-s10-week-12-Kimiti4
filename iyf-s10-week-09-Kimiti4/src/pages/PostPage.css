@@ -10,9 +10,9 @@
   padding: 1rem;
   position: sticky;
   top: 0;
-  background: var(--surface-elevated, #fff);
+  background: var(--surface-elevated, var(--surface));
   z-index: 10;
-  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  border-bottom: 1px solid var(--border-color, var(--border));
 }
 
 .post-page-back {
@@ -46,7 +46,7 @@
 .post-page-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid var(--border-color, #e5e7eb);
+  border: 3px solid var(--border-color, var(--border));
   border-top-color: #ff6b6b;
   border-radius: 50%;
   animation: postSpin 0.8s linear infinite;
@@ -59,14 +59,14 @@
 .post-page-error {
   text-align: center;
   padding: 3rem;
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary, var(--text-tertiary));
 }
 
 .post-page-error button {
   display: block;
   margin: 1rem auto 0;
   padding: 0.5rem 1rem;
-  border: 1px solid var(--border-color, #e5e7eb);
+  border: 1px solid var(--border-color, var(--border));
   border-radius: 8px;
   background: none;
   color: #ff6b6b;

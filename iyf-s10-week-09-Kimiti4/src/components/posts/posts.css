@@ -1,8 +1,8 @@
 /* ===== Post Card ===== */
 
 .post-card {
-  background: var(--surface-elevated, #fff);
-  border: 1px solid var(--border-color, #e5e7eb);
+  background: var(--surface-elevated, var(--surface));
+  border: 1px solid var(--border-color, var(--border));
   border-radius: 16px;
   overflow: hidden;
   transition: box-shadow 0.2s ease;
@@ -19,7 +19,7 @@
 .post-card-deleted-notice {
   padding: 1.5rem;
   text-align: center;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
   font-style: italic;
   margin: 0;
 }
@@ -33,7 +33,7 @@
 
 .post-card-time {
   font-size: 0.75rem;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
 }
 
 .post-card-content {
@@ -56,7 +56,7 @@
 
 .post-card-text {
   font-size: 0.9rem;
-  color: var(--text-secondary, #374151);
+  color: var(--text-secondary, var(--text-primary));
   margin: 0 0 0.5rem;
   line-height: 1.5;
   white-space: pre-wrap;
@@ -99,7 +99,7 @@
 }
 
 .post-author-badge {
-  color: #3b82f6;
+  color: var(--info);
   font-size: 0.8rem;
 }
 
@@ -110,7 +110,7 @@
 .post-follow-btn {
   margin-left: auto;
   padding: 0.25rem 0.75rem;
-  border: 1px solid var(--border-color, #e5e7eb);
+  border: 1px solid var(--border-color, var(--border));
   border-radius: 9999px;
   background: none;
   color: var(--text-primary, #1f2937);
@@ -127,7 +127,7 @@
 
 .post-follow-btn.following {
   background: var(--surface-base, #f3f4f6);
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary, var(--text-tertiary));
 }
 
 /* ===== Post Media ===== */
@@ -141,7 +141,7 @@
 
 .post-media-skeleton {
   aspect-ratio: 16 / 9;
-  background: linear-gradient(90deg, var(--surface-base, #f3f4f6) 25%, var(--surface-hover, #e5e7eb) 50%, var(--surface-base, #f3f4f6) 75%);
+  background: linear-gradient(90deg, var(--surface-base, #f3f4f6) 25%, var(--surface-hover, var(--border)) 50%, var(--surface-base, #f3f4f6) 75%);
   background-size: 200% 100%;
   animation: postSkeletonShimmer 1.5s infinite;
 }
@@ -177,7 +177,7 @@
   padding: 0.5rem 0.625rem;
   border: none;
   background: none;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
   font-size: 0.85rem;
   cursor: pointer;
   border-radius: 8px;
@@ -186,19 +186,19 @@
 
 .post-action-btn:hover {
   background: var(--surface-hover, #f3f4f6);
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary, var(--text-tertiary));
 }
 
 .post-action-btn.active.liked {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .post-action-btn.active.reposted {
-  color: #10b981;
+  color: var(--success);
 }
 
 .post-action-btn.active.saved {
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .post-action-count {
@@ -215,14 +215,14 @@
 
 .post-engagement-stat {
   font-size: 0.8rem;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
 }
 
 /* ===== Post Composer ===== */
 
 .post-composer {
-  background: var(--surface-elevated, #fff);
-  border: 1px solid var(--border-color, #e5e7eb);
+  background: var(--surface-elevated, var(--surface));
+  border: 1px solid var(--border-color, var(--border));
   border-radius: 16px;
   padding: 1rem;
 }
@@ -248,7 +248,7 @@
   height: 32px;
   border: none;
   background: none;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
   cursor: pointer;
   border-radius: 8px;
 }
@@ -300,16 +300,16 @@
 
 .post-composer-char-count {
   font-size: 0.75rem;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
 }
 
 .post-composer-category {
   padding: 0.25rem 0.5rem;
-  border: 1px solid var(--border-color, #e5e7eb);
+  border: 1px solid var(--border-color, var(--border));
   border-radius: 6px;
   font-size: 0.8rem;
-  color: var(--text-secondary, #6b7280);
-  background: var(--surface-base, #fff);
+  color: var(--text-secondary, var(--text-tertiary));
+  background: var(--surface-base, var(--surface));
 }
 
 .post-composer-preview {
@@ -355,17 +355,17 @@
   align-items: center;
   gap: 0.375rem;
   padding: 0.375rem 0.75rem;
-  border: 1px solid var(--border-color, #e5e7eb);
+  border: 1px solid var(--border-color, var(--border));
   border-radius: 8px;
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary, var(--text-tertiary));
   font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .post-composer-image-btn:hover {
-  border-color: #10b981;
-  color: #10b981;
+  border-color: var(--success);
+  color: var(--success);
 }
 
 .post-composer-file-input {
@@ -409,7 +409,7 @@
   margin-top: 0.5rem;
   padding: 0.5rem;
   background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  color: var(--danger);
   border-radius: 6px;
   font-size: 0.8rem;
 }
@@ -425,7 +425,7 @@
 .comment-composer-input {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border-color, #e5e7eb);
+  border: 1px solid var(--border-color, var(--border));
   border-radius: 9999px;
   font-size: 0.85rem;
   color: var(--text-primary, #1f2937);
@@ -466,7 +466,7 @@
 .comment-list-loading {
   text-align: center;
   padding: 1rem;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
   font-size: 0.85rem;
 }
 
@@ -476,7 +476,7 @@
   gap: 0.5rem;
   padding: 0.375rem 0;
   font-size: 0.8rem;
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary, var(--text-tertiary));
 }
 
 .comment-reply-indicator button {
@@ -520,7 +520,7 @@
 
 .comment-time {
   font-size: 0.7rem;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
 }
 
 .comment-text {
@@ -543,18 +543,18 @@
   gap: 0.25rem;
   border: none;
   background: none;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
   font-size: 0.75rem;
   cursor: pointer;
   padding: 0;
 }
 
 .comment-action:hover {
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary, var(--text-tertiary));
 }
 
 .comment-action.liked {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .comment-action.delete {
@@ -570,7 +570,14 @@
 .comment-list-empty {
   text-align: center;
   padding: 1rem;
-  color: var(--text-tertiary, #9ca3af);
+  color: var(--text-tertiary, var(--text-muted));
   font-size: 0.85rem;
   margin: 0;
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

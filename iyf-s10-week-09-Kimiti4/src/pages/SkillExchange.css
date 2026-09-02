@@ -98,7 +98,7 @@
 .skill-list button {
   background: none;
   border: none;
-  color: #ef4444;
+  color: var(--danger);
   cursor: pointer;
 }
 
@@ -112,4 +112,11 @@
   border-radius: 8px;
   font-size: 1.1rem;
   cursor: pointer;
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

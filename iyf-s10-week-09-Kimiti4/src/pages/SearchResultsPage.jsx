@@ -49,6 +49,7 @@ export default function SearchResultsPage() {
     return (
       <motion.div 
         className="search-no-query"
+        aria-live="polite"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -63,7 +64,7 @@ export default function SearchResultsPage() {
   }
 
   return (
-    <div className="search-results-page">
+    <main className="search-results-page" role="main" aria-label="Search results">
       <motion.div 
         className="search-header"
         initial={{ opacity: 0, y: -20 }}
@@ -135,6 +136,6 @@ export default function SearchResultsPage() {
           )}
         </AnimatePresence>
       )}
-    </div>
+    </main>
   )
 }

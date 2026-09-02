@@ -68,7 +68,7 @@ const ActivityHistory = () => {
   }
 
   return (
-    <div className="activity-history-page">
+    <main className="activity-history-page" role="main" aria-label="Activity history">
       <motion.div 
         className="activity-header"
         initial={{ opacity: 0, y: -20 }}
@@ -141,7 +141,7 @@ const ActivityHistory = () => {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </main>
   )
 }
 

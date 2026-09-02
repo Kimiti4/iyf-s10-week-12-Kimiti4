@@ -25,7 +25,7 @@ export default function CreatorStudioPage() {
   }, [activeTab, analyticsPeriod, fetchAnalytics, fetchDrafts]);
 
   return (
-    <div className="creator-studio">
+    <main className="creator-studio" role="main" aria-label="Creator studio">
       <header className="creator-studio-header">
         <h1>Creator Studio</h1>
         <div className="creator-studio-actions">
@@ -87,6 +87,6 @@ export default function CreatorStudioPage() {
           <DraftsList drafts={drafts} onDelete={deleteDraft} />
         )}
       </div>
-    </div>
+    </main>
   );
 }

@@ -70,7 +70,7 @@ Fresh harvest available every morning from 6am. Delivery within Nairobi same day
   }
   
   return (
-    <div className="post-detail-page">
+    <main className="post-detail-page" role="main" aria-label="Post detail">
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -178,6 +178,6 @@ Fresh harvest available every morning from 6am. Delivery within Nairobi same day
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </main>
   )
 }

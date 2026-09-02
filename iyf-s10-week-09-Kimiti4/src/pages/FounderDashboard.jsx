@@ -38,7 +38,7 @@ export default function FounderDashboard() {
   ]
 
   return (
-    <div className="founder-dashboard">
+    <main className="founder-dashboard" role="main" aria-label="Founder dashboard">
       <motion.div 
         className="dashboard-header"
         initial={{ opacity: 0, y: -20 }}
@@ -161,7 +161,7 @@ export default function FounderDashboard() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </main>
   )
 }
 

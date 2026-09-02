@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: #000;
+    background: var(--text-primary);
     z-index: 1000;
     overflow: hidden;
 }
@@ -206,15 +206,15 @@
 }
 
 .comment-wrapper:hover {
-    color: #3b82f6;
+    color: var(--info);
 }
 
 .share-wrapper:hover {
-    color: #10b981;
+    color: var(--success);
 }
 
 .sound-wrapper:hover {
-    color: #f59e0b;
+    color: var(--warning);
 }
 
 .action-count {
@@ -266,7 +266,7 @@
 }
 
 .verified-badge {
-    color: #3b82f6;
+    color: var(--info);
     font-size: 1rem;
     font-weight: bold;
 }
@@ -331,7 +331,7 @@
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    background: linear-gradient(90deg, var(--info), #8b5cf6, #ec4899);
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
@@ -397,4 +397,11 @@
     .reels-page-header h1 {
         font-size: 1.2rem;
     }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

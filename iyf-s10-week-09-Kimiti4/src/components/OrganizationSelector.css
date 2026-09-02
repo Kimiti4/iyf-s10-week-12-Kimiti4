@@ -25,7 +25,7 @@
 
 .org-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .org-type-badge {
@@ -34,12 +34,12 @@
   border-radius: 4px;
   font-size: 11px;
   text-transform: uppercase;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .dropdown-arrow {
   font-size: 10px;
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* Dropdown Menu */
@@ -98,17 +98,17 @@
 .org-info .org-name {
   font-weight: 600;
   font-size: 14px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .org-description {
   font-size: 12px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .org-members {
   font-size: 12px;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .org-check {
@@ -130,7 +130,7 @@
 
 .org-dropdown-empty p {
   margin: 0 0 12px 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -174,4 +174,11 @@
 
 .org-dropdown::-webkit-scrollbar-thumb:hover {
   background: #aaa;
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

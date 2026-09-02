@@ -29,7 +29,7 @@ const ACTIVITY = [
 
 function FarmPage() {
     return (
-        <div className="feature-page">
+        <main className="feature-page" role="main" aria-label="Farm">
             <div className="feature-hero">
                 <div className="feature-eyebrow">
                     <span className="feature-emoji">🌱</span> Grow Together
@@ -77,7 +77,7 @@ function FarmPage() {
                     </motion.div>
                 ))}
             </div>
-        </div>
+        </main>
     )
 }
 

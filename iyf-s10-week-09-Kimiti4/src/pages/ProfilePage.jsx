@@ -71,6 +71,7 @@ export default function ProfilePage() {
         return (
             <motion.div 
                 className="loading-state"
+                aria-live="polite"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
             >
@@ -107,7 +108,7 @@ export default function ProfilePage() {
     const isOwnProfile = currentUser?._id === profileUser._id || !id
     
     return (
-        <div className="profile-page">
+        <main className="profile-page" role="main" aria-label="Profile">
             <div className="profile-container">
                 <motion.div 
                     className="profile-header"
@@ -265,6 +266,6 @@ export default function ProfilePage() {
                     )}
                 </AnimatePresence>
             </div>
-        </div>
+        </main>
     )
 }

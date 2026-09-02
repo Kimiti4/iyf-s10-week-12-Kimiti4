@@ -83,7 +83,7 @@ export default function OrganizationPage() {
   }
 
   return (
-    <div className="organization-page">
+    <main className="organization-page" role="main" aria-label="Organization">
       <motion.header 
         className="org-header"
         initial={{ opacity: 0, y: -20 }}
@@ -185,6 +185,6 @@ export default function OrganizationPage() {
           </div>
         </aside>
       </main>
-    </div>
+    </main>
   )
 }

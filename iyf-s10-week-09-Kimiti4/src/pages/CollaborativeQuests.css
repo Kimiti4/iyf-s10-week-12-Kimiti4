@@ -5,7 +5,7 @@
   margin: 0 auto;
   padding: 2rem;
   min-height: calc(100vh - 80px);
-  background: #fafafa;
+  background: var(--surface-soft);
 }
 
 .quests-loading {
@@ -177,7 +177,7 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #666;
+  color: var(--text-secondary);
   display: inline-block;
 }
 
@@ -188,11 +188,11 @@
 
 .quest-card h3 {
   font-size: 1.3rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .quest-description {
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
@@ -207,7 +207,7 @@
   display: flex;
   justify-content: space-between;
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .progress-bar {
@@ -247,7 +247,7 @@
 
 .progress-detail {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 /* Participants */
@@ -259,7 +259,7 @@
 
 .participants-count {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .team-preview {
@@ -273,7 +273,7 @@
   background: #f0f0f0;
   border-radius: 12px;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 /* Reward */
@@ -374,12 +374,12 @@
 }
 
 .your-contribution {
-  color: #333;
+  color: var(--text-primary);
 }
 
 .quest-completed-date {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 /* Preview Info */
@@ -399,12 +399,12 @@
 
 .info-label {
   font-weight: 600;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .info-value {
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .btn-notify-me {
@@ -457,4 +457,11 @@
   .btn-notify-me {
     width: 100%;
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

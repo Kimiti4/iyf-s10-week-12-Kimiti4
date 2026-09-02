@@ -28,7 +28,7 @@ function SettingsPage() {
   ]
   
   return (
-    <div className="settings-page">
+    <main className="settings-page" role="main" aria-label="Settings">
       <motion.div 
         className="settings-header"
         initial={{ opacity: 0, y: -20 }}
@@ -51,6 +51,7 @@ function SettingsPage() {
       <div className="settings-layout">
         <motion.div 
           className="settings-tabs"
+          role="tablist"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
         >
@@ -60,6 +61,8 @@ function SettingsPage() {
               className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
               whileHover={{ x: 5 }}
+              role="tab"
+              aria-selected={activeTab === tab.id}
               style={{ 
                 color: activeTab === tab.id ? tab.color : 'inherit'
               }}
@@ -223,7 +226,7 @@ function SettingsPage() {
           </AnimatePresence>
         </div>
       </div>
-    </div>
+    </main>
   )
 }
 

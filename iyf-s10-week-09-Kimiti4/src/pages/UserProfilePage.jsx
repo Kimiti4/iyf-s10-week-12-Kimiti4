@@ -79,7 +79,7 @@ const UserProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="profile-loading">
+      <div className="profile-loading" aria-live="polite">
         <div className="loading-spinner"></div>
         <p>Loading profile...</p>
       </div>
@@ -87,7 +87,7 @@ const UserProfilePage = () => {
   }
 
   return (
-    <div className="user-profile-page">
+    <main className="user-profile-page" role="main" aria-label="User profile">
       {/* Profile Header */}
       <div className="profile-header">
         <div className="profile-cover">
@@ -365,7 +365,7 @@ const UserProfilePage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </main>
   );
 };
 

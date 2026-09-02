@@ -6,8 +6,8 @@
 /* ─── CSS Variables ─── */
 :root {
   /* Palette */
-  --ig-bg: #fafafa;
-  --ig-surface: #ffffff;
+  --ig-bg: var(--surface-soft);
+  --ig-surface: var(--surface);
   --ig-border: #dbdbdb;
   --ig-text: #262626;
   --ig-text-secondary: #8e8e8e;
@@ -150,7 +150,7 @@ button {
   height: 18px;
   padding: 0 5px;
   background: var(--ig-heart);
-  color: #fff;
+  color: var(--surface);
   font-size: 10px;
   font-weight: 700;
   border-radius: var(--radius-full);
@@ -218,7 +218,7 @@ button {
   width: 20px;
   height: 20px;
   background: var(--ig-blue);
-  color: #fff;
+  color: var(--surface);
   font-size: 14px;
   font-weight: 700;
   border-radius: var(--radius-full);
@@ -500,7 +500,7 @@ button {
 
 .ig-btn--primary {
   background: var(--ig-blue);
-  color: #fff;
+  color: var(--surface);
 }
 
 .ig-btn--primary:hover {
@@ -522,7 +522,7 @@ button {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: #000;
+  background: var(--text-primary);
   display: flex;
   flex-direction: column;
 }
@@ -549,7 +549,7 @@ button {
   content: "";
   display: block;
   height: 100%;
-  background: #fff;
+  background: var(--surface);
   animation: ig-story-progress 5s linear forwards;
 }
 
@@ -563,7 +563,7 @@ button {
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  color: #fff;
+  color: var(--surface);
 }
 
 .ig-story-viewer__img {
@@ -605,7 +605,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: var(--space-lg);
-  color: #fff;
+  color: var(--surface);
   font-size: 13px;
   font-weight: 600;
   opacity: 0;

@@ -70,7 +70,7 @@
 }
 
 .required {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .optional {
@@ -202,7 +202,7 @@
 
 .form-input.error,
 .form-textarea.error {
-  border-color: #ef4444;
+  border-color: var(--danger);
 }
 
 .form-textarea {
@@ -218,7 +218,7 @@
 }
 
 .error-message {
-  color: #ef4444;
+  color: var(--danger);
   font-size: var(--text-xs);
   margin-top: var(--space-1);
 }
@@ -378,4 +378,11 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

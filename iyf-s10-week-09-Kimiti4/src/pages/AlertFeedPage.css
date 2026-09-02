@@ -34,7 +34,7 @@
   padding: 8px 16px;
   border-radius: var(--radius-md);
   background: var(--brand-500);
-  color: #fff;
+  color: var(--surface);
   font-size: 14px;
   font-weight: 600;
   border: none;
@@ -74,7 +74,7 @@
   transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 .severity-chip:hover {
-  background: var(--surface-soft, #f2f4f7);
+  background: var(--surface-soft, var(--surface-soft));
 }
 .severity-chip:focus-visible {
   outline: 2px solid var(--brand-500);
@@ -88,7 +88,7 @@
 
 .severity-chip__icon { font-size: 12px; }
 .severity-chip__count {
-  background: var(--surface-soft, #f2f4f7);
+  background: var(--surface-soft, var(--surface-soft));
   padding: 1px 6px;
   border-radius: 999px;
   font-size: 11px;

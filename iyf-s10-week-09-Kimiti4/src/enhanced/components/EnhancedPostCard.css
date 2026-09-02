@@ -215,13 +215,13 @@
 
 /* Downvote Button */
 .downvote-btn.active {
-    border-color: #ef4444;
-    color: #ef4444;
+    border-color: var(--danger);
+    color: var(--danger);
     background: rgba(239, 68, 68, 0.08);
 }
 
 .downvote-btn:hover {
-    color: #ef4444;
+    color: var(--danger);
     background: rgba(239, 68, 68, 0.05);
 }
 
@@ -253,13 +253,13 @@
 
 /* Bookmark Button */
 .bookmark-btn.active {
-    border-color: #f59e0b;
-    color: #f59e0b;
+    border-color: var(--warning);
+    color: var(--warning);
     background: rgba(245, 158, 11, 0.08);
 }
 
 .bookmark-btn:hover {
-    color: #f59e0b;
+    color: var(--warning);
     background: rgba(245, 158, 11, 0.05);
 }
 

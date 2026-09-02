@@ -239,8 +239,8 @@
 @media print {
   .verification-badge {
     background: none !important;
-    border: 2px solid #000 !important;
-    color: #000 !important;
+    border: 2px solid var(--text-primary) !important;
+    color: var(--text-primary) !important;
     box-shadow: none !important;
   }
   
@@ -249,4 +249,11 @@
   .verification-badge::after {
     display: none;
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

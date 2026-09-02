@@ -90,13 +90,13 @@
   align-items: center;
   justify-content: center;
   padding: 4rem 2rem;
-  color: #6b7280;
+  color: var(--text-tertiary);
 }
 
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 4px solid #e5e7eb;
+  border: 4px solid var(--border);
   border-top: 4px solid #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -125,7 +125,7 @@
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
   white-space: nowrap;
 }
 
@@ -138,14 +138,14 @@
 
 .filter-btn {
   padding: 0.5rem 1rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   background: white;
   border-radius: 20px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  color: #6b7280;
+  color: var(--text-tertiary);
   white-space: nowrap;
 }
 
@@ -196,7 +196,7 @@
 }
 
 .no-events p {
-  color: #6b7280;
+  color: var(--text-tertiary);
 }
 
 /* Event Card */
@@ -211,7 +211,7 @@
 }
 
 .event-card.confirmed-event {
-  border: 2px solid #10b981;
+  border: 2px solid var(--success);
   box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);
 }
 
@@ -303,7 +303,7 @@
 }
 
 .event-description {
-  color: #6b7280;
+  color: var(--text-tertiary);
   font-size: 0.875rem;
   margin: 0;
   line-height: 1.6;
@@ -328,7 +328,7 @@
   align-items: center;
   gap: 0.75rem;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .meta-icon {
@@ -347,14 +347,14 @@
 .team-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .team-member {
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -370,7 +370,7 @@
 
 .team-member-badge {
   background: #f3f4f6;
-  color: #374151;
+  color: var(--text-primary);
   padding: 0.35rem 0.75rem;
   border-radius: 16px;
   font-size: 0.8rem;
@@ -398,7 +398,7 @@
 }
 
 .attendees-icon {
-  color: #3b82f6;
+  color: var(--info);
   font-size: 1.1rem;
 }
 
@@ -419,7 +419,7 @@
 }
 
 .ticket-icon {
-  color: #10b981;
+  color: var(--success);
   font-size: 1.1rem;
 }
 
@@ -435,7 +435,7 @@
   gap: 0.75rem;
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .rsvp-button {
@@ -457,13 +457,13 @@
 }
 
 .rsvp-button.rsvped {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
 }
 
 .icon-btn {
   width: 40px;
   height: 40px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   background: white;
   border-radius: 10px;
   display: flex;
@@ -471,7 +471,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s;
-  color: #6b7280;
+  color: var(--text-tertiary);
 }
 
 .icon-btn:hover {
@@ -481,7 +481,7 @@
 }
 
 .bookmarked {
-  color: #f59e0b !important;
+  color: var(--warning) !important;
 }
 
 /* Modal */
@@ -531,7 +531,7 @@
 
 .form-group label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
   font-size: 0.9rem;
 }
 
@@ -539,7 +539,7 @@
 .form-group textarea,
 .form-group select {
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   border-radius: 10px;
   font-size: 1rem;
   transition: all 0.3s;
@@ -579,11 +579,11 @@
 
 .btn-cancel {
   background: #f3f4f6;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .btn-cancel:hover {
-  background: #e5e7eb;
+  background: var(--border);
 }
 
 .btn-submit {
@@ -611,7 +611,7 @@
   }
   
   .event-description {
-    color: #9ca3af;
+    color: var(--text-muted);
   }
   
   .filter-bar {
@@ -624,8 +624,8 @@
   
   .filter-btn {
     background: #1f2937;
-    border-color: #374151;
-    color: #9ca3af;
+    border-color: var(--text-primary);
+    color: var(--text-muted);
   }
   
   .modal-content {
@@ -644,7 +644,7 @@
   .form-group textarea,
   .form-group select {
     background: #111827;
-    border-color: #374151;
+    border-color: var(--text-primary);
     color: #f9fafb;
   }
 }

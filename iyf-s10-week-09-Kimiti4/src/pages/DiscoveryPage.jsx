@@ -48,7 +48,7 @@ export default function DiscoveryPage() {
   const isSearching = searchQuery.length > 0;
 
   return (
-    <div className="discovery-page">
+    <main className="discovery-page" role="main" aria-label="Discovery">
       <header className="discovery-header">
         <h1>Discover</h1>
         <DiscoverySearchBar onSearch={handleSearch} />
@@ -81,7 +81,7 @@ export default function DiscoveryPage() {
           </>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -93,11 +93,11 @@ function SearchResults({ results, status, query }) {
     results.users.length > 0;
 
   return (
-    <div className="search-results">
-      {status === 'loading' && <div className="search-loading">Searching...</div>}
+    <div className="search-results" role="search" aria-label={`Search results for ${query}`}>
+      {status === 'loading' && <div className="search-loading" aria-live="polite">Searching...</div>}
 
       {!hasResults && status === 'loaded' && (
-        <div className="search-empty">
+        <div className="search-empty" aria-live="polite">
           <p>No results for "{query}"</p>
         </div>
       )}

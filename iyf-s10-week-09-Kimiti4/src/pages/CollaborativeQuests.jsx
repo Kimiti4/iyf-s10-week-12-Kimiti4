@@ -105,7 +105,7 @@ const CollaborativeQuests = () => {
   }
 
   return (
-    <div className="collaborative-quests">
+    <main className="collaborative-quests" role="main" aria-label="Collaborative quests">
       <motion.div 
         className="quests-header"
         initial={{ opacity: 0, y: -20 }}
@@ -202,7 +202,7 @@ const CollaborativeQuests = () => {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </main>
   )
 }
 

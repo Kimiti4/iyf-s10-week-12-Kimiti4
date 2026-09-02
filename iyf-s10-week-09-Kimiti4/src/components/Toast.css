@@ -40,27 +40,27 @@
 }
 
 .toast-error {
-    border-left-color: #ef4444;
+    border-left-color: var(--danger);
 }
 
 .toast-error .toast-icon {
-    color: #ef4444;
+    color: var(--danger);
 }
 
 .toast-warning {
-    border-left-color: #f59e0b;
+    border-left-color: var(--warning);
 }
 
 .toast-warning .toast-icon {
-    color: #f59e0b;
+    color: var(--warning);
 }
 
 .toast-info {
-    border-left-color: #3b82f6;
+    border-left-color: var(--info);
 }
 
 .toast-info .toast-icon {
-    color: #3b82f6;
+    color: var(--info);
 }
 
 .toast-icon {
@@ -120,15 +120,15 @@
 }
 
 .toast-error .toast-progress {
-    background: #ef4444;
+    background: var(--danger);
 }
 
 .toast-warning .toast-progress {
-    background: #f59e0b;
+    background: var(--warning);
 }
 
 .toast-info .toast-progress {
-    background: #3b82f6;
+    background: var(--info);
 }
 
 @keyframes progress {
@@ -169,4 +169,11 @@
     .toast-progress {
         animation: none;
     }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

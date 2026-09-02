@@ -11,6 +11,7 @@ export default function SkillExchange() {
   const [matches, setMatches] = useState([]);
   const [profile, setProfile] = useState({ offering: [], seeking: [] });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [newOffer, setNewOffer] = useState('');
   const [newSeek, setNewSeek] = useState('');
@@ -25,7 +26,7 @@ export default function SkillExchange() {
       if (profRes.data) setProfile(profRes.data);
       if (matchRes.data) setMatches(matchRes.data);
     } catch {
-      // Fetch data failed silently
+      setError('Failed to load skill exchange data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -41,7 +42,7 @@ export default function SkillExchange() {
       toast.success('Profile updated! We will recalculate your matches.');
       fetchData();
     } catch {
-      // Save profile failed silently
+      toast.error('Failed to save profile. Please try again.');
     }
   };
 
@@ -60,7 +61,7 @@ export default function SkillExchange() {
   };
 
   return (
-    <div className="skill-exchange-page">
+    <main className="skill-exchange-page" role="main" aria-label="Skill exchange">
       <div className="header-section">
         <h1>🤝 #DevSwapKE</h1>
         <p>Exchange skills. Build reputation. Grow together.</p>
@@ -77,7 +78,12 @@ export default function SkillExchange() {
 
       <div className="content-section">
         {loading ? (
-          <div>Loading...</div>
+          <div aria-live="polite">Loading...</div>
+        ) : error ? (
+          <div className="error-state" role="alert">
+            <p>{error}</p>
+            <button onClick={fetchData}>Try Again</button>
+          </div>
         ) : activeTab === 'matches' ? (
           <div className="matches-grid">
             {matches.length === 0 ? (
@@ -138,6 +144,6 @@ export default function SkillExchange() {
           </motion.div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

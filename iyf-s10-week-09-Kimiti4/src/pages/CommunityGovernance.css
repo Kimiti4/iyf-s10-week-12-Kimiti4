@@ -5,7 +5,7 @@
   margin: 0 auto;
   padding: 2rem;
   min-height: calc(100vh - 80px);
-  background: #fafafa;
+  background: var(--surface-soft);
 }
 
 /* Loading State */
@@ -137,7 +137,7 @@
 
 .proposals-header h2 {
   font-size: 1.8rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .btn-new-proposal {
@@ -194,7 +194,7 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .proposal-status {
@@ -205,12 +205,12 @@
 .proposal-header h3 {
   font-size: 1.4rem;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .proposal-author {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .proposal-description {
@@ -312,7 +312,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
   padding-top: 1rem;
   border-top: 1px solid #e0e0e0;
 }
@@ -327,12 +327,12 @@
 
 .result-text {
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .result-date {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 /* Decisions Container */
@@ -344,7 +344,7 @@
 
 .decisions-container h2 {
   font-size: 1.8rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .decisions-list {
@@ -377,12 +377,12 @@
 
 .decision-info h3 {
   font-size: 1.2rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .decision-date {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .decision-outcome {
@@ -401,7 +401,7 @@
 .guide-container h2 {
   font-size: 1.8rem;
   margin-bottom: 2rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .guide-sections {
@@ -437,11 +437,11 @@
 .section-content h3 {
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .section-content p {
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
@@ -450,7 +450,7 @@
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
   border-left: 4px solid #667eea;
   border-radius: 8px;
-  color: #333;
+  color: var(--text-primary);
   line-height: 1.6;
 }
 
@@ -483,7 +483,7 @@
 .modal-content h2 {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .proposal-form {
@@ -500,7 +500,7 @@
 
 .form-group label {
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .form-group input,
@@ -606,4 +606,11 @@
   .modal-content {
     padding: 1.5rem;
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

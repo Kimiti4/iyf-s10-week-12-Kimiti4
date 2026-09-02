@@ -112,7 +112,7 @@ export default function CreatePostPage() {
   }
 
   return (
-    <div className="create-post-page">
+    <main className="create-post-page" role="main" aria-label="Create post">
       <motion.div 
         className="container"
         initial={{ opacity: 0, y: 20 }}
@@ -218,6 +218,6 @@ export default function CreatePostPage() {
           </div>
         </form>
       </motion.div>
-    </div>
+    </main>
   )
 }

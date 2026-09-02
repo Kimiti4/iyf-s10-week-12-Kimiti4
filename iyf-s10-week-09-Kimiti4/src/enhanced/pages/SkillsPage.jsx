@@ -29,7 +29,7 @@ const ACTIVITY = [
 
 function SkillsPage() {
     return (
-        <div className="feature-page">
+        <main className="feature-page" role="main" aria-label="Skills">
             <div className="feature-hero">
                 <div className="feature-eyebrow">
                     <span className="feature-emoji">🤝</span> Learn &amp; Share
@@ -77,7 +77,7 @@ function SkillsPage() {
                     </motion.div>
                 ))}
             </div>
-        </div>
+        </main>
     )
 }
 

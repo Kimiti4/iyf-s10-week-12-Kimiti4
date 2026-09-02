@@ -139,13 +139,13 @@
 .resources {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .resources h4 {
   font-size: 0.875rem;
   margin: 0 0 0.5rem 0;
-  color: #6b7280;
+  color: var(--text-tertiary);
 }
 
 .resources ul {
@@ -163,17 +163,17 @@
   padding: 1rem;
   border-radius: 8px;
   background: #fef3c7;
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--warning);
 }
 
 .fact-check-result.true {
   background: #d1fae5;
-  border-left-color: #10b981;
+  border-left-color: var(--success);
 }
 
 .fact-check-result.false {
   background: #fee2e2;
-  border-left-color: #ef4444;
+  border-left-color: var(--danger);
 }
 
 .fact-check-result p {
@@ -187,13 +187,13 @@
   gap: 0.5rem;
   padding: 1rem;
   background: white;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .chat-input-area textarea {
   flex: 1;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   resize: none;
   font-family: inherit;
@@ -299,4 +299,11 @@
   .logo-icon {
     font-size: 2rem;
   }
+}
+
+/* J-022: Dark mode overrides */
+[data-theme='dark'] & {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
 }

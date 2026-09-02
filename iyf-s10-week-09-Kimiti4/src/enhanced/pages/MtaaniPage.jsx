@@ -29,7 +29,7 @@ const ACTIVITY = [
 
 function MtaaniPage() {
     return (
-        <div className="feature-page">
+        <main className="feature-page" role="main" aria-label="Mtaani">
             <div className="feature-hero">
                 <div className="feature-eyebrow">
                     <span className="feature-emoji">🏘️</span> Your Neighborhood
@@ -77,7 +77,7 @@ function MtaaniPage() {
                     </motion.div>
                 ))}
             </div>
-        </div>
+        </main>
     )
 }
 

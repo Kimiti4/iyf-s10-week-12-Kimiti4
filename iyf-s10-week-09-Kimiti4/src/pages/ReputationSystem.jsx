@@ -18,6 +18,7 @@ const ReputationSystem = () => {
   const toast = useToast()
   const [activeTab, setActiveTab] = useState('overview')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [reputationData, setReputationData] = useState({
     score: 0,
     level: 1,
@@ -35,7 +36,7 @@ const ReputationSystem = () => {
           if (res.data) setReputationData(res.data);
         }
       } catch {
-        // Fetch reputation data failed silently
+        setError('Failed to load reputation data. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -105,15 +106,24 @@ const ReputationSystem = () => {
 
   if (loading) {
     return (
-      <div className="reputation-loading">
+      <div className="reputation-loading" aria-live="polite">
         <div className="loading-spinner"></div>
         <p>Calculating your awesomeness... ✨</p>
       </div>
     )
   }
 
+  if (error) {
+    return (
+      <div className="error-state" role="alert">
+        <p>{error}</p>
+        <button onClick={() => { setError(null); setLoading(true); window.location.reload(); }}>Try Again</button>
+      </div>
+    )
+  }
+
   return (
-    <div className="reputation-system">
+    <main className="reputation-system" role="main" aria-label="Reputation system">
       <motion.div 
         className="reputation-header"
         initial={{ opacity: 0, y: -20 }}
@@ -325,7 +335,7 @@ const ReputationSystem = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </main>
   )
 }
 

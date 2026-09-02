@@ -35,7 +35,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="auth-page">
+    <main className="auth-page" role="main" aria-label="Login">
       <motion.div 
         className="auth-container"
         initial={{ opacity: 0, y: 30 }}
@@ -99,6 +99,6 @@ export default function LoginPage() {
           <p>🎯 Demo: demo@jamiilink.co.ke / demo123</p>
         </div>
       </motion.div>
-    </div>
+    </main>
   )
 }
