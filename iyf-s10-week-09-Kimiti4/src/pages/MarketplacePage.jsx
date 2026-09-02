@@ -5,7 +5,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
-import { colors } from '../styles/designSystem'
 import ProductCard from '../components/ProductCard'
 import StoreCard from '../components/StoreCard'
 import { useToast } from '../components/Toast'

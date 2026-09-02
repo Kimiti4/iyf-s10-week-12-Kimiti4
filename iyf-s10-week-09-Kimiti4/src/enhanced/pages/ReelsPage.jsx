@@ -288,9 +288,9 @@ export default function ReelsPage() {
                                 
                                 <div className="reel-music-info">
                                     <FaMusic className="music-icon-spinning" />
-                                    <marquee scrollamount="3" className="music-marquee">
+                                    <span className="music-marquee">
                                         {reel.music}
-                                    </marquee>
+                                    </span>
                                 </div>
                             </div>
 

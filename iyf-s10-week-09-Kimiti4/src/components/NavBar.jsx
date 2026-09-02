@@ -14,8 +14,6 @@ const NavBar = memo(function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { unreadCount } = useNotifications()
 
-  const isActive = (path) => location.pathname === path
-
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }

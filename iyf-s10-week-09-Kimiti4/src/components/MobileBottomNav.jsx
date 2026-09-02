@@ -16,7 +16,9 @@ const MobileBottomNav = memo(function MobileBottomNav() {
   return (
     <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
       {navItems.map((item) => {
-        const isActive = location.pathname === item.path;
+        const isActive = item.path === '/profile'
+          ? location.pathname === '/profile' || location.pathname.startsWith('/profile/')
+          : location.pathname === item.path;
         return (
           <Link
             key={item.path}

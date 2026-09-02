@@ -10,7 +10,9 @@ const Sidebar = memo(function Sidebar({ isOpen = false, onClose = () => {} }) {
   const location = useLocation()
   const { isCollapsed, setIsCollapsed } = useSidebar()
 
-  const isActive = (path) => location.pathname === path
+  const isActive = (path, prefix = false) => prefix
+    ? location.pathname === path || location.pathname.startsWith(path + '/')
+    : location.pathname === path
 
   if (!isAuthenticated) return null
 
@@ -98,7 +100,7 @@ const Sidebar = memo(function Sidebar({ isOpen = false, onClose = () => {} }) {
         {/* ── Your Space ── */}
         <div className="nav-group">
           {!isCollapsed && <h3 className="nav-section-title">Your Space</h3>}
-          <Link to={`/profile/${user._id || user.id}`} className={`nav-item ${isActive('/profile') ? 'active' : ''}`} aria-current={isActive('/profile') ? 'page' : undefined}>
+          <Link to={`/profile/${user._id || user.id}`} className={`nav-item ${isActive('/profile', true) ? 'active' : ''}`} aria-current={isActive('/profile', true) ? 'page' : undefined}>
             <span className="nav-icon" aria-hidden="true">👤</span>
             {!isCollapsed && <span className="nav-label">Profile</span>}
           </Link>
