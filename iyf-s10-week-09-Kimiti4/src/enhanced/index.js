@@ -9,4 +9,3 @@ export { default as EnhancedFeedPage } from './pages/EnhancedFeedPage';
 
 // Components
 export { default as ConstellationBackground } from './components/ConstellationBackground';
-export { default as EnhancedPostCard } from './components/EnhancedPostCard';
