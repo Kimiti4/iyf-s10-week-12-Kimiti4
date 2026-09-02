@@ -11,6 +11,8 @@
     "test:console": "node scripts/verify-no-console-errors.mjs",
     "lint": "eslint src e2e --ext .js,.jsx",
     "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test e2e/smoke/",
+    "test:e2e:headed": "playwright test --headed",
     "test:a11y": "playwright test e2e/a11y.spec.js"
   },
   "dependencies": {

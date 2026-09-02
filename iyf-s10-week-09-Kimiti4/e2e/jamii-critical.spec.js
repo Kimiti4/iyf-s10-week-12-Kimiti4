@@ -16,9 +16,33 @@ test.describe('JamiiLink Critical Path', () => {
     });
   });
 
-  test('aggregate feed is interactable from an empty draft store', async ({ page }) => {
+  test('aggregate feed is interactable from an empty draft store', async ({ page, context }) => {
+    await context.addInitScript(() => {
+      localStorage.setItem('token', 'test-token-for-feed');
+      localStorage.setItem('user', JSON.stringify({
+        id: 'test-feed-user',
+        email: 'feed@jamii.link',
+        username: 'feeduser',
+        role: 'user',
+      }));
+    });
+    await context.route('**/api/auth/me', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          user: {
+            id: 'test-feed-user',
+            email: 'feed@jamii.link',
+            username: 'feeduser',
+            role: 'user',
+          },
+        }),
+      })
+    );
     await page.goto('/');
-    await expect(page.locator('nav.enhanced-navbar')).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
   });
 
   test('auth pages render without crashing', async ({ page }) => {
