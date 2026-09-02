@@ -13,7 +13,11 @@
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test e2e/smoke/",
     "test:e2e:headed": "playwright test --headed",
-    "test:a11y": "playwright test e2e/a11y.spec.js"
+    "test:a11y": "playwright test e2e/a11y.spec.js",
+    "perf:check": "node scripts/perf-check.js",
+    "perf:bundle": "node scripts/perf-bundle-check.js",
+    "perf:report": "node scripts/perf-report.js",
+    "perf:all": "npm run perf:bundle && npm run perf:check"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

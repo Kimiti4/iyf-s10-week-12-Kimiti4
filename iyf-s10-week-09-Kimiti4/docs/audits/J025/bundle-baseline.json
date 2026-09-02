@@ -1,0 +1,366 @@
+{
+  "timestamp": "2026-09-02T22:45:36.277Z",
+  "js": {
+    "files": [
+      {
+        "name": "html2pdf-Bcn14AKV.js",
+        "size": 975754
+      },
+      {
+        "name": "react-vendor-CBwE2Yxx.js",
+        "size": 162086
+      },
+      {
+        "name": "framer-motion-Hl0KeBoP.js",
+        "size": 126493
+      },
+      {
+        "name": "index-B9pLqTV4.js",
+        "size": 112092
+      },
+      {
+        "name": "socket-io-BkL6vOXg.js",
+        "size": 41523
+      },
+      {
+        "name": "EnhancedRegisterPage-BgrKFfFo.js",
+        "size": 17942
+      },
+      {
+        "name": "JamDetailPage-CVJ6X-4-.js",
+        "size": 15766
+      },
+      {
+        "name": "AlertFeedPage-BFQ3UJ3K.js",
+        "size": 15476
+      },
+      {
+        "name": "PostCard-CHqbi2FM.js",
+        "size": 13807
+      },
+      {
+        "name": "CommunityEvents-CIn41lp7.js",
+        "size": 13573
+      },
+      {
+        "name": "UnifiedFeed-Dw93FySs.js",
+        "size": 13012
+      },
+      {
+        "name": "UserProfilePage-URAwIr7B.js",
+        "size": 12496
+      },
+      {
+        "name": "AdminDashboard-DdubLGPu.js",
+        "size": 12464
+      },
+      {
+        "name": "JamCreationPage-D7vK_EuN.js",
+        "size": 11053
+      },
+      {
+        "name": "EnhancedEmergencyAlerts-BzaVRzXO.js",
+        "size": 10019
+      },
+      {
+        "name": "ReputationSystem-BD_8QkSS.js",
+        "size": 9820
+      },
+      {
+        "name": "MarketplacePage-CkBN1eFT.js",
+        "size": 9070
+      },
+      {
+        "name": "DiscoveryPage-CykKcvvp.js",
+        "size": 8797
+      },
+      {
+        "name": "CreatorStudioPage-DECfvPkc.js",
+        "size": 8689
+      },
+      {
+        "name": "ReelDetailPage-Cb9bfnpB.js",
+        "size": 7424
+      },
+      {
+        "name": "ReelsPage-BPKXysk3.js",
+        "size": 5912
+      },
+      {
+        "name": "ActionBar-Pmy-xYMF.js",
+        "size": 5688
+      },
+      {
+        "name": "SettingsPage-CJuDfpsD.js",
+        "size": 5397
+      },
+      {
+        "name": "PostPage-BAIrNRJb.js",
+        "size": 5304
+      },
+      {
+        "name": "FounderDashboard-pegMwrSZ.js",
+        "size": 4824
+      },
+      {
+        "name": "EnhancedLoginPage-DdvEwAf0.js",
+        "size": 4769
+      },
+      {
+        "name": "ChatPage-De1Hr472.js",
+        "size": 4507
+      },
+      {
+        "name": "CommunityGovernance-D4VUBfTq.js",
+        "size": 4459
+      },
+      {
+        "name": "CollaborativeQuests-DB4Oz7SW.js",
+        "size": 4449
+      },
+      {
+        "name": "OrganizationPage-1baRyPg5.js",
+        "size": 4008
+      },
+      {
+        "name": "TiannaraAssistant-BCQGwREt.js",
+        "size": 3961
+      },
+      {
+        "name": "postApi-C-bVbR4R.js",
+        "size": 3781
+      },
+      {
+        "name": "NotificationsPage-DU6RjMlQ.js",
+        "size": 3698
+      },
+      {
+        "name": "ActivityHistory-Jn0eUF4K.js",
+        "size": 3337
+      },
+      {
+        "name": "DraftsPage-sPu2urH0.js",
+        "size": 3234
+      },
+      {
+        "name": "JamCard-B8yM_iTx.js",
+        "size": 3097
+      },
+      {
+        "name": "JamFeedPage-DoHUbp5X.js",
+        "size": 2700
+      },
+      {
+        "name": "usePostActions-BBrnJ8B-.js",
+        "size": 2587
+      },
+      {
+        "name": "MtaaniPage-AaNiFq0q.js",
+        "size": 2515
+      },
+      {
+        "name": "icons-7lM7OAqj.js",
+        "size": 2455
+      },
+      {
+        "name": "SkillsPage-yEZIetwP.js",
+        "size": 2387
+      },
+      {
+        "name": "GigsPage-MMhwiWSG.js",
+        "size": 2369
+      },
+      {
+        "name": "FarmPage-Cc6nmyCm.js",
+        "size": 2360
+      },
+      {
+        "name": "reelApi-DFcWopIS.js",
+        "size": 1959
+      },
+      {
+        "name": "jamApi-BHLbmZGo.js",
+        "size": 1751
+      },
+      {
+        "name": "FollowingPage-BUHF0Hl_.js",
+        "size": 1719
+      },
+      {
+        "name": "AvatarIcon-sPV7_WIr.js",
+        "size": 1406
+      },
+      {
+        "name": "AnalyticsCard-BzKw2gx3.js",
+        "size": 1327
+      },
+      {
+        "name": "analyticsApi-ClBhb5pM.js",
+        "size": 1252
+      },
+      {
+        "name": "jam-Cm5cCEEo.js",
+        "size": 739
+      },
+      {
+        "name": "JamStatusBadge-yDU6UzjU.js",
+        "size": 682
+      },
+      {
+        "name": "EmptyState-Cl-Rv1Qu.js",
+        "size": 508
+      },
+      {
+        "name": "StatusBadge-IKbJaRVc.js",
+        "size": 455
+      },
+      {
+        "name": "formatTime-CeTPSoJe.js",
+        "size": 376
+      },
+      {
+        "name": "designSystem-V-7Xj2tA.js",
+        "size": 145
+      }
+    ],
+    "total": 1697473,
+    "count": 55,
+    "largest": 975754
+  },
+  "css": {
+    "files": [
+      {
+        "name": "index-yy0G-AHP.css",
+        "size": 49853
+      },
+      {
+        "name": "jam-DS8Cn_RK.css",
+        "size": 16119
+      },
+      {
+        "name": "AlertFeedPage-Pyk9tqa-.css",
+        "size": 13235
+      },
+      {
+        "name": "MarketplacePage-CpshmVBj.css",
+        "size": 10029
+      },
+      {
+        "name": "ReputationSystem-BYqzqJVj.css",
+        "size": 9674
+      },
+      {
+        "name": "FounderDashboard-Du5EdFHS.css",
+        "size": 9637
+      },
+      {
+        "name": "AdminDashboard-3Bz16Th4.css",
+        "size": 8762
+      },
+      {
+        "name": "CommunityEvents-D5pYrx65.css",
+        "size": 8663
+      },
+      {
+        "name": "posts-Eil_TNX1.css",
+        "size": 8657
+      },
+      {
+        "name": "CommunityGovernance-DZoWXUpX.css",
+        "size": 7825
+      },
+      {
+        "name": "UserProfilePage-UPu3ce7i.css",
+        "size": 7638
+      },
+      {
+        "name": "ReelDetailPage-BQzf4-J-.css",
+        "size": 7623
+      },
+      {
+        "name": "SettingsPage-Dy0RxnqE.css",
+        "size": 6985
+      },
+      {
+        "name": "ChatPage-DTm7PCzV.css",
+        "size": 6012
+      },
+      {
+        "name": "CreatorStudioPage-BdBVyubE.css",
+        "size": 5916
+      },
+      {
+        "name": "CollaborativeQuests-BrpArREa.css",
+        "size": 5793
+      },
+      {
+        "name": "EnhancedRegisterPage-Bl8mqE-i.css",
+        "size": 5245
+      },
+      {
+        "name": "DiscoveryPage-wrAcaGT3.css",
+        "size": 5117
+      },
+      {
+        "name": "ActivityHistory-Ckwm3g4W.css",
+        "size": 5058
+      },
+      {
+        "name": "ReelsPage-BOtsx6Ko.css",
+        "size": 4915
+      },
+      {
+        "name": "OrganizationPage-utAKo3Sl.css",
+        "size": 4650
+      },
+      {
+        "name": "JamDetailPage-CZjtr9ca.css",
+        "size": 4532
+      },
+      {
+        "name": "NotificationsPage-BkecDtl4.css",
+        "size": 4465
+      },
+      {
+        "name": "EnhancedLoginPage-0Q9utWNi.css",
+        "size": 4180
+      },
+      {
+        "name": "TiannaraAssistant-BrAvOHTJ.css",
+        "size": 3852
+      },
+      {
+        "name": "DraftsPage-kkzSgbAV.css",
+        "size": 2916
+      },
+      {
+        "name": "EnhancedEmergencyAlerts-BHCZg7gS.css",
+        "size": 2870
+      },
+      {
+        "name": "EmptyState-C0SR3rfI.css",
+        "size": 1982
+      },
+      {
+        "name": "FollowingPage-DNikcd6L.css",
+        "size": 1555
+      },
+      {
+        "name": "PostPage-Bxi8JBL5.css",
+        "size": 1301
+      },
+      {
+        "name": "ActionBar-C_5Zl33-.css",
+        "size": 778
+      },
+      {
+        "name": "StatusBadge-DqHZiIZt.css",
+        "size": 445
+      }
+    ],
+    "total": 236282,
+    "count": 32,
+    "largest": 49853
+  },
+  "total": 1933755
+}

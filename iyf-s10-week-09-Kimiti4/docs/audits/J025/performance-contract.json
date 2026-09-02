@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "mission": "J-025",
+  "baseline": "3cfe995",
+  "created": "2026-09-02",
+  "coreWebVitals": {
+    "LCP": { "good": 2500, "poor": 4000, "unit": "ms", "description": "Largest Contentful Paint" },
+    "FID": { "good": 100, "poor": 300, "unit": "ms", "description": "First Input Delay" },
+    "CLS": { "good": 0.1, "poor": 0.25, "unit": "", "description": "Cumulative Layout Shift" },
+    "INP": { "good": 200, "poor": 500, "unit": "ms", "description": "Interaction to Next Paint" },
+    "TTFB": { "good": 800, "poor": 1800, "unit": "ms", "description": "Time to First Byte" },
+    "FCP": { "good": 1800, "poor": 3000, "unit": "ms", "description": "First Contentful Paint" }
+  },
+  "bundleBudgets": {
+    "totalJs": { "limit": 2048000, "unit": "bytes", "description": "Total JavaScript transfer size (includes lazy chunks)" },
+    "totalCss": { "limit": 307200, "unit": "bytes", "description": "Total CSS transfer size" },
+    "largestChunk": { "limit": 1024000, "unit": "bytes", "description": "Largest single JS chunk (html2pdf lazy-loaded)" },
+    "chunkCount": { "limit": 60, "unit": "count", "description": "Total number of JS chunks" }
+  },
+  "routeBudgets": {
+    "loadTime": { "good": 1000, "poor": 3000, "unit": "ms" },
+    "tti": { "good": 2000, "poor": 5000, "unit": "ms" }
+  },
+  "criticalRoutes": [
+    "/", "/login", "/register", "/discover", "/alerts",
+    "/profile", "/jams", "/reels", "/settings"
+  ],
+  "regressionPolicy": {
+    "threshold": 0.20,
+    "description": "Metrics >20% worse than baseline trigger FAIL",
+    "allowedWarnings": 2,
+    "zeroTolerance": ["LCP", "CLS"]
+  }
+}
