@@ -15,17 +15,17 @@ services:
         value: 10000
       - key: DATABASE_URL
         sync: false
-        description: "Supabase PostgreSQL connection string (e.g., postgresql://user:pass@host:5432/db)"
+        description: "Supabase PostgreSQL connection string from Dashboard → Connect → Connection string → URI. Format: postgresql://postgres:<password>@db.<project-ref>.supabase.co:5432/postgres"
       - key: JWT_SECRET
         sync: false
-        description: "Random 32+ character string for JWT signing (generate with: openssl rand -base64 32)"
+        description: "Random 32+ character string for JWT signing. Generate locally with: openssl rand -base64 32"
       - key: CORS_ORIGIN
         sync: false
-        description: "Frontend URL for CORS (e.g., https://taskflow-frontend.vercel.app)"
+        description: "Frontend URL for CORS. Set to your Vercel deployment URL, e.g., https://taskflow-frontend.vercel.app"
       - key: SUPABASE_URL
         sync: false
-        description: "Supabase project URL (e.g., https://xxx.supabase.co)"
+        description: "Supabase Project URL from Dashboard → Settings → API Keys (or Connect). Format: https://<project-ref>.supabase.co"
       - key: SUPABASE_KEY
         sync: false
-        description: "Supabase anon/service key"
+        description: "Supabase Secret key (sb_secret_...) for backend/server use. Found in Dashboard → Settings → API Keys. Server-side only — never expose to browser. This key bypasses RLS for API operations on behalf of users."
     domains: []
