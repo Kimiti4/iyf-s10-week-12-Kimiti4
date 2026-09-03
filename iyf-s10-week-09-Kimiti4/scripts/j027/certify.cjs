@@ -24,6 +24,14 @@ const errors = ev('error-recovery');
 const security = ev('security');
 const perf = ev('performance');
 
+const PREDEPLOY = path.join(AUDIT, 'predeploy');
+const recon = fs.existsSync(path.join(PREDEPLOY, 'reconciliation.json')) ? loadJSON(path.join(PREDEPLOY, 'reconciliation.json')) : null;
+const ctests = fs.existsSync(path.join(PREDEPLOY, 'contract-tests.json')) ? loadJSON(path.join(PREDEPLOY, 'contract-tests.json')) : null;
+
+const g14Pass = recon && ctests &&
+  recon.every(r => ['ALIGNED', 'ADAPTER_PRESENT', 'MISMATCH_REPAIRED'].indexOf(r.classification) >= 0) &&
+  ctests.results.every(r => r.status !== 'FAIL');
+
 const gates = [
   ['G01', 'Baseline Integrity', fs.existsSync(path.join(AUDIT, '../J026/J026_FINAL_CERTIFICATION.md'))],
   ['G02', 'Infrastructure Plan', fs.existsSync(path.join(AUDIT, 'J027_INFRASTRUCTURE_PLAN.md'))],
@@ -38,7 +46,7 @@ const gates = [
   ['G11', 'Authorization', authz ? allPass(authz) : 'BLOCKED'],
   ['G12', 'Critical Workflow', smoke ? smoke.results.some(r => r.name === 'update task status' && r.status === 'PASS') : 'BLOCKED'],
   ['G13', 'CRUD Persistence', smoke ? smoke.results.some(r => r.name === 'persistence verified' && r.status === 'PASS') : 'BLOCKED'],
-  ['G14', 'API Contract (11 repairs)', api ? allPass(api) : 'BLOCKED'],
+  ['G14', 'API Contract (11 repairs)', g14Pass],
   ['G15', 'Error Recovery', errors ? allPass(errors) : 'BLOCKED'],
   ['G16', 'Accessibility', 'WARNING'],
   ['G17', 'Performance', perf ? (perf.comparisons || []).every(c => c.status !== 'FAIL') : 'WARNING'],

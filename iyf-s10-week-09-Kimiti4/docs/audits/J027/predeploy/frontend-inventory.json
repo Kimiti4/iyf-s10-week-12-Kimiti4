@@ -1,0 +1,188 @@
+[
+  {
+    "method": "POST",
+    "path": "/auth/login",
+    "file": "products\\taskflow\\frontend\\src\\api\\auth.js",
+    "line": 4
+  },
+  {
+    "method": "POST",
+    "path": "/auth/register",
+    "file": "products\\taskflow\\frontend\\src\\api\\auth.js",
+    "line": 12
+  },
+  {
+    "method": "GET",
+    "path": "/auth/me",
+    "file": "products\\taskflow\\frontend\\src\\api\\auth.js",
+    "line": 20
+  },
+  {
+    "method": "GET",
+    "path": "/dashboard?org_id=:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\dashboard.js",
+    "line": 4
+  },
+  {
+    "method": "GET",
+    "path": "/dashboard?org_id=:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\dashboard.js",
+    "line": 8
+  },
+  {
+    "method": "GET",
+    "path": "/labels?org_id=:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\labels.js",
+    "line": 4
+  },
+  {
+    "method": "POST",
+    "path": "/labels",
+    "file": "products\\taskflow\\frontend\\src\\api\\labels.js",
+    "line": 8
+  },
+  {
+    "method": "DELETE",
+    "path": "/labels/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\labels.js",
+    "line": 12
+  },
+  {
+    "method": "POST",
+    "path": "/labels/tasks/:p/labels",
+    "file": "products\\taskflow\\frontend\\src\\api\\labels.js",
+    "line": 16
+  },
+  {
+    "method": "DELETE",
+    "path": "/labels/tasks/:p/labels/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\labels.js",
+    "line": 20
+  },
+  {
+    "method": "GET",
+    "path": "/orgs",
+    "file": "products\\taskflow\\frontend\\src\\api\\orgs.js",
+    "line": 4
+  },
+  {
+    "method": "POST",
+    "path": "/orgs",
+    "file": "products\\taskflow\\frontend\\src\\api\\orgs.js",
+    "line": 8
+  },
+  {
+    "method": "PUT",
+    "path": "/orgs/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\orgs.js",
+    "line": 12
+  },
+  {
+    "method": "DELETE",
+    "path": "/orgs/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\orgs.js",
+    "line": 16
+  },
+  {
+    "method": "GET",
+    "path": "/orgs/:p/members",
+    "file": "products\\taskflow\\frontend\\src\\api\\orgs.js",
+    "line": 20
+  },
+  {
+    "method": "POST",
+    "path": "/orgs/:p/members",
+    "file": "products\\taskflow\\frontend\\src\\api\\orgs.js",
+    "line": 24
+  },
+  {
+    "method": "DELETE",
+    "path": "/orgs/:p/members/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\orgs.js",
+    "line": 28
+  },
+  {
+    "method": "GET",
+    "path": "/projects?org_id=:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\projects.js",
+    "line": 4
+  },
+  {
+    "method": "GET",
+    "path": "/projects/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\projects.js",
+    "line": 8
+  },
+  {
+    "method": "POST",
+    "path": "/projects",
+    "file": "products\\taskflow\\frontend\\src\\api\\projects.js",
+    "line": 12
+  },
+  {
+    "method": "PUT",
+    "path": "/projects/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\projects.js",
+    "line": 16
+  },
+  {
+    "method": "DELETE",
+    "path": "/projects/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\projects.js",
+    "line": 20
+  },
+  {
+    "method": "PUT",
+    "path": "/projects/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\projects.js",
+    "line": 24
+  },
+  {
+    "method": "GET",
+    "path": "/search?q=:p&org_id=:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\search.js",
+    "line": 4
+  },
+  {
+    "method": "GET",
+    "path": "/projects/:p/tasks",
+    "file": "products\\taskflow\\frontend\\src\\api\\tasks.js",
+    "line": 5
+  },
+  {
+    "method": "GET",
+    "path": "/tasks/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\tasks.js",
+    "line": 9
+  },
+  {
+    "method": "POST",
+    "path": "/projects/:p/tasks",
+    "file": "products\\taskflow\\frontend\\src\\api\\tasks.js",
+    "line": 13
+  },
+  {
+    "method": "PUT",
+    "path": "/tasks/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\tasks.js",
+    "line": 17
+  },
+  {
+    "method": "DELETE",
+    "path": "/tasks/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\tasks.js",
+    "line": 21
+  },
+  {
+    "method": "PUT",
+    "path": "/tasks/:p/move",
+    "file": "products\\taskflow\\frontend\\src\\api\\tasks.js",
+    "line": 25
+  },
+  {
+    "method": "PUT",
+    "path": "/tasks/:p",
+    "file": "products\\taskflow\\frontend\\src\\api\\tasks.js",
+    "line": 29
+  }
+]

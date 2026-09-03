@@ -101,4 +101,21 @@ router.delete(
   }
 );
 
+router.delete(
+  '/:id',
+  validate([param('id').isUUID()]),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      await supabase.from('task_labels').delete().eq('label_id', id);
+      const { error } = await supabase.from('labels').delete().eq('id', id);
+      if (error) throw error;
+      res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 module.exports = router;

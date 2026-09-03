@@ -1,0 +1,300 @@
+{
+  "mounts": [
+    {
+      "prefix": "/api/tf/health",
+      "var": "healthRoutes",
+      "file": "./src/routes/health",
+      "at": "server.js:24"
+    },
+    {
+      "prefix": "/api/tf/auth",
+      "var": "authRoutes",
+      "file": "./src/routes/auth",
+      "at": "server.js:25"
+    },
+    {
+      "prefix": "/api/tf/orgs",
+      "var": "orgRoutes",
+      "file": "./src/routes/orgs",
+      "at": "server.js:26"
+    },
+    {
+      "prefix": "/api/tf/projects",
+      "var": "projectRoutes",
+      "file": "./src/routes/projects",
+      "at": "server.js:27"
+    },
+    {
+      "prefix": "/api/tf",
+      "var": "taskRoutes",
+      "file": "./src/routes/tasks",
+      "at": "server.js:28"
+    },
+    {
+      "prefix": "/api/tf/labels",
+      "var": "labelRoutes",
+      "file": "./src/routes/labels",
+      "at": "server.js:29"
+    },
+    {
+      "prefix": "/api/tf",
+      "var": "activityRoutes",
+      "file": "./src/routes/activity",
+      "at": "server.js:30"
+    },
+    {
+      "prefix": "/api/tf/search",
+      "var": "searchRoutes",
+      "file": "./src/routes/search",
+      "at": "server.js:31"
+    },
+    {
+      "prefix": "/api/tf/dashboard",
+      "var": "dashboardRoutes",
+      "file": "./src/routes/dashboard",
+      "at": "server.js:32"
+    }
+  ],
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/projects/:id/activity",
+      "full": "/api/tf/projects/:id/activity",
+      "mount": "server.js:30",
+      "file": "products\\taskflow\\backend\\src\\routes\\activity.js",
+      "line": 12
+    },
+    {
+      "method": "POST",
+      "path": "/register",
+      "full": "/api/tf/auth/register",
+      "mount": "server.js:25",
+      "file": "products\\taskflow\\backend\\src\\routes\\auth.js",
+      "line": 17
+    },
+    {
+      "method": "POST",
+      "path": "/login",
+      "full": "/api/tf/auth/login",
+      "mount": "server.js:25",
+      "file": "products\\taskflow\\backend\\src\\routes\\auth.js",
+      "line": 56
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "full": "/api/tf/auth/me",
+      "mount": "server.js:25",
+      "file": "products\\taskflow\\backend\\src\\routes\\auth.js",
+      "line": 89
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "full": "/api/tf/dashboard",
+      "mount": "server.js:32",
+      "file": "products\\taskflow\\backend\\src\\routes\\dashboard.js",
+      "line": 12
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "full": "/api/tf/health",
+      "mount": "server.js:24",
+      "file": "products\\taskflow\\backend\\src\\routes\\health.js",
+      "line": 4
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "full": "/api/tf/labels",
+      "mount": "server.js:29",
+      "file": "products\\taskflow\\backend\\src\\routes\\labels.js",
+      "line": 12
+    },
+    {
+      "method": "POST",
+      "path": "/",
+      "full": "/api/tf/labels",
+      "mount": "server.js:29",
+      "file": "products\\taskflow\\backend\\src\\routes\\labels.js",
+      "line": 31
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/:id/labels",
+      "full": "/api/tf/labels/tasks/:id/labels",
+      "mount": "server.js:29",
+      "file": "products\\taskflow\\backend\\src\\routes\\labels.js",
+      "line": 56
+    },
+    {
+      "method": "DELETE",
+      "path": "/tasks/:id/labels/:labelId",
+      "full": "/api/tf/labels/tasks/:id/labels/:labelId",
+      "mount": "server.js:29",
+      "file": "products\\taskflow\\backend\\src\\routes\\labels.js",
+      "line": 84
+    },
+    {
+      "method": "DELETE",
+      "path": "/:id",
+      "full": "/api/tf/labels/:id",
+      "mount": "server.js:29",
+      "file": "products\\taskflow\\backend\\src\\routes\\labels.js",
+      "line": 105
+    },
+    {
+      "method": "GET",
+      "path": "/:id/members",
+      "full": "/api/tf/orgs/:id/members",
+      "mount": "server.js:26",
+      "file": "products\\taskflow\\backend\\src\\routes\\orgs.js",
+      "line": 12
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "full": "/api/tf/orgs",
+      "mount": "server.js:26",
+      "file": "products\\taskflow\\backend\\src\\routes\\orgs.js",
+      "line": 31
+    },
+    {
+      "method": "POST",
+      "path": "/",
+      "full": "/api/tf/orgs",
+      "mount": "server.js:26",
+      "file": "products\\taskflow\\backend\\src\\routes\\orgs.js",
+      "line": 52
+    },
+    {
+      "method": "POST",
+      "path": "/:id/members",
+      "full": "/api/tf/orgs/:id/members",
+      "mount": "server.js:26",
+      "file": "products\\taskflow\\backend\\src\\routes\\orgs.js",
+      "line": 84
+    },
+    {
+      "method": "DELETE",
+      "path": "/:id/members/:userId",
+      "full": "/api/tf/orgs/:id/members/:userId",
+      "mount": "server.js:26",
+      "file": "products\\taskflow\\backend\\src\\routes\\orgs.js",
+      "line": 137
+    },
+    {
+      "method": "PUT",
+      "path": "/:id",
+      "full": "/api/tf/orgs/:id",
+      "mount": "server.js:26",
+      "file": "products\\taskflow\\backend\\src\\routes\\orgs.js",
+      "line": 169
+    },
+    {
+      "method": "DELETE",
+      "path": "/:id",
+      "full": "/api/tf/orgs/:id",
+      "mount": "server.js:26",
+      "file": "products\\taskflow\\backend\\src\\routes\\orgs.js",
+      "line": 199
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "full": "/api/tf/projects",
+      "mount": "server.js:27",
+      "file": "products\\taskflow\\backend\\src\\routes\\projects.js",
+      "line": 12
+    },
+    {
+      "method": "POST",
+      "path": "/",
+      "full": "/api/tf/projects",
+      "mount": "server.js:27",
+      "file": "products\\taskflow\\backend\\src\\routes\\projects.js",
+      "line": 40
+    },
+    {
+      "method": "GET",
+      "path": "/:id",
+      "full": "/api/tf/projects/:id",
+      "mount": "server.js:27",
+      "file": "products\\taskflow\\backend\\src\\routes\\projects.js",
+      "line": 74
+    },
+    {
+      "method": "PUT",
+      "path": "/:id",
+      "full": "/api/tf/projects/:id",
+      "mount": "server.js:27",
+      "file": "products\\taskflow\\backend\\src\\routes\\projects.js",
+      "line": 99
+    },
+    {
+      "method": "DELETE",
+      "path": "/:id",
+      "full": "/api/tf/projects/:id",
+      "mount": "server.js:27",
+      "file": "products\\taskflow\\backend\\src\\routes\\projects.js",
+      "line": 142
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "full": "/api/tf/search",
+      "mount": "server.js:31",
+      "file": "products\\taskflow\\backend\\src\\routes\\search.js",
+      "line": 12
+    },
+    {
+      "method": "GET",
+      "path": "/projects/:projectId/tasks",
+      "full": "/api/tf/projects/:projectId/tasks",
+      "mount": "server.js:28",
+      "file": "products\\taskflow\\backend\\src\\routes\\tasks.js",
+      "line": 12
+    },
+    {
+      "method": "POST",
+      "path": "/projects/:projectId/tasks",
+      "full": "/api/tf/projects/:projectId/tasks",
+      "mount": "server.js:28",
+      "file": "products\\taskflow\\backend\\src\\routes\\tasks.js",
+      "line": 45
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id",
+      "full": "/api/tf/tasks/:id",
+      "mount": "server.js:28",
+      "file": "products\\taskflow\\backend\\src\\routes\\tasks.js",
+      "line": 98
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/:id",
+      "full": "/api/tf/tasks/:id",
+      "mount": "server.js:28",
+      "file": "products\\taskflow\\backend\\src\\routes\\tasks.js",
+      "line": 122
+    },
+    {
+      "method": "DELETE",
+      "path": "/tasks/:id",
+      "full": "/api/tf/tasks/:id",
+      "mount": "server.js:28",
+      "file": "products\\taskflow\\backend\\src\\routes\\tasks.js",
+      "line": 173
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/:id/move",
+      "full": "/api/tf/tasks/:id/move",
+      "mount": "server.js:28",
+      "file": "products\\taskflow\\backend\\src\\routes\\tasks.js",
+      "line": 207
+    }
+  ]
+}

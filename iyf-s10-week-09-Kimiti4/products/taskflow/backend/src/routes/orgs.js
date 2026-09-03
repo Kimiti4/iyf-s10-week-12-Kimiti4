@@ -165,4 +165,62 @@ router.delete(
   }
 );
 
+router.put(
+  '/:id',
+  validate([
+    param('id').isUUID(),
+    body('name').optional().trim().notEmpty(),
+    body('description').optional().trim(),
+  ]),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const updates = {};
+      if (req.body.name !== undefined) updates.name = req.body.name;
+      if (req.body.description !== undefined) updates.description = req.body.description;
+
+      const { data: org, error } = await supabase
+        .from('organizations')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (!org) return res.status(404).json({ error: 'Organization not found', code: 'NOT_FOUND' });
+      res.json({ org });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.delete(
+  '/:id',
+  validate([param('id').isUUID()]),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const { data: caller } = await supabase
+        .from('organization_members')
+        .select('role')
+        .eq('org_id', id)
+        .eq('user_id', req.user.id)
+        .single();
+
+      if (!caller || caller.role !== 'owner') {
+        return res.status(403).json({ error: 'Only the owner can delete an organization', code: 'PERMISSION_DENIED' });
+      }
+
+      await supabase.from('organization_members').delete().eq('org_id', id);
+      const { error } = await supabase.from('organizations').delete().eq('id', id);
+      if (error) throw error;
+      res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 module.exports = router;

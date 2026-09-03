@@ -1,0 +1,56 @@
+[
+  {
+    "id": "M05",
+    "method": "GET",
+    "flat": "/api/tf/projects",
+    "nested": "/api/tf/orgs/:p/projects",
+    "frontend": "products\\taskflow\\frontend\\src\\api\\projects.js:4",
+    "classification": "ALIGNED",
+    "evidence": "flat route: products\\taskflow\\backend\\src\\routes\\projects.js:12"
+  },
+  {
+    "id": "M06",
+    "method": "POST",
+    "flat": "/api/tf/projects",
+    "nested": "/api/tf/orgs/:p/projects",
+    "frontend": "products\\taskflow\\frontend\\src\\api\\projects.js:12",
+    "classification": "ALIGNED",
+    "evidence": "flat route: products\\taskflow\\backend\\src\\routes\\projects.js:40"
+  },
+  {
+    "id": "M07",
+    "method": "GET",
+    "flat": "/api/tf/projects/:p/tasks",
+    "nested": "/api/tf/orgs/:p/projects/:p/tasks",
+    "frontend": "products\\taskflow\\frontend\\src\\api\\tasks.js:5",
+    "classification": "ALIGNED",
+    "evidence": "flat route: products\\taskflow\\backend\\src\\routes\\tasks.js:12"
+  },
+  {
+    "id": "M08",
+    "method": "GET",
+    "flat": "/api/tf/tasks/:p",
+    "nested": "/api/tf/orgs/:p/projects/:p/tasks/:p",
+    "frontend": "products\\taskflow\\frontend\\src\\api\\tasks.js:9",
+    "classification": "ALIGNED",
+    "evidence": "flat route: products\\taskflow\\backend\\src\\routes\\tasks.js:98"
+  },
+  {
+    "id": "M09",
+    "method": "PUT",
+    "flat": "/api/tf/tasks/:p",
+    "nested": "/api/tf/orgs/:p/projects/:p/tasks/:p",
+    "frontend": "products\\taskflow\\frontend\\src\\api\\tasks.js:17",
+    "classification": "ALIGNED",
+    "evidence": "flat route: products\\taskflow\\backend\\src\\routes\\tasks.js:122"
+  },
+  {
+    "id": "M10",
+    "method": "PUT",
+    "flat": "/api/tf/tasks/:p/move",
+    "nested": "/api/tf/orgs/:p/projects/:p/tasks/:p/move",
+    "frontend": "products\\taskflow\\frontend\\src\\api\\tasks.js:25",
+    "classification": "ALIGNED",
+    "evidence": "flat route: products\\taskflow\\backend\\src\\routes\\tasks.js:207"
+  }
+]

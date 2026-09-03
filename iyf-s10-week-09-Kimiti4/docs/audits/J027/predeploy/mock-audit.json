@@ -1,0 +1,16 @@
+[
+  {
+    "file": "products\\taskflow\\frontend\\e2e\\taskflow.spec.js",
+    "catchAllMocksEverything": false,
+    "scopedMocks": [
+      "**/api/tf/auth/me",
+      "**/api/tf/orgs",
+      "**/api/tf/projects",
+      "**/api/tf/auth/register",
+      "**/api/tf/auth/login",
+      "**/api/tf/auth/login",
+      "**/api/tf/auth/login",
+      "**/api/tf/orgs"
+    ]
+  }
+]

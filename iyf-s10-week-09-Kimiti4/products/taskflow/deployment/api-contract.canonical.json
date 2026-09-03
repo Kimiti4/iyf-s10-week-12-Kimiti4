@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "policy": "flat canonical; ownership always server-derived; org_id in query (list) or body (create) only",
+  "contracts": [
+    { "id": "M05", "method": "GET", "path": "/api/tf/projects", "frontend_call": "getProjects(orgId) → GET /projects?org_id=", "backend_route": "projects.js:12", "org_context": "query.org_id", "authorization": "membership verified server-side" },
+    { "id": "M06", "method": "POST", "path": "/api/tf/projects", "frontend_call": "createProject(orgId, data) → POST /projects {org_id, ...data}", "backend_route": "projects.js:40", "org_context": "body.org_id", "authorization": "membership verified server-side" },
+    { "id": "M07", "method": "GET", "path": "/api/tf/projects/:id/tasks", "frontend_call": "getTasks(projectId) → GET /projects/{id}/tasks", "backend_route": "tasks.js:12", "org_context": "derived:project.org_id", "authorization": "membership verified server-side" },
+    { "id": "M08", "method": "GET", "path": "/api/tf/tasks/:id", "frontend_call": "getTask(taskId) → GET /tasks/{id}", "backend_route": "tasks.js:98", "org_context": "derived:task→project.org_id", "authorization": "membership verified server-side" },
+    { "id": "M09", "method": "PUT", "path": "/api/tf/tasks/:id", "frontend_call": "updateTask(taskId, data) → PUT /tasks/{id}", "backend_route": "tasks.js:122", "org_context": "derived; client org ignored", "authorization": "membership verified server-side" },
+    { "id": "M10", "method": "PUT", "path": "/api/tf/tasks/:id/move", "frontend_call": "moveTask(taskId, status, position) → PUT /tasks/{id}/move", "backend_route": "tasks.js:207", "org_context": "derived; client org ignored", "authorization": "membership verified server-side" }
+  ],
+  "additional_repairs": [
+    { "id": "ADD-01", "method": "PUT", "path": "/api/tf/orgs/:id", "frontend_call": "frontend expected but was missing in backend", "backend_route": "orgs.js:169", "status": "ADDED in J027-PREDEPLOY" },
+    { "id": "ADD-02", "method": "DELETE", "path": "/api/tf/orgs/:id", "frontend_call": "frontend expected but was missing in backend", "backend_route": "orgs.js:199", "status": "ADDED in J027-PREDEPLOY" },
+    { "id": "ADD-03", "method": "DELETE", "path": "/api/tf/labels/:id", "frontend_call": "frontend expected but was missing in backend", "backend_route": "labels.js:105", "status": "ADDED in J027-PREDEPLOY" },
+    { "id": "CLEANUP-01", "action": "removed dead mount", "detail": "server.js: removed duplicate 'app.use(/api/tf/projects, taskRoutes)' that produced /api/tf/projects/projects/... paths", "status": "CLEANED" },
+    { "id": "CLEANUP-02", "action": "fixed activity mount", "detail": "server.js: moved activityRoutes from /api/tf/projects to /api/tf to produce correct /api/tf/projects/:id/activity", "status": "FIXED" }
+  ],
+  "orphan_routes": [
+    { "path": "/api/tf/projects/:id/activity", "note": "backend route exists but frontend dashboard uses dashboard.getActivity() instead. Activity log data flows through dashboard endpoint." }
+  ]
+}

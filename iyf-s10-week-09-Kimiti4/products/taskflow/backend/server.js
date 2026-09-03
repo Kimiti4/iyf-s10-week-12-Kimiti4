@@ -25,10 +25,9 @@ app.use('/api/tf/health', healthRoutes);
 app.use('/api/tf/auth', authRoutes);
 app.use('/api/tf/orgs', orgRoutes);
 app.use('/api/tf/projects', projectRoutes);
-app.use('/api/tf/projects', taskRoutes);
 app.use('/api/tf', taskRoutes);
 app.use('/api/tf/labels', labelRoutes);
-app.use('/api/tf/projects', activityRoutes);
+app.use('/api/tf', activityRoutes);
 app.use('/api/tf/search', searchRoutes);
 app.use('/api/tf/dashboard', dashboardRoutes);
 

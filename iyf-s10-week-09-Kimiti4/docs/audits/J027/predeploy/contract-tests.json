@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-09-03T19:40:10.345Z",
+  "results": [
+    {
+      "name": "all frontend calls have backend coverage",
+      "status": "PASS",
+      "detail": "31/31 covered"
+    },
+    {
+      "name": "M05 GET /api/tf/projects",
+      "status": "PASS",
+      "detail": "ALIGNED — flat route: products\\taskflow\\backend\\src\\routes\\projects.js:12"
+    },
+    {
+      "name": "M06 POST /api/tf/projects",
+      "status": "PASS",
+      "detail": "ALIGNED — flat route: products\\taskflow\\backend\\src\\routes\\projects.js:40"
+    },
+    {
+      "name": "M07 GET /api/tf/projects/:p/tasks",
+      "status": "PASS",
+      "detail": "ALIGNED — flat route: products\\taskflow\\backend\\src\\routes\\tasks.js:12"
+    },
+    {
+      "name": "M08 GET /api/tf/tasks/:p",
+      "status": "PASS",
+      "detail": "ALIGNED — flat route: products\\taskflow\\backend\\src\\routes\\tasks.js:98"
+    },
+    {
+      "name": "M09 PUT /api/tf/tasks/:p",
+      "status": "PASS",
+      "detail": "ALIGNED — flat route: products\\taskflow\\backend\\src\\routes\\tasks.js:122"
+    },
+    {
+      "name": "M10 PUT /api/tf/tasks/:p/move",
+      "status": "PASS",
+      "detail": "ALIGNED — flat route: products\\taskflow\\backend\\src\\routes\\tasks.js:207"
+    },
+    {
+      "name": "no dead routes",
+      "status": "PASS"
+    }
+  ]
+}
