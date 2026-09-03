@@ -1,0 +1,348 @@
+{
+  "product": {
+    "name": "TaskFlow",
+    "version": "1.0.0",
+    "description": "Team task and project management SaaS application",
+    "category": "project-management"
+  },
+  "problem": "Teams need a lightweight, fast project management tool to organize work into projects, track tasks through customizable workflows, and maintain visibility across team activities.",
+  "target_users": [
+    "Small to medium teams (2-20 members)",
+    "Project managers",
+    "Developers",
+    "Designers",
+    "Team leads"
+  ],
+  "roles": [
+    {
+      "id": "ROLE-001",
+      "name": "owner",
+      "description": "Organization creator with full control",
+      "permissions": ["manage_org", "manage_members", "manage_projects", "manage_tasks", "view_analytics"]
+    },
+    {
+      "id": "ROLE-002",
+      "name": "admin",
+      "description": "Organization admin with member and project management",
+      "permissions": ["manage_members", "manage_projects", "manage_tasks", "view_analytics"]
+    },
+    {
+      "id": "ROLE-003",
+      "name": "member",
+      "description": "Regular team member with task management",
+      "permissions": ["manage_tasks", "view_projects", "view_analytics"]
+    }
+  ],
+  "entities": [
+    {
+      "id": "ENT-USER",
+      "name": "User",
+      "fields": [
+        { "name": "id", "type": "uuid", "primary": true },
+        { "name": "email", "type": "string", "unique": true, "constraints": ["required", "email"] },
+        { "name": "name", "type": "string", "constraints": ["required", "min:2", "max:100"] },
+        { "name": "password_hash", "type": "string", "internal": true },
+        { "name": "avatar_url", "type": "string", "nullable": true },
+        { "name": "created_at", "type": "timestamp" },
+        { "name": "updated_at", "type": "timestamp" }
+      ]
+    },
+    {
+      "id": "ENT-ORG",
+      "name": "Organization",
+      "fields": [
+        { "name": "id", "type": "uuid", "primary": true },
+        { "name": "name", "type": "string", "constraints": ["required", "min:2", "max:100"] },
+        { "name": "slug", "type": "string", "unique": true, "constraints": ["required", "slug"] },
+        { "name": "description", "type": "string", "nullable": true, "max": 500 },
+        { "name": "owner_id", "type": "uuid", "references": "User.id" },
+        { "name": "created_at", "type": "timestamp" }
+      ]
+    },
+    {
+      "id": "ENT-MEMBER",
+      "name": "OrganizationMember",
+      "fields": [
+        { "name": "id", "type": "uuid", "primary": true },
+        { "name": "org_id", "type": "uuid", "references": "Organization.id", "constraints": ["required"] },
+        { "name": "user_id", "type": "uuid", "references": "User.id", "constraints": ["required"] },
+        { "name": "role", "type": "enum", "values": ["owner", "admin", "member"], "constraints": ["required"] },
+        { "name": "joined_at", "type": "timestamp" }
+      ],
+      "unique_constraint": ["org_id", "user_id"]
+    },
+    {
+      "id": "ENT-PROJECT",
+      "name": "Project",
+      "fields": [
+        { "name": "id", "type": "uuid", "primary": true },
+        { "name": "org_id", "type": "uuid", "references": "Organization.id", "constraints": ["required"] },
+        { "name": "name", "type": "string", "constraints": ["required", "min:2", "max:100"] },
+        { "name": "description", "type": "string", "nullable": true, "max": 1000 },
+        { "name": "status", "type": "enum", "values": ["active", "archived", "completed"], "default": "active" },
+        { "name": "priority", "type": "enum", "values": ["low", "medium", "high", "urgent"], "default": "medium" },
+        { "name": "owner_id", "type": "uuid", "references": "User.id" },
+        { "name": "created_at", "type": "timestamp" },
+        { "name": "updated_at", "type": "timestamp" }
+      ]
+    },
+    {
+      "id": "ENT-TASK",
+      "name": "Task",
+      "fields": [
+        { "name": "id", "type": "uuid", "primary": true },
+        { "name": "project_id", "type": "uuid", "references": "Project.id", "constraints": ["required"] },
+        { "name": "title", "type": "string", "constraints": ["required", "min:3", "max:200"] },
+        { "name": "description", "type": "string", "nullable": true, "max": 5000 },
+        { "name": "status", "type": "enum", "values": ["todo", "in_progress", "review", "done"], "default": "todo" },
+        { "name": "priority", "type": "enum", "values": ["low", "medium", "high", "urgent"], "default": "medium" },
+        { "name": "assignee_id", "type": "uuid", "references": "User.id", "nullable": true },
+        { "name": "due_date", "type": "date", "nullable": true },
+        { "name": "position", "type": "integer", "default": 0 },
+        { "name": "created_by", "type": "uuid", "references": "User.id" },
+        { "name": "created_at", "type": "timestamp" },
+        { "name": "updated_at", "type": "timestamp" }
+      ]
+    },
+    {
+      "id": "ENT-LABEL",
+      "name": "Label",
+      "fields": [
+        { "name": "id", "type": "uuid", "primary": true },
+        { "name": "org_id", "type": "uuid", "references": "Organization.id", "constraints": ["required"] },
+        { "name": "name", "type": "string", "constraints": ["required", "max:50"] },
+        { "name": "color", "type": "string", "constraints": ["required", "hex_color"] }
+      ]
+    },
+    {
+      "id": "ENT-TASKLABEL",
+      "name": "TaskLabel",
+      "fields": [
+        { "name": "task_id", "type": "uuid", "references": "Task.id", "primary": true },
+        { "name": "label_id", "type": "uuid", "references": "Label.id", "primary": true }
+      ]
+    },
+    {
+      "id": "ENT-ACTIVITY",
+      "name": "Activity",
+      "fields": [
+        { "name": "id", "type": "uuid", "primary": true },
+        { "name": "project_id", "type": "uuid", "references": "Project.id", "constraints": ["required"] },
+        { "name": "user_id", "type": "uuid", "references": "User.id" },
+        { "name": "action", "type": "string", "constraints": ["required"] },
+        { "name": "entity_type", "type": "string" },
+        { "name": "entity_id", "type": "uuid" },
+        { "name": "metadata", "type": "jsonb", "nullable": true },
+        { "name": "created_at", "type": "timestamp" }
+      ]
+    }
+  ],
+  "relationships": [
+    { "from": "Organization.owner_id", "to": "User.id", "type": "many-to-one" },
+    { "from": "OrganizationMember.org_id", "to": "Organization.id", "type": "many-to-one" },
+    { "from": "OrganizationMember.user_id", "to": "User.id", "type": "many-to-one" },
+    { "from": "Project.org_id", "to": "Organization.id", "type": "many-to-one" },
+    { "from": "Project.owner_id", "to": "User.id", "type": "many-to-one" },
+    { "from": "Task.project_id", "to": "Project.id", "type": "many-to-one" },
+    { "from": "Task.assignee_id", "to": "User.id", "type": "many-to-one" },
+    { "from": "Task.created_by", "to": "User.id", "type": "many-to-one" },
+    { "from": "Label.org_id", "to": "Organization.id", "type": "many-to-one" },
+    { "from": "TaskLabel.task_id", "to": "Task.id", "type": "many-to-one" },
+    { "from": "TaskLabel.label_id", "to": "Label.id", "type": "many-to-one" },
+    { "from": "Activity.project_id", "to": "Project.id", "type": "many-to-one" },
+    { "from": "Activity.user_id", "to": "User.id", "type": "many-to-one" }
+  ],
+  "features": [
+    {
+      "id": "FEAT-001",
+      "name": "Authentication",
+      "description": "User registration, login, logout, session management",
+      "requirements": ["REQ-AUTH-001", "REQ-AUTH-002", "REQ-AUTH-003", "REQ-AUTH-004"]
+    },
+    {
+      "id": "FEAT-002",
+      "name": "Organization Management",
+      "description": "Create org, invite members, manage roles",
+      "requirements": ["REQ-ORG-001", "REQ-ORG-002", "REQ-ORG-003"]
+    },
+    {
+      "id": "FEAT-003",
+      "name": "Project Management",
+      "description": "Create, edit, archive, delete projects",
+      "requirements": ["REQ-PROJECT-001", "REQ-PROJECT-002", "REQ-PROJECT-003", "REQ-PROJECT-004"]
+    },
+    {
+      "id": "FEAT-004",
+      "name": "Task Management",
+      "description": "Create, edit, assign, move, delete tasks",
+      "requirements": ["REQ-TASK-001", "REQ-TASK-002", "REQ-TASK-003", "REQ-TASK-004", "REQ-TASK-005"]
+    },
+    {
+      "id": "FEAT-005",
+      "name": "Board View",
+      "description": "Kanban-style board with status columns",
+      "requirements": ["REQ-BOARD-001", "REQ-BOARD-002"]
+    },
+    {
+      "id": "FEAT-006",
+      "name": "Labels",
+      "description": "Create and assign colored labels to tasks",
+      "requirements": ["REQ-LABEL-001", "REQ-LABEL-002"]
+    },
+    {
+      "id": "FEAT-007",
+      "name": "Activity Log",
+      "description": "Track and display project activity",
+      "requirements": ["REQ-ACTIVITY-001"]
+    },
+    {
+      "id": "FEAT-008",
+      "name": "Search & Filter",
+      "description": "Search tasks, filter by status/priority/assignee/label",
+      "requirements": ["REQ-SEARCH-001", "REQ-SEARCH-002"]
+    },
+    {
+      "id": "FEAT-009",
+      "name": "Dashboard",
+      "description": "Overview of projects, tasks, team activity",
+      "requirements": ["REQ-DASH-001", "REQ-DASH-002"]
+    },
+    {
+      "id": "FEAT-010",
+      "name": "Responsive Layout",
+      "description": "Mobile-friendly responsive design",
+      "requirements": ["REQ-UI-001", "REQ-UI-002"]
+    }
+  ],
+  "workflows": [
+    {
+      "id": "WF-001",
+      "name": "User Onboarding",
+      "steps": ["register", "create_or_join_org", "create_first_project", "create_first_task"]
+    },
+    {
+      "id": "WF-002",
+      "name": "Task Lifecycle",
+      "steps": ["create_task", "assign_task", "start_work", "submit_review", "complete"]
+    },
+    {
+      "id": "WF-003",
+      "name": "Project Setup",
+      "steps": ["create_project", "configure_columns", "add_members", "create_labels", "populate_tasks"]
+    }
+  ],
+  "business_rules": [
+    "Only org members can access org projects",
+    "Only project owner/admin can delete projects",
+    "Only task creator/assignee/org admin can delete tasks",
+    "Task status transitions: todo → in_progress → review → done",
+    "Archived projects are read-only",
+    "Org owner cannot be removed",
+    "Member role can only be changed by owner/admin"
+  ],
+  "routes": [
+    { "path": "/tf", "name": "Dashboard", "auth": true },
+    { "path": "/tf/login", "name": "Login", "auth": false },
+    { "path": "/tf/register", "name": "Register", "auth": false },
+    { "path": "/tf/organizations", "name": "Organizations", "auth": true },
+    { "path": "/tf/projects", "name": "Projects", "auth": true },
+    { "path": "/tf/projects/:id", "name": "Project Detail", "auth": true },
+    { "path": "/tf/projects/:id/board", "name": "Board View", "auth": true },
+    { "path": "/tf/tasks/:id", "name": "Task Detail", "auth": true },
+    { "path": "/tf/settings", "name": "Settings", "auth": true }
+  ],
+  "api_requirements": [
+    { "method": "POST", "path": "/api/tf/auth/register", "auth": false },
+    { "method": "POST", "path": "/api/tf/auth/login", "auth": false },
+    { "method": "GET", "path": "/api/tf/auth/me", "auth": true },
+    { "method": "GET", "path": "/api/tf/orgs", "auth": true },
+    { "method": "POST", "path": "/api/tf/orgs", "auth": true },
+    { "method": "POST", "path": "/api/tf/orgs/:id/members", "auth": true, "authorization": "admin+" },
+    { "method": "DELETE", "path": "/api/tf/orgs/:id/members/:userId", "auth": true, "authorization": "admin+" },
+    { "method": "GET", "path": "/api/tf/projects", "auth": true },
+    { "method": "POST", "path": "/api/tf/projects", "auth": true },
+    { "method": "GET", "path": "/api/tf/projects/:id", "auth": true },
+    { "method": "PUT", "path": "/api/tf/projects/:id", "auth": true },
+    { "method": "DELETE", "path": "/api/tf/projects/:id", "auth": true, "authorization": "owner/admin" },
+    { "method": "GET", "path": "/api/tf/projects/:id/tasks", "auth": true },
+    { "method": "POST", "path": "/api/tf/projects/:id/tasks", "auth": true },
+    { "method": "GET", "path": "/api/tf/tasks/:id", "auth": true },
+    { "method": "PUT", "path": "/api/tf/tasks/:id", "auth": true },
+    { "method": "DELETE", "path": "/api/tf/tasks/:id", "auth": true },
+    { "method": "PUT", "path": "/api/tf/tasks/:id/move", "auth": true },
+    { "method": "GET", "path": "/api/tf/labels", "auth": true },
+    { "method": "POST", "path": "/api/tf/labels", "auth": true },
+    { "method": "POST", "path": "/api/tf/tasks/:id/labels", "auth": true },
+    { "method": "DELETE", "path": "/api/tf/tasks/:id/labels/:labelId", "auth": true },
+    { "method": "GET", "path": "/api/tf/projects/:id/activity", "auth": true },
+    { "method": "GET", "path": "/api/tf/search", "auth": true },
+    { "method": "GET", "path": "/api/tf/dashboard", "auth": true },
+    { "method": "GET", "path": "/api/tf/health", "auth": false }
+  ],
+  "ui_requirements": [
+    "Responsive layout: mobile (≤768px), tablet (769-1024px), desktop (>1024px)",
+    "Dark mode support via CSS custom properties",
+    "Loading skeletons for all data-fetching states",
+    "Empty states with actionable CTAs for all list views",
+    "Toast notifications for all mutation results",
+    "Form validation with inline error messages",
+    "Keyboard-navigable board view",
+    "ARIA labels on all interactive elements"
+  ],
+  "accessibility_requirements": [
+    "WCAG 2.1 AA compliance on all user-facing routes",
+    "All interactive elements have accessible names",
+    "Form errors announced to screen readers",
+    "Focus visible on all focusable elements",
+    "Color not used as sole indicator of status",
+    "Touch targets ≥ 44px on mobile",
+    "Reduced motion respected via prefers-reduced-motion"
+  ],
+  "performance_requirements": {
+    "bundle": {
+      "initialJS": { "target": 250, "warning": 350, "failure": 500, "unit": "kb" },
+      "initialCSS": { "target": 50, "warning": 75, "failure": 100, "unit": "kb" },
+      "largestChunk": { "target": 200, "warning": 300, "failure": 500, "unit": "kb" }
+    },
+    "webVitals": {
+      "LCP": { "target": 2500, "failure": 4000, "unit": "ms" },
+      "FCP": { "target": 1800, "failure": 3000, "unit": "ms" },
+      "CLS": { "target": 0.1, "failure": 0.25, "unit": "score" },
+      "TTFB": { "target": 800, "failure": 1800, "unit": "ms" }
+    }
+  },
+  "security_requirements": [
+    "Passwords hashed with bcrypt (cost ≥ 10)",
+    "JWT tokens with expiration (24h)",
+    "CORS restricted to known origins",
+    "Input validation on all API endpoints",
+    "No secrets in client bundle",
+    "SQL injection prevention (parameterized queries)",
+    "XSS prevention (escaped output)",
+    "Rate limiting on auth endpoints"
+  ],
+  "deployment_requirements": {
+    "frontend": { "platform": "vercel", "build": "vite build", "output": "dist/" },
+    "backend": { "platform": "railway", "runtime": "node", "entry": "server.js" },
+    "database": { "provider": "supabase", "engine": "postgresql" },
+    "environment_variables": [
+      "DATABASE_URL",
+      "JWT_SECRET",
+      "CORS_ORIGIN",
+      "NODE_ENV",
+      "PORT"
+    ]
+  },
+  "acceptance_criteria": [
+    { "id": "AC-001", "description": "A new user can register, create an org, create a project, and create a task" },
+    { "id": "AC-002", "description": "Tasks can be moved through status columns on the board view" },
+    { "id": "AC-003", "description": "Multiple team members can collaborate on the same project" },
+    { "id": "AC-004", "description": "Search returns matching tasks across projects" },
+    { "id": "AC-005", "description": "Dashboard shows accurate project and task statistics" },
+    { "id": "AC-006", "description": "Mobile layout is fully functional" },
+    { "id": "AC-007", "description": "All E2E tests pass" },
+    { "id": "AC-008", "description": "Application is deployed and accessible via public URL" },
+    { "id": "AC-009", "description": "Performance budget is satisfied" },
+    { "id": "AC-010", "description": "Accessibility baseline is satisfied" }
+  ]
+}

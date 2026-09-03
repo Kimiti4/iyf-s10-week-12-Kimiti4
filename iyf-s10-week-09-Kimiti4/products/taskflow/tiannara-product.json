@@ -1,0 +1,33 @@
+{
+  "product_id": "taskflow",
+  "product_version": "1.0.0",
+  "spec_version": "1.0.0",
+  "generator_version": "tiannara-compiler-v1",
+  "generation_timestamp": "2026-09-03",
+  "architecture": {
+    "frontend": "React 18 + Vite",
+    "backend": "Express.js",
+    "database": "Supabase Postgres",
+    "auth": "JWT"
+  },
+  "features": [
+    "auth",
+    "organizations",
+    "projects",
+    "tasks",
+    "board",
+    "labels",
+    "activity",
+    "search",
+    "dashboard"
+  ],
+  "routes_count": 9,
+  "entities_count": 9,
+  "requirements_total": 27,
+  "tests": {
+    "e2e": 40,
+    "suites": 10
+  },
+  "certification_status": "CERTIFIED_WITH_WARNINGS",
+  "deployment_status": "BUILD_VERIFIED"
+}
