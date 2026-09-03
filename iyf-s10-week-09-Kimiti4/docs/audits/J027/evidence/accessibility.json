@@ -1,0 +1,85 @@
+{
+  "category": "accessibility",
+  "timestamp": "2026-09-03T20:28:24.694Z",
+  "commit": "0000499",
+  "results": [
+    {
+      "name": "HTML has lang attribute",
+      "status": "PASS"
+    },
+    {
+      "name": "HTML has viewport meta",
+      "status": "PASS"
+    },
+    {
+      "name": "HTML has title",
+      "status": "PASS"
+    },
+    {
+      "name": "HTML has meta description",
+      "status": "PASS"
+    },
+    {
+      "name": "HTML has charset",
+      "status": "PASS"
+    },
+    {
+      "name": "CSS has prefers-reduced-motion support",
+      "status": "PASS"
+    },
+    {
+      "name": "CSS has focus-visible styles",
+      "status": "PASS"
+    },
+    {
+      "name": "CSS has min-height for touch targets (44px)",
+      "status": "PASS"
+    },
+    {
+      "name": "JS has aria-label usage",
+      "status": "PASS"
+    },
+    {
+      "name": "JS has aria-hidden usage",
+      "status": "PASS"
+    },
+    {
+      "name": "JS has role usage",
+      "status": "PASS"
+    },
+    {
+      "name": "JS has tabIndex usage",
+      "status": "PASS"
+    },
+    {
+      "name": "Pages use semantic HTML (button elements)",
+      "status": "PASS"
+    },
+    {
+      "name": "Pages use semantic HTML (nav elements)",
+      "status": "PASS"
+    },
+    {
+      "name": "Pages use semantic HTML (main elements)",
+      "status": "PASS"
+    },
+    {
+      "name": "Pages use semantic HTML (section elements)",
+      "status": "PASS"
+    },
+    {
+      "name": "Pages have form labels (htmlFor or label wrapping)",
+      "status": "PASS"
+    },
+    {
+      "name": "Components use aria-hidden for decorative icons",
+      "status": "PASS"
+    },
+    {
+      "name": "Components use semantic roles",
+      "status": "PASS"
+    }
+  ],
+  "scope": "LOCAL BUILD SCAN (not runtime axe-core)",
+  "note": "Runtime axe-core scan available via npx playwright test e2e/a11y/ when backend is deployed"
+}

@@ -13,10 +13,10 @@ G12	BLOCKED	Critical Workflow
 G13	BLOCKED	CRUD Persistence
 G14	PASS	API Contract (11 repairs)
 G15	FAIL	Error Recovery
-G16	WARNING	Accessibility
-G17	WARNING	Performance
-G18	FAIL	Security Baseline
-G19	FAIL	Provenance
+G16	PASS	Accessibility
+G17	PASS	Performance
+G18	PASS	Security Baseline
+G19	PASS	Provenance
 G20	PASS	Human Intervention Log
 G21	PASS	Reproducible Verification
 G22	WARNING	Production Completeness

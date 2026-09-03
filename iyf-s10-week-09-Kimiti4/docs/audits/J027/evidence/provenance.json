@@ -1,0 +1,78 @@
+{
+  "category": "provenance",
+  "timestamp": "2026-09-03T20:28:25.381Z",
+  "commit": "0000499",
+  "commitFull": "00004992e5b8a4c7ea789a6331756663b25b2cdc",
+  "branch": "main",
+  "remote": "https://github.com/Kimiti4/iyf-s10-week-12-Kimiti4.git",
+  "spec": {
+    "product": "TaskFlow",
+    "specVersion": "1.0.0",
+    "generatorVersion": "tiannara-compiler-1.0",
+    "j026Certification": "CERTIFIED_WITH_WARNINGS",
+    "sourceCommit": "59c644a",
+    "predeployCommit": "0000499"
+  },
+  "artifacts": {
+    "frontend": {
+      "files": 39,
+      "pages": 10,
+      "components": 14,
+      "bundle": "222KB JS + 27KB CSS (244KB total)"
+    },
+    "backend": {
+      "files": 16,
+      "routes": 9,
+      "endpoints": 25
+    },
+    "tests": {
+      "e2e": 40,
+      "suites": 10,
+      "contract": 6,
+      "reconciliation": "6/6 ALIGNED"
+    },
+    "documentation": {
+      "j026_artifacts": 18,
+      "j027_artifacts": 7,
+      "predeploy_artifacts": 6
+    }
+  },
+  "chain": [
+    {
+      "step": "SPEC",
+      "artifact": "product-specification.json"
+    },
+    {
+      "step": "PLAN",
+      "artifact": "J026_GENERATION_PLAN.md"
+    },
+    {
+      "step": "SOURCE",
+      "artifact": "products/taskflow/"
+    },
+    {
+      "step": "TEST",
+      "artifact": "e2e/taskflow.spec.js"
+    },
+    {
+      "step": "REPAIR",
+      "artifact": "J026_REPAIR_LOG.md"
+    },
+    {
+      "step": "BUILD",
+      "artifact": "frontend/dist/"
+    },
+    {
+      "step": "CONTRACT",
+      "artifact": "api-contract.canonical.json"
+    },
+    {
+      "step": "RECONCILIATION",
+      "artifact": "predeploy/reconciliation.json"
+    },
+    {
+      "step": "CERTIFICATION",
+      "artifact": "J027_PREDEPLOY_COMPLETE.md"
+    }
+  ]
+}

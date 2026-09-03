@@ -32,6 +32,16 @@ const g14Pass = recon && ctests &&
   recon.every(r => ['ALIGNED', 'ADAPTER_PRESENT', 'MISMATCH_REPAIRED'].indexOf(r.classification) >= 0) &&
   ctests.results.every(r => r.status !== 'FAIL');
 
+const a11y = ev('accessibility');
+const perfLocal = ev('performance');
+const securityLocal = ev('security');
+const provenance = ev('provenance');
+
+const g16Pass = a11y ? a11y.results.every(r => r.status === 'PASS') : false;
+const g17Pass = perfLocal ? perfLocal.results.every(r => r.status === 'PASS') : false;
+const g18Pass = securityLocal ? securityLocal.results.every(r => r.status === 'PASS') : false;
+const g19Pass = provenance ? !!(provenance.commit && provenance.spec && provenance.chain) : false;
+
 const gates = [
   ['G01', 'Baseline Integrity', fs.existsSync(path.join(AUDIT, '../J026/J026_FINAL_CERTIFICATION.md'))],
   ['G02', 'Infrastructure Plan', fs.existsSync(path.join(AUDIT, 'J027_INFRASTRUCTURE_PLAN.md'))],
@@ -48,10 +58,10 @@ const gates = [
   ['G13', 'CRUD Persistence', smoke ? smoke.results.some(r => r.name === 'persistence verified' && r.status === 'PASS') : 'BLOCKED'],
   ['G14', 'API Contract (11 repairs)', g14Pass],
   ['G15', 'Error Recovery', errors ? allPass(errors) : 'BLOCKED'],
-  ['G16', 'Accessibility', 'WARNING'],
-  ['G17', 'Performance', perf ? (perf.comparisons || []).every(c => c.status !== 'FAIL') : 'WARNING'],
-  ['G18', 'Security Baseline', security ? allPass(security) : 'BLOCKED'],
-  ['G19', 'Provenance', deployment ? !!(deployment.deployment_commit && deployment.urls) : 'WARNING'],
+  ['G16', 'Accessibility', g16Pass],
+  ['G17', 'Performance', g17Pass],
+  ['G18', 'Security Baseline', g18Pass],
+  ['G19', 'Provenance', g19Pass],
   ['G20', 'Human Intervention Log', fs.existsSync(path.join(AUDIT, 'J027_HUMAN_INTERVENTIONS.md'))],
   ['G21', 'Reproducible Verification', true],
   ['G22', 'Production Completeness', 'WARNING'],

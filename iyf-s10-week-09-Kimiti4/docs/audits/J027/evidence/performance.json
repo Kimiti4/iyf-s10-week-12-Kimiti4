@@ -1,0 +1,153 @@
+{
+  "category": "performance",
+  "timestamp": "2026-09-03T20:28:24.945Z",
+  "commit": "0000499",
+  "results": [
+    {
+      "name": "Total JS within budget",
+      "status": "PASS",
+      "detail": "217.15KB / 500KB budget"
+    },
+    {
+      "name": "Total CSS within budget",
+      "status": "PASS",
+      "detail": "26.97KB / 100KB budget"
+    },
+    {
+      "name": "Largest chunk within budget",
+      "status": "PASS",
+      "detail": "160.02KB / 500KB budget"
+    },
+    {
+      "name": "JS chunk count",
+      "status": "PASS",
+      "detail": "3 chunks"
+    },
+    {
+      "name": "Total bundle size",
+      "status": "PASS",
+      "detail": "244.11KB total"
+    },
+    {
+      "name": "HTML has preload hints",
+      "status": "PASS",
+      "detail": "1 preload links"
+    },
+    {
+      "name": "HTML has modulepreload",
+      "status": "PASS",
+      "detail": "2 modulepreloads"
+    },
+    {
+      "name": "Lazy loading detected (chunks under 50KB)",
+      "status": "PASS",
+      "detail": "2 small chunks (code-split)"
+    }
+  ],
+  "metrics": {
+    "totalJS": 217.15,
+    "totalCSS": 26.97,
+    "largestChunk": 160.02,
+    "totalBundle": 244.11,
+    "jsChunkCount": 3,
+    "cssChunkCount": 1,
+    "preloadHints": 1
+  },
+  "budgets": {
+    "webVitals": {
+      "LCP": {
+        "target": 2500,
+        "warning": 3000,
+        "failure": 4000,
+        "unit": "ms",
+        "rationale": "Google recommends LCP < 2.5s for good UX"
+      },
+      "INP": {
+        "target": 200,
+        "warning": 300,
+        "failure": 500,
+        "unit": "ms",
+        "rationale": "INP < 200ms ensures responsive interactions"
+      },
+      "CLS": {
+        "target": 0.1,
+        "warning": 0.15,
+        "failure": 0.25,
+        "unit": "score",
+        "rationale": "CLS < 0.1 prevents jarring layout shifts"
+      },
+      "FCP": {
+        "target": 1800,
+        "warning": 2500,
+        "failure": 3000,
+        "unit": "ms",
+        "rationale": "FCP < 1.8s provides fast initial render"
+      },
+      "TTFB": {
+        "target": 800,
+        "warning": 1200,
+        "failure": 1800,
+        "unit": "ms",
+        "rationale": "TTFB < 800ms ensures fast server response"
+      }
+    },
+    "bundle": {
+      "initialJS": {
+        "target": 250,
+        "warning": 350,
+        "failure": 500,
+        "unit": "kb",
+        "rationale": "Initial JS < 250KB for fast first load"
+      },
+      "initialCSS": {
+        "target": 50,
+        "warning": 75,
+        "failure": 100,
+        "unit": "kb",
+        "rationale": "Initial CSS < 50KB to minimize render blocking"
+      },
+      "largestChunk": {
+        "target": 200,
+        "warning": 300,
+        "failure": 500,
+        "unit": "kb",
+        "rationale": "No single chunk should exceed 200KB"
+      }
+    },
+    "network": {
+      "requestCount": {
+        "target": 30,
+        "warning": 50,
+        "failure": 100,
+        "unit": "requests",
+        "rationale": "Limit concurrent requests to avoid waterfall"
+      },
+      "totalTransfer": {
+        "target": 1000,
+        "warning": 1500,
+        "failure": 2000,
+        "unit": "kb",
+        "rationale": "Total transfer < 1MB for fast page load"
+      }
+    },
+    "runtime": {
+      "longTaskCount": {
+        "target": 5,
+        "warning": 10,
+        "failure": 20,
+        "unit": "tasks",
+        "rationale": "Minimize long tasks (>50ms) for responsiveness"
+      },
+      "totalBlockingTime": {
+        "target": 200,
+        "warning": 300,
+        "failure": 500,
+        "unit": "ms",
+        "rationale": "TBT < 200ms for smooth interactions"
+      }
+    }
+  },
+  "scope": "LOCAL BUILD MEASUREMENT (not live Web Vitals)",
+  "environment": "build",
+  "note": "Live Web Vitals measurement available via npm run j027:perf when deployed"
+}

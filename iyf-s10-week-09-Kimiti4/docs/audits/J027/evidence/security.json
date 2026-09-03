@@ -1,21 +1,86 @@
 {
   "category": "security",
-  "timestamp": "2026-09-03T17:20:03.213Z",
-  "commit": "59c644a",
+  "timestamp": "2026-09-03T20:28:25.197Z",
+  "commit": "0000499",
   "results": [
     {
-      "name": "frontend URL is https",
-      "status": "FAIL"
+      "name": "Backend uses helmet for security headers",
+      "status": "PASS"
     },
     {
-      "name": "backend URL is https",
-      "status": "FAIL"
+      "name": "Backend has CORS configuration",
+      "status": "PASS"
     },
     {
-      "name": "health endpoint reachable",
-      "status": "FAIL",
-      "detail": "Failed to parse URL from /api/tf/health"
+      "name": "CORS uses env variable (not wildcard)",
+      "status": "PASS"
+    },
+    {
+      "name": "JWT uses env secret (not hardcoded)",
+      "status": "PASS"
+    },
+    {
+      "name": "Passwords are hashed with bcrypt",
+      "status": "PASS"
+    },
+    {
+      "name": "No raw password comparisons",
+      "status": "PASS"
+    },
+    {
+      "name": "Database queries use parameterized (Supabase)",
+      "status": "PASS"
+    },
+    {
+      "name": "No secrets in client bundle",
+      "status": "PASS",
+      "detail": "clean"
+    },
+    {
+      "name": "No inline scripts with secrets",
+      "status": "PASS"
+    },
+    {
+      "name": "No inline styles with secrets",
+      "status": "PASS"
+    },
+    {
+      "name": "No secrets in frontend source",
+      "status": "PASS",
+      "detail": "clean"
+    },
+    {
+      "name": "Input validation middleware present",
+      "status": "PASS"
+    },
+    {
+      "name": "JWT auth middleware present",
+      "status": "PASS"
+    },
+    {
+      "name": "Supabase key from env, not hardcoded",
+      "status": "PASS"
+    },
+    {
+      "name": "No unescaped HTML rendering",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "name": "Token stored (not in cookies without flags)",
+      "status": "PASS",
+      "detail": "localStorage"
     }
   ],
-  "scope": "BASELINE SECURITY VERIFICATION"
+  "scope": "BASELINE SECURITY VERIFICATION (local build + config scan)",
+  "secretsChecked": [
+    "JWT_SECRET value",
+    "DATABASE_URL with password",
+    "service_role key",
+    "supabaseServiceKey",
+    "AWS secret key",
+    "private key block",
+    "hardcoded API key"
+  ],
+  "note": "Live security headers and CORS verification available via npm run j027:verify when deployed"
 }

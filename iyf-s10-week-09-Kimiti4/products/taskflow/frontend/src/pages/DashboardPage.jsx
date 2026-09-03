@@ -55,43 +55,43 @@ export default function DashboardPage() {
         <p className="page-subtitle">Welcome to {currentOrg.name}</p>
       </div>
 
-      <div className="stats-grid">
+      <section className="stats-grid" aria-label="Dashboard statistics">
         <div className="stat-card">
-          <FiFolder className="stat-icon stat-icon-primary" />
+          <FiFolder className="stat-icon stat-icon-primary" aria-hidden="true" />
           <div className="stat-content">
             <span className="stat-value">{totalProjects}</span>
             <span className="stat-label">Projects</span>
           </div>
         </div>
         <div className="stat-card">
-          <FiCheckSquare className="stat-icon stat-icon-success" />
+          <FiCheckSquare className="stat-icon stat-icon-success" aria-hidden="true" />
           <div className="stat-content">
             <span className="stat-value">{totalTasks}</span>
             <span className="stat-label">Total Tasks</span>
           </div>
         </div>
         <div className="stat-card">
-          <FiClock className="stat-icon stat-icon-warning" />
+          <FiClock className="stat-icon stat-icon-warning" aria-hidden="true" />
           <div className="stat-content">
             <span className="stat-value">{tasksInProgress}</span>
             <span className="stat-label">In Progress</span>
           </div>
         </div>
         <div className="stat-card">
-          <FiCheckSquare className="stat-icon stat-icon-info" />
+          <FiCheckSquare className="stat-icon stat-icon-info" aria-hidden="true" />
           <div className="stat-content">
             <span className="stat-value">{tasksDone}</span>
             <span className="stat-label">Completed</span>
           </div>
         </div>
-      </div>
+      </section>
 
       <div className="dashboard-grid">
-        <div className="dashboard-section">
+        <section className="dashboard-section" aria-labelledby="recent-projects-heading">
           <div className="section-header">
-            <h2>Recent Projects</h2>
+            <h2 id="recent-projects-heading">Recent Projects</h2>
             <Link to="/tf/projects" className="section-link">
-              View all <FiArrowRight />
+              View all <FiArrowRight aria-hidden="true" />
             </Link>
           </div>
           {projects.length === 0 ? (
@@ -108,19 +108,19 @@ export default function DashboardPage() {
               ))}
             </div>
           )}
-        </div>
+        </section>
 
-        <div className="dashboard-section">
+        <section className="dashboard-section" aria-labelledby="recent-activity-heading">
           <div className="section-header">
-            <h2>Recent Activity</h2>
+            <h2 id="recent-activity-heading">Recent Activity</h2>
           </div>
           {activity.length === 0 ? (
             <p className="text-muted">No recent activity</p>
           ) : (
-            <div className="activity-feed">
+            <div className="activity-feed" role="feed" aria-label="Recent activity feed">
               {activity.slice(0, 10).map((item, i) => (
-                <div key={item.id || i} className="activity-item">
-                  <div className="activity-dot" />
+                <div key={item.id || i} className="activity-item" role="article">
+                  <div className="activity-dot" aria-hidden="true" />
                   <div className="activity-content">
                     <span className="activity-text">
                       <strong>{item.user?.name || 'Someone'}</strong> {item.action || item.description || 'performed an action'}
@@ -131,7 +131,7 @@ export default function DashboardPage() {
               ))}
             </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );
