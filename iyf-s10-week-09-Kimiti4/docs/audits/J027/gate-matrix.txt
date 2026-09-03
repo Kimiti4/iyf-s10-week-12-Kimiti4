@@ -1,0 +1,25 @@
+G01	PASS	Baseline Integrity
+G02	PASS	Infrastructure Plan
+G03	PASS	Deployment Contract
+G04	FAIL	Environment Safety
+G05	FAIL	Database Provisioning
+G06	FAIL	Backend Deployment
+G07	FAIL	Frontend Deployment
+G08	BLOCKED	Integration (Smoke)
+G09	FAIL	Health Endpoint
+G10	BLOCKED	Authentication
+G11	FAIL	Authorization
+G12	BLOCKED	Critical Workflow
+G13	BLOCKED	CRUD Persistence
+G14	FAIL	API Contract (11 repairs)
+G15	FAIL	Error Recovery
+G16	WARNING	Accessibility
+G17	WARNING	Performance
+G18	FAIL	Security Baseline
+G19	FAIL	Provenance
+G20	PASS	Human Intervention Log
+G21	PASS	Reproducible Verification
+G22	WARNING	Production Completeness
+G23	PASS	Certification Integrity
+
+VERDICT: BLOCKED
