@@ -6,17 +6,6 @@
   "installCommand": "npm install",
   "framework": "vite",
   "rootDirectory": "products/taskflow/frontend",
-  "env": {
-    "VITE_API_URL": {
-      "description": "Backend API URL (Render deployment)",
-      "value": "https://taskflow-api.onrender.com/api/tf"
-    }
-  },
-  "build": {
-    "env": {
-      "VITE_API_URL": "@vite_api_url"
-    }
-  },
   "rewrites": [
     {
       "source": "/((?!api|assets|favicon.ico|.*\\..*).*)",
