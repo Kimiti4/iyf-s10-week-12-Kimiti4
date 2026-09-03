@@ -1,0 +1,12 @@
+{
+  "category": "deployment",
+  "timestamp": "2026-09-03T17:16:30.171Z",
+  "commit": "59c644a",
+  "status": "BLOCKED",
+  "reason": "No production URLs configured",
+  "repairLog": [],
+  "urls": {
+    "frontend": "",
+    "backend": ""
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "application": {
+    "product_id": "taskflow",
+    "name": "TaskFlow",
+    "version": "1.0.0",
+    "source_commit": "59c644a",
+    "spec_version": "1.0.0",
+    "generator_version": "tiannara-compiler-1.0",
+    "j026_certification": "CERTIFIED_WITH_WARNINGS"
+  },
+  "production": {
+    "frontend_provider": "vercel",
+    "backend_provider": "railway",
+    "database_provider": "supabase-postgres",
+    "frontend_url_env": "TASKFLOW_FRONTEND_URL",
+    "backend_url_env": "TASKFLOW_BACKEND_URL",
+    "health_endpoint": "/api/tf/health",
+    "build_command": { "frontend": "npm run build", "backend": "npm install" },
+    "start_command": { "backend": "npm start" },
+    "required_server_variables": ["DATABASE_URL", "JWT_SECRET", "CORS_ORIGIN"],
+    "required_public_variables": ["VITE_API_URL"],
+    "deployment_dependencies": ["node>=18", "git"],
+    "verification": {
+      "smoke": true,
+      "api_contract": true,
+      "authorization": true,
+      "error_recovery": true,
+      "security": true,
+      "performance": true,
+      "accessibility": true,
+      "journeys": true
+    }
+  }
+}

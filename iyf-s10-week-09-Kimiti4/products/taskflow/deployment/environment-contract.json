@@ -1,0 +1,12 @@
+{
+  "variables": [
+    { "name": "VITE_API_URL", "scope": "PUBLIC", "requirement": "REQUIRED", "secret": false, "rule": "Must equal production backend URL + /api/tf; must never contain secrets" },
+    { "name": "DATABASE_URL", "scope": "SERVER_ONLY", "requirement": "REQUIRED", "secret": true },
+    { "name": "JWT_SECRET", "scope": "SERVER_ONLY", "requirement": "REQUIRED", "secret": true },
+    { "name": "CORS_ORIGIN", "scope": "SERVER_ONLY", "requirement": "REQUIRED", "secret": false, "rule": "Must equal production frontend origin; wildcard disallowed" },
+    { "name": "TASKFLOW_FRONTEND_URL", "scope": "CI_ONLY", "requirement": "REQUIRED", "secret": false, "rule": "Verification-only; https required" },
+    { "name": "TASKFLOW_BACKEND_URL", "scope": "CI_ONLY", "requirement": "REQUIRED", "secret": false, "rule": "Verification-only; https required" },
+    { "name": "TIANNARA_DEPLOY_AUTHORIZED", "scope": "CI_ONLY", "requirement": "OPTIONAL", "secret": false, "rule": "Explicit opt-in for CLI deployment" },
+    { "name": "TIANNARA_MIGRATE_AUTHORIZED", "scope": "CI_ONLY", "requirement": "OPTIONAL", "secret": false, "rule": "Explicit opt-in for production migrations" }
+  ]
+}

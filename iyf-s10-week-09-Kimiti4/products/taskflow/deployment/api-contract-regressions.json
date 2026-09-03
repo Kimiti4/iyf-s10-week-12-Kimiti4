@@ -1,0 +1,16 @@
+{
+  "source": "J026_REPAIR_LOG",
+  "regressions": [
+    { "id": "MISMATCH-01", "endpoint": "/auth/register", "method": "POST", "auth": false, "expected": { "status": 201, "shape": [{ "path": "user.id", "type": "string" }, { "path": "user.email", "type": "string" }, { "path": "token", "type": "string" }] } },
+    { "id": "MISMATCH-02", "endpoint": "/auth/login", "method": "POST", "auth": false, "expected": { "status": 200, "shape": [{ "path": "token", "type": "string" }, { "path": "user.id", "type": "string" }] } },
+    { "id": "MISMATCH-03", "endpoint": "/auth/me", "method": "GET", "auth": true, "expected": { "status": 200, "shape": [{ "path": "user.id", "type": "string" }, { "path": "user.email", "type": "string" }] } },
+    { "id": "MISMATCH-04", "endpoint": "/orgs", "method": "GET", "auth": true, "expected": { "status": 200, "shape": [{ "path": "organizations", "type": "array" }] } },
+    { "id": "MISMATCH-05", "endpoint": "/projects", "method": "GET", "auth": true, "expected": { "status": 200, "shape": [{ "path": "projects", "type": "array" }] } },
+    { "id": "MISMATCH-06", "endpoint": "/projects", "method": "POST", "auth": true, "expected": { "status": 201, "shape": [{ "path": "project.id", "type": "string" }, { "path": "project.name", "type": "string" }] } },
+    { "id": "MISMATCH-07", "endpoint": "/projects/:id/tasks", "method": "GET", "auth": true, "needs": "project", "expected": { "status": 200, "shape": [{ "path": "tasks", "type": "array" }] } },
+    { "id": "MISMATCH-08", "endpoint": "/tasks/:id", "method": "GET", "auth": true, "needs": "task", "expected": { "status": 200, "shape": [{ "path": "task.id", "type": "string" }, { "path": "task.title", "type": "string" }] } },
+    { "id": "MISMATCH-09", "endpoint": "/tasks/:id", "method": "PUT", "auth": true, "needs": "task", "expected": { "status": 200, "shape": [{ "path": "task.id", "type": "string" }] } },
+    { "id": "MISMATCH-10", "endpoint": "/tasks/:id/move", "method": "PUT", "auth": true, "needs": "task", "expected": { "status": 200, "shape": [{ "path": "task.id", "type": "string" }, { "path": "task.status", "type": "string" }] } },
+    { "id": "MISMATCH-11", "endpoint": "/dashboard", "method": "GET", "auth": true, "expected": { "status": 200, "shape": [{ "path": "total_projects", "type": "number" }, { "path": "total_tasks", "type": "number" }] } }
+  ]
+}

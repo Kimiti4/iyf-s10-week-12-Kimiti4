@@ -1,0 +1,12 @@
+{
+  "category": "api-verification",
+  "timestamp": "2026-09-03T17:20:02.116Z",
+  "commit": "59c644a",
+  "results": [
+    {
+      "name": "backend URL configured",
+      "status": "FAIL",
+      "detail": "TASKFLOW_BACKEND_URL not set"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "category": "security",
+  "timestamp": "2026-09-03T17:20:03.213Z",
+  "commit": "59c644a",
+  "results": [
+    {
+      "name": "frontend URL is https",
+      "status": "FAIL"
+    },
+    {
+      "name": "backend URL is https",
+      "status": "FAIL"
+    },
+    {
+      "name": "health endpoint reachable",
+      "status": "FAIL",
+      "detail": "Failed to parse URL from /api/tf/health"
+    }
+  ],
+  "scope": "BASELINE SECURITY VERIFICATION"
+}

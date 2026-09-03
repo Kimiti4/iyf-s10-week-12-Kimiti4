@@ -1,0 +1,62 @@
+{
+  "category": "preflight",
+  "timestamp": "2026-09-03T17:16:12.858Z",
+  "commit": "59c644a",
+  "status": "INFRASTRUCTURE_BLOCKED",
+  "results": [
+    {
+      "check": "env:DATABASE_URL",
+      "status": "FAIL"
+    },
+    {
+      "check": "env:JWT_SECRET",
+      "status": "FAIL"
+    },
+    {
+      "check": "env:CORS_ORIGIN",
+      "status": "FAIL"
+    },
+    {
+      "check": "env:VITE_API_URL",
+      "status": "FAIL"
+    },
+    {
+      "check": "env:TASKFLOW_FRONTEND_URL",
+      "status": "FAIL"
+    },
+    {
+      "check": "env:TASKFLOW_BACKEND_URL",
+      "status": "FAIL"
+    },
+    {
+      "check": "VITE_API_URL is https",
+      "status": "FAIL"
+    },
+    {
+      "check": "VITE_API_URL contains no secret material",
+      "status": "PASS"
+    },
+    {
+      "check": "CORS_ORIGIN is set",
+      "status": "FAIL"
+    },
+    {
+      "check": "CORS_ORIGIN is not wildcard",
+      "status": "PASS"
+    },
+    {
+      "check": "provider authorization available",
+      "status": "BLOCKED"
+    }
+  ],
+  "providerAuth": {
+    "vercel": false,
+    "railway": false,
+    "deploy_opt_in": false,
+    "migrate_opt_in": false
+  },
+  "urls": {
+    "frontend": "",
+    "backend": ""
+  }
+}

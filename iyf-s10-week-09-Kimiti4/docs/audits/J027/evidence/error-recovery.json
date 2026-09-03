@@ -1,0 +1,12 @@
+{
+  "category": "error-recovery",
+  "timestamp": "2026-09-03T17:20:02.730Z",
+  "commit": "59c644a",
+  "results": [
+    {
+      "name": "backend configured",
+      "status": "FAIL",
+      "detail": "TASKFLOW_BACKEND_URL not set"
+    }
+  ]
+}
