@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: taskflow-backend
+    runtime: node
+    plan: starter
+    rootDir: products/taskflow/backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/tf/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+        description: "Supabase PostgreSQL connection string (e.g., postgresql://user:pass@host:5432/db)"
+      - key: JWT_SECRET
+        sync: false
+        description: "Random 32+ character string for JWT signing (generate with: openssl rand -base64 32)"
+      - key: CORS_ORIGIN
+        sync: false
+        description: "Frontend URL for CORS (e.g., https://taskflow-frontend.vercel.app)"
+      - key: SUPABASE_URL
+        sync: false
+        description: "Supabase project URL (e.g., https://xxx.supabase.co)"
+      - key: SUPABASE_KEY
+        sync: false
+        description: "Supabase anon/service key"
+    domains: []
