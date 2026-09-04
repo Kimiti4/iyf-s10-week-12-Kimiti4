@@ -12,7 +12,7 @@
     "db:migrate": "node scripts/migrate.js",
     "db:migrate:002": "node scripts/migrations/002_add_alert_constraints.js",
     "db:migrate:004": "node scripts/migrations/004_geographic_and_fts.js",
-    "db:migrate:all": "node scripts/migrate-all.js"
+    "db:migrate:all": "node scripts/migrate.js"
   },
   "keywords": [
     "jamii",
