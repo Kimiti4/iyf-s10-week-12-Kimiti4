@@ -99,8 +99,7 @@ const ALERT_CATEGORIES = [
 const SEVERITY_LEVELS = [
   { value: 'info', label: 'Info', color: '#3b82f6', description: 'General information' },
   { value: 'warning', label: 'Warning', color: '#f59e0b', description: 'Important notice' },
-  { value: 'critical', label: 'Critical', color: '#ef4444', description: 'Urgent action needed' },
-  { value: 'official', label: 'Official', color: '#8b5cf6', description: 'Verified official source' }
+  { value: 'critical', label: 'Critical', color: '#ef4444', description: 'Urgent action needed' }
 ];
 
 export default function CreateAlertForm({ onSubmit, onCancel }) {

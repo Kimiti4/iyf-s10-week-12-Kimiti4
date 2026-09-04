@@ -455,7 +455,7 @@
 }
 
 /* J-022: Dark mode overrides */
-[data-theme='dark'] & {
+[data-theme='dark'] .chat-page {
   background-color: var(--surface);
   color: var(--text-primary);
   border-color: var(--border);

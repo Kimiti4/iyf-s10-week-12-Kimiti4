@@ -630,7 +630,7 @@
 }
 
 /* J-022: Dark mode overrides */
-[data-theme='dark'] & {
+[data-theme='dark'] .admin-dashboard {
   background-color: var(--surface);
   color: var(--text-primary);
   border-color: var(--border);

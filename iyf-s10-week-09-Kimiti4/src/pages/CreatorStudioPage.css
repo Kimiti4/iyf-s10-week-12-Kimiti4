@@ -375,7 +375,7 @@
 .creator-studio-content-list h2:first-child { margin-top: 0; }
 
 /* J-022: Dark mode overrides */
-[data-theme='dark'] & {
+[data-theme='dark'] .creator-studio {
   background-color: var(--surface);
   color: var(--text-primary);
   border-color: var(--border);

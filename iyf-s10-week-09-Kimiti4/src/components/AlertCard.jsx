@@ -22,9 +22,7 @@ const VERIFICATION_CONFIG = {
 
 export default function AlertCard({ alert, onConfirm, currentUser }) {
   const toast = useToast();
-  const [confirmed, setConfirmed] = useState(
-    alert.confirmations?.some(c => c.user === currentUser?._id) || false
-  );
+  const [confirmed, setConfirmed] = useState(false);
   const [confirmationCount, setConfirmationCount] = useState(alert.confirmationCount || 0);
 
   const verification = VERIFICATION_CONFIG[alert.verificationLevel] || VERIFICATION_CONFIG.unverified;
@@ -32,7 +30,7 @@ export default function AlertCard({ alert, onConfirm, currentUser }) {
   const handleConfirm = async () => {
     if (!currentUser) { toast.info('Login to confirm alerts'); return; }
     try {
-      await onConfirm(alert._id);
+      await onConfirm(alert.id);
       setConfirmed(!confirmed);
       setConfirmationCount(prev => confirmed ? prev - 1 : prev + 1);
     } catch { /* silent */ }
@@ -61,7 +59,6 @@ export default function AlertCard({ alert, onConfirm, currentUser }) {
               {alert.severity === 'critical' && '🔴'}
               {alert.severity === 'warning' && '🟠'}
               {alert.severity === 'info' && '🔵'}
-              {alert.severity === 'official' && '🟣'}
               {' '}{alert.severity?.charAt(0).toUpperCase() + alert.severity?.slice(1)}
             </span>
             <span className={`alert-card__verification ${verification.className}`}>
@@ -122,11 +119,11 @@ export default function AlertCard({ alert, onConfirm, currentUser }) {
         {alert.author && (
           <div className="alert-card__author">
             <div className="alert-card__avatar" aria-hidden="true">
-              {alert.author.avatar || alert.author.username?.charAt(0).toUpperCase()}
+              {alert.author.avatarIcon || alert.author.username?.charAt(0).toUpperCase()}
             </div>
             <span className="alert-card__author-name">{alert.author.username}</span>
-            {alert.author.profile?.verified && (
-              <span className="alert-card__verified">✓ Verified</span>
+            {verification.className !== 'badge--unverified' && (
+              <span className="alert-card__verified">{verification.label}</span>
             )}
           </div>
         )}

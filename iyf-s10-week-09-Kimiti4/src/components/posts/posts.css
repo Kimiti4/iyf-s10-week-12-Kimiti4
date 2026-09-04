@@ -576,7 +576,7 @@
 }
 
 /* J-022: Dark mode overrides */
-[data-theme='dark'] & {
+[data-theme='dark'] .post-card {
   background-color: var(--surface);
   color: var(--text-primary);
   border-color: var(--border);

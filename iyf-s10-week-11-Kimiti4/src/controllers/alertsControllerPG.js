@@ -6,6 +6,9 @@ const getAlerts = asyncHandler(async (req, res) => {
     status: req.query.status || 'active',
     category: req.query.category && req.query.category !== 'all' ? req.query.category : undefined,
     severity: req.query.severity,
+    verificationLevel: req.query.verificationLevel,
+    county: req.query.county,
+    search: req.query.search,
     page: req.query.page,
     limit: req.query.limit,
   });

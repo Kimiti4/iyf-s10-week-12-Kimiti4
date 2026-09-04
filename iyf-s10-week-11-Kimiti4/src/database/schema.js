@@ -247,7 +247,7 @@ const createTables = async () => {
         title VARCHAR(200) NOT NULL,
         description TEXT NOT NULL,
         category VARCHAR(50) NOT NULL,
-        severity VARCHAR(20) NOT NULL DEFAULT 'medium',
+        severity VARCHAR(20) NOT NULL DEFAULT 'info' CHECK (severity IN ('info', 'warning', 'critical')),
         location VARCHAR(300),
         longitude DOUBLE PRECISION,
         latitude DOUBLE PRECISION,
@@ -256,12 +256,13 @@ const createTables = async () => {
         author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         organization_id UUID REFERENCES organizations(id) ON DELETE SET NULL,
         status VARCHAR(20) NOT NULL DEFAULT 'active',
-        verification_level VARCHAR(30) NOT NULL DEFAULT 'unverified',
+        verification_level VARCHAR(30) NOT NULL DEFAULT 'unverified' CHECK (verification_level IN ('unverified', 'community_verified', 'mod_verified', 'official')),
         reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
         reviewed_at TIMESTAMP,
         review_notes TEXT,
         views INTEGER NOT NULL DEFAULT 0,
         expires_at TIMESTAMP,
+        radius_km INTEGER,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
       )
@@ -370,6 +371,15 @@ const createTables = async () => {
     await query(`CREATE INDEX IF NOT EXISTS idx_comments_author ON comments(author_id)`);
     
     await query(`CREATE INDEX IF NOT EXISTS idx_mfa_user ON mfa_methods(user_id)`);
+
+    // Add radius_km column if it doesn't exist (P3: persist alert radius)
+    try { await query(`ALTER TABLE alerts ADD COLUMN IF NOT EXISTS radius_km INTEGER`); } catch {}
+    await query(`CREATE INDEX IF NOT EXISTS idx_alerts_radius ON alerts(radius_km)`);
+
+    // Add alert category + verification indexes
+    await query(`CREATE INDEX IF NOT EXISTS idx_alerts_category ON alerts(category)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_alerts_verification ON alerts(verification_level)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_alerts_created ON alerts(created_at DESC)`);
 
     console.log('✅ All tables and indexes created successfully!');
     return true;

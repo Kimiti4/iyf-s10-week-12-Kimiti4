@@ -8,6 +8,13 @@ class AlertRepository {
     if (filters.status) { conditions.push(`a.status = $${index++}`); values.push(filters.status); }
     if (filters.category) { conditions.push(`a.category = $${index++}`); values.push(filters.category); }
     if (filters.severity) { conditions.push(`a.severity = $${index++}`); values.push(filters.severity); }
+    if (filters.verificationLevel) { conditions.push(`a.verification_level = $${index++}`); values.push(filters.verificationLevel); }
+    if (filters.county) { conditions.push(`a.location ILIKE $${index++}`); values.push(`%${filters.county}%`); }
+    if (filters.search) {
+      conditions.push(`(a.title ILIKE $${index} OR a.description ILIKE $${index})`);
+      values.push(`%${filters.search}%`);
+      index++;
+    }
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const limit = Math.min(Number(filters.limit) || 50, 100);
     const page = Math.max(Number(filters.page) || 1, 1);
@@ -38,11 +45,13 @@ class AlertRepository {
 
   async create(data) {
     const result = await query(`INSERT INTO alerts
-      (title, description, category, severity, location, longitude, latitude, images, tags, author_id, organization_id)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id`, [
+      (title, description, category, severity, location, longitude, latitude, images, tags, author_id, organization_id, expires_at, radius_km)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`, [
       data.title, data.description, data.category, data.severity, data.location || null,
       data.coordinates?.[0] || null, data.coordinates?.[1] || null,
-      JSON.stringify(data.images || []), data.tags || [], data.authorId, data.organizationId || null
+      JSON.stringify(data.images || []), data.tags || [], data.authorId, data.organizationId || null,
+      data.expiresAt ? new Date(data.expiresAt) : null,
+      data.radius ? Number(data.radius) : null
     ]);
     return this.findById(result.rows[0].id);
   }
@@ -83,7 +92,36 @@ class AlertRepository {
 
   format(row) {
     if (!row) return null;
-    return { ...row, author: { id: row.author_id, username: row.author_username, avatarIcon: row.author_avatar_icon }, organization: row.organization_id ? { id: row.organization_id, name: row.organization_name, slug: row.organization_slug } : null, coordinates: row.longitude == null ? null : [row.longitude, row.latitude], confirmationCount: Number(row.confirmation_count || 0), tags: row.tags || [], images: row.images || [] };
+    return {
+      id: row.id,
+      author_id: row.author_id,
+      title: row.title,
+      description: row.description,
+      category: row.category,
+      severity: row.severity,
+      status: row.status,
+      verificationLevel: row.verification_level,
+      location: row.location,
+      coordinates: row.longitude == null ? null : [row.longitude, row.latitude],
+      images: row.images || [],
+      tags: row.tags || [],
+      views: row.views,
+      expiresAt: row.expires_at || null,
+      radius: row.radius_km || null,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      author: {
+        id: row.author_id,
+        username: row.author_username,
+        avatarIcon: row.author_avatar_icon,
+      },
+      organization: row.organization_id ? {
+        id: row.organization_id,
+        name: row.organization_name,
+        slug: row.organization_slug,
+      } : null,
+      confirmationCount: Number(row.confirmation_count || 0),
+    };
   }
 }
 

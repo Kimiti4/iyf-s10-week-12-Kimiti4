@@ -196,7 +196,7 @@
 }
 
 /* J-022: Dark mode overrides */
-[data-theme='dark'] & {
+[data-theme='dark'] .error-boundary-fallback {
   background-color: var(--surface);
   color: var(--text-primary);
   border-color: var(--border);

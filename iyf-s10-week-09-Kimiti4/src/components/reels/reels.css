@@ -570,7 +570,7 @@
 }
 
 /* J-022: Dark mode overrides */
-[data-theme='dark'] & {
+[data-theme='dark'] .reel-card {
   background-color: var(--surface);
   color: var(--text-primary);
   border-color: var(--border);

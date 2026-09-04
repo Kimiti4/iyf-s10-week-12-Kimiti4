@@ -74,7 +74,7 @@
   transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 .severity-chip:hover {
-  background: var(--surface-soft, var(--surface-soft));
+  background: var(--surface-soft);
 }
 .severity-chip:focus-visible {
   outline: 2px solid var(--brand-500);
@@ -88,7 +88,7 @@
 
 .severity-chip__icon { font-size: 12px; }
 .severity-chip__count {
-  background: var(--surface-soft, var(--surface-soft));
+  background: var(--surface-soft);
   padding: 1px 6px;
   border-radius: 999px;
   font-size: 11px;
@@ -111,6 +111,34 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-bar__search {
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+}
+.filter-input:focus {
+  outline: none;
+  border-color: var(--brand-500);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-500) 12%, transparent);
+}
+
+.filter-bar__select-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .filter-bar__label {
@@ -191,6 +219,45 @@
   font-size: 14px;
   color: var(--text-tertiary);
   font-weight: 400;
+}
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 12px 0;
+}
+
+.pagination__btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.pagination__btn:hover:not(:disabled) {
+  background: var(--surface-soft);
+  border-color: var(--brand-500);
+}
+.pagination__btn:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+}
+.pagination__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.pagination__info {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-weight: 500;
 }
 
 /* ── Responsive ── */

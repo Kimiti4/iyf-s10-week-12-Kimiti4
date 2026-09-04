@@ -11,7 +11,14 @@ const SEVERITY_FILTERS = [
   { value: 'critical', label: 'Emergency', icon: '🔴' },
   { value: 'warning', label: 'Warning', icon: '🟠' },
   { value: 'info', label: 'Info', icon: '🔵' },
-  { value: 'official', label: 'Official', icon: '🟣' },
+];
+
+const VERIFICATION_FILTERS = [
+  { value: 'all', label: 'All Sources' },
+  { value: 'official', label: 'Official' },
+  { value: 'mod_verified', label: 'Mod Verified' },
+  { value: 'community_verified', label: 'Community Verified' },
+  { value: 'unverified', label: 'Unverified' },
 ];
 
 const CATEGORIES = [
@@ -34,6 +41,11 @@ export default function AlertFeedPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [severityFilter, setSeverityFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [verificationFilter, setVerificationFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const toast = useToast();
   const toastRef = useRef(toast);
@@ -42,34 +54,41 @@ export default function AlertFeedPage() {
     toastRef.current = toast;
   }, [toast]);
 
-  const fetchAlerts = useCallback(async () => {
+  const fetchAlerts = useCallback(async (pageNum = 1) => {
     try {
       setLoading(true);
-      const params = {};
+      const params = { page: pageNum, limit: 20 };
       if (severityFilter !== 'all') params.severity = severityFilter;
       if (categoryFilter !== 'all') params.category = categoryFilter;
+      if (verificationFilter !== 'all') params.verificationLevel = verificationFilter;
+      if (searchQuery.trim()) params.search = searchQuery.trim();
       const response = await alertsAPI.getAll(params);
       setAlerts(response.data || []);
+      setPage(response.page || 1);
+      setTotalPages(response.pages || 1);
+      setTotal(response.total || 0);
     } catch {
       toastRef.current.error('Failed to load alerts');
     } finally {
       setLoading(false);
     }
-  }, [severityFilter, categoryFilter]);
+  }, [severityFilter, categoryFilter, verificationFilter, searchQuery]);
 
   useEffect(() => {
     const socket = initializeSocket();
     const cleanupNew = onNewAlert((newAlert) => {
       setAlerts(prev => [newAlert, ...prev]);
+      setTotal(prev => prev + 1);
       toastRef.current.info(`New alert: ${newAlert.title}`);
     });
     const cleanupUpdate = onAlertUpdate((updated) => {
-      setAlerts(prev => prev.map(a => a._id === updated._id ? updated : a));
+      setAlerts(prev => prev.map(a => a.id === updated.id ? updated : a));
     });
     const cleanupDelete = onAlertDelete(({ alertId }) => {
-      setAlerts(prev => prev.filter(a => a._id !== alertId));
+      setAlerts(prev => prev.filter(a => a.id !== alertId));
+      setTotal(prev => Math.max(0, prev - 1));
     });
-    fetchAlerts();
+    fetchAlerts(1);
     return () => { cleanupNew(); cleanupUpdate(); cleanupDelete(); disconnectSocket(); };
   }, [fetchAlerts]);
 
@@ -78,7 +97,10 @@ export default function AlertFeedPage() {
       const response = await alertsAPI.create(formData);
       toastRef.current.success('Alert published');
       setShowCreateForm(false);
-      if (response.data) setAlerts(prev => [response.data, ...prev]);
+      if (response.data) {
+        setAlerts(prev => [response.data, ...prev]);
+        setTotal(prev => prev + 1);
+      }
     } catch (error) {
       toastRef.current.error(error.response?.data?.message || 'Failed to create alert');
       throw error;
@@ -141,19 +163,45 @@ export default function AlertFeedPage() {
         </div>
       )}
 
-      {/* Category Filter */}
+      {/* Search + Filters */}
       <div className="filter-bar">
-        <label htmlFor="alert-category-filter" className="filter-bar__label">Category</label>
-        <select
-          id="alert-category-filter"
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          className="filter-select"
-        >
-          {CATEGORIES.map(c => (
-            <option key={c.value} value={c.value}>{c.label}</option>
-          ))}
-        </select>
+        <div className="filter-bar__search">
+          <input
+            type="search"
+            id="alert-search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search alerts..."
+            className="filter-input"
+            aria-label="Search alerts"
+          />
+        </div>
+        <div className="filter-bar__select-group">
+          <label htmlFor="alert-category-filter" className="filter-bar__label">Category</label>
+          <select
+            id="alert-category-filter"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="filter-select"
+          >
+            {CATEGORIES.map(c => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="filter-bar__select-group">
+          <label htmlFor="alert-verification-filter" className="filter-bar__label">Source</label>
+          <select
+            id="alert-verification-filter"
+            value={verificationFilter}
+            onChange={(e) => setVerificationFilter(e.target.value)}
+            className="filter-select"
+          >
+            {VERIFICATION_FILTERS.map(v => (
+              <option key={v.value} value={v.value}>{v.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Alert List */}
@@ -170,13 +218,39 @@ export default function AlertFeedPage() {
             <p className="empty-hint">Nothing to report right now</p>
           </div>
         ) : (
-          <ul className="alerts-list" role="list">
-            {alerts.map(alert => (
-              <li key={alert._id}>
-                <AlertCard alert={alert} onConfirm={() => handleConfirmAlert(alert._id)} />
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="alerts-list" role="list">
+              {alerts.map(alert => (
+                <li key={alert.id}>
+                  <AlertCard alert={alert} onConfirm={() => handleConfirmAlert(alert.id)} />
+                </li>
+              ))}
+            </ul>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <nav className="pagination" role="navigation" aria-label="Alert pagination">
+                <button
+                  className="pagination__btn"
+                  onClick={() => fetchAlerts(page - 1)}
+                  disabled={page <= 1}
+                  aria-label="Previous page"
+                >
+                  ← Prev
+                </button>
+                <span className="pagination__info">
+                  {page} / {totalPages} ({total} total)
+                </span>
+                <button
+                  className="pagination__btn"
+                  onClick={() => fetchAlerts(page + 1)}
+                  disabled={page >= totalPages}
+                  aria-label="Next page"
+                >
+                  Next →
+                </button>
+              </nav>
+            )}
+          </>
         )}
       </section>
     </div>

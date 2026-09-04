@@ -757,7 +757,7 @@ input:checked + .slider:before {
 }
 
 /* J-022: Dark mode overrides */
-[data-theme='dark'] & {
+[data-theme='dark'] .founder-dashboard {
   background-color: var(--surface);
   color: var(--text-primary);
   border-color: var(--border);
