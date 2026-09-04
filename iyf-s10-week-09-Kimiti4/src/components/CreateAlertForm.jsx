@@ -109,6 +109,9 @@ export default function CreateAlertForm({ onSubmit, onCancel }) {
     category: '',
     severity: 'info',
     location: '',
+    county: '',
+    settlement: '',
+    ward: '',
     radius: 5,
     expiresAt: ''
   });
@@ -157,6 +160,9 @@ export default function CreateAlertForm({ onSubmit, onCancel }) {
         category: '',
         severity: 'info',
         location: '',
+        county: '',
+        settlement: '',
+        ward: '',
         radius: 5,
         expiresAt: ''
       });
@@ -300,13 +306,56 @@ export default function CreateAlertForm({ onSubmit, onCancel }) {
               id="location"
               value={formData.location}
               onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-              placeholder="Add location (e.g., Westlands, Nairobi)"
+              placeholder="Free-form location text"
               className="form-input"
             />
           </div>
         </div>
 
-        {/* Radius Slider */}
+        {/* Structured geographic fields */}
+        <div className="form-section">
+          <label className="form-label">
+            Geographic context <span className="optional">(Optional, for filtering)</span>
+          </label>
+          <div className="geo-fields">
+            <div className="geo-field">
+              <input
+                type="text"
+                id="county"
+                value={formData.county}
+                onChange={(e) => setFormData(prev => ({ ...prev, county: e.target.value }))}
+                placeholder="County (e.g., Nairobi)"
+                className="form-input"
+                aria-label="County"
+              />
+            </div>
+            <div className="geo-field">
+              <input
+                type="text"
+                id="settlement"
+                value={formData.settlement}
+                onChange={(e) => setFormData(prev => ({ ...prev, settlement: e.target.value }))}
+                placeholder="Settlement (e.g., Westlands)"
+                className="form-input"
+                aria-label="Settlement"
+              />
+            </div>
+            <div className="geo-field">
+              <input
+                type="text"
+                id="ward"
+                value={formData.ward}
+                onChange={(e) => setFormData(prev => ({ ...prev, ward: e.target.value }))}
+                placeholder="Ward (optional)"
+                className="form-input"
+                aria-label="Ward"
+              />
+            </div>
+          </div>
+          <p className="help-text">Used to filter alerts by location. Leave blank to skip.</p>
+        </div>
+
+        {/* Radius Slider — supports decimal radii via 0.5 step */}
         <div className="form-section">
           <label htmlFor="radius" className="form-label">
             Alert Radius: {formData.radius}km
@@ -314,14 +363,15 @@ export default function CreateAlertForm({ onSubmit, onCancel }) {
           <input
             type="range"
             id="radius"
-            min="1"
+            min="0.5"
             max="50"
+            step="0.5"
             value={formData.radius}
-            onChange={(e) => setFormData(prev => ({ ...prev, radius: parseInt(e.target.value) }))}
+            onChange={(e) => setFormData(prev => ({ ...prev, radius: parseFloat(e.target.value) }))}
             className="range-slider"
           />
           <div className="range-labels">
-            <span>1km</span>
+            <span>0.5km</span>
             <span>25km</span>
             <span>50km</span>
           </div>
