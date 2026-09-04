@@ -43,21 +43,15 @@ const startServer = async () => {
     
     server.listen(PORT, '0.0.0.0', () => {
       console.log('='.repeat(60));
-      console.log(' Jamii Link KE API running in ${NODE_ENV} mode');
-      console.log(' Server listening on 0.0.0.0:${PORT}');
-      console.log(' Railway can now route to this service');
-      console.log(' Health endpoint: http://0.0.0.0:${PORT}/api/health');
+      console.log(` Jamii Link KE API running in ${NODE_ENV} mode`);
+      console.log(` Server listening on 0.0.0.0:${PORT}`);
+      console.log(` Health: http://0.0.0.0:${PORT}/health`);
       console.log('='.repeat(60));
-      console.log(' Organizations: http://0.0.0.0:${PORT}/api/organizations');
-      console.log(' Posts: http://0.0.0.0:${PORT}/api/posts');
-      console.log(' Users: http://0.0.0.0:${PORT}/api/users');
-      console.log(' Farm Prices: http://0.0.0.0:${PORT}/api/market/prices');
-      console.log('🚨 Alerts: http://0.0.0.0:${PORT}/api/alerts');
+      console.log(` Alerts: http://0.0.0.0:${PORT}/api/alerts`);
+      console.log(` Posts:  http://0.0.0.0:${PORT}/api/posts`);
+      console.log(` Orgs:   http://0.0.0.0:${PORT}/api/organizations`);
       console.log('='.repeat(60));
-      console.log('💡 Tip: Use category=mtaani|skill|farm|gig to filter posts');
-      console.log('🔑 Create org: POST /api/organizations with auth token');
-      console.log('='.repeat(60));
-      console.log('✅ SERVER IS READY - Railway should be able to connect!\n');
+      console.log('✅ SERVER IS READY\n');
     });
 
     // Handle server errors (critical for debugging)
@@ -78,8 +72,8 @@ const startServer = async () => {
     console.error('❌ Failed to start server:', error.message);
     console.error('Stack trace:', error.stack);
     console.error('\n💡 Common issues:');
-    console.error('   1. DATABASE_URL not set in Railway environment variables');
-    console.error('   2. PostgreSQL service not connected to this service');
+    console.error('   1. DATABASE_URL not set in .env');
+    console.error('   2. PostgreSQL service not running');
     console.error('   3. Invalid connection string format');
     console.error('   4. Database service is down or unreachable');
     process.exit(1);

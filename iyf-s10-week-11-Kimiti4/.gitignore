@@ -51,3 +51,22 @@ src/seeds/
 !src/database/*.js
 !src/database/repositories/
 !src/database/repositories/*.js
+
+# Allow new directories added for migration framework + tests
+!scripts/
+!scripts/migrate.js
+!scripts/migrate-all.js
+!scripts/migrations/
+!scripts/migrations/*.js
+!tests/
+!tests/*.js
+
+# Allow archive/ files (legacy MongoDB code preserved for reference)
+!archive/
+!archive/*.js
+!archive/*.md
+!archive/models/
+!archive/models/*.js
+!archive/*.json
+!archive/*.yaml
+!archive/*.bat

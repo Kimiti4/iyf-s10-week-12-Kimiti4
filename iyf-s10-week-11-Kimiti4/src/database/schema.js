@@ -9,6 +9,8 @@ const createTables = async () => {
 
   try {
     await query(`CREATE EXTENSION IF NOT EXISTS pgcrypto`);
+    // Full-text search support (optional — script continues if extension not available)
+    try { await query(`CREATE EXTENSION IF NOT EXISTS pg_trgm`); } catch {}
 
     // 1. Users Table
     await query(`
@@ -249,6 +251,9 @@ const createTables = async () => {
         category VARCHAR(50) NOT NULL,
         severity VARCHAR(20) NOT NULL DEFAULT 'info' CHECK (severity IN ('info', 'warning', 'critical')),
         location VARCHAR(300),
+        county VARCHAR(100),
+        settlement VARCHAR(100),
+        ward VARCHAR(100),
         longitude DOUBLE PRECISION,
         latitude DOUBLE PRECISION,
         images JSONB DEFAULT '[]'::jsonb,
@@ -262,7 +267,14 @@ const createTables = async () => {
         review_notes TEXT,
         views INTEGER NOT NULL DEFAULT 0,
         expires_at TIMESTAMP,
-        radius_km INTEGER,
+        radius_km NUMERIC(6,2),
+        search_vector tsvector GENERATED ALWAYS AS (
+          setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+          setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
+          setweight(to_tsvector('english', coalesce(location, '')), 'C') ||
+          setweight(to_tsvector('english', coalesce(county, '')), 'C') ||
+          setweight(to_tsvector('english', coalesce(settlement, '')), 'C')
+        ) STORED,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
       )
@@ -373,8 +385,34 @@ const createTables = async () => {
     await query(`CREATE INDEX IF NOT EXISTS idx_mfa_user ON mfa_methods(user_id)`);
 
     // Add radius_km column if it doesn't exist (P3: persist alert radius)
-    try { await query(`ALTER TABLE alerts ADD COLUMN IF NOT EXISTS radius_km INTEGER`); } catch {}
+    try { await query(`ALTER TABLE alerts ADD COLUMN IF NOT EXISTS radius_km NUMERIC(6,2)`); } catch {}
     await query(`CREATE INDEX IF NOT EXISTS idx_alerts_radius ON alerts(radius_km)`);
+
+    // Add county/settlement/ward columns + index
+    try { await query(`ALTER TABLE alerts ADD COLUMN IF NOT EXISTS county VARCHAR(100)`); } catch {}
+    try { await query(`ALTER TABLE alerts ADD COLUMN IF NOT EXISTS settlement VARCHAR(100)`); } catch {}
+    try { await query(`ALTER TABLE alerts ADD COLUMN IF NOT EXISTS ward VARCHAR(100)`); } catch {}
+    await query(`CREATE INDEX IF NOT EXISTS idx_alerts_county ON alerts(county) WHERE county IS NOT NULL`);
+
+    // Add search_vector column for FTS (P4: production-grade search)
+    try {
+      await query(`
+        ALTER TABLE alerts
+          ADD COLUMN IF NOT EXISTS search_vector tsvector
+          GENERATED ALWAYS AS (
+            setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+            setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
+            setweight(to_tsvector('english', coalesce(location, '')), 'C') ||
+            setweight(to_tsvector('english', coalesce(county, '')), 'C') ||
+            setweight(to_tsvector('english', coalesce(settlement, '')), 'C')
+          ) STORED
+      `);
+    } catch {}
+    try { await query(`CREATE INDEX IF NOT EXISTS idx_alerts_search_vector ON alerts USING GIN (search_vector)`); } catch {}
+
+    // Trigram GIN indexes for fuzzy search (P4: production-grade search)
+    try { await query(`CREATE INDEX IF NOT EXISTS idx_alerts_title_trgm ON alerts USING GIN (title gin_trgm_ops)`); } catch {}
+    try { await query(`CREATE INDEX IF NOT EXISTS idx_alerts_description_trgm ON alerts USING GIN (description gin_trgm_ops)`); } catch {}
 
     // Add alert category + verification indexes
     await query(`CREATE INDEX IF NOT EXISTS idx_alerts_category ON alerts(category)`);

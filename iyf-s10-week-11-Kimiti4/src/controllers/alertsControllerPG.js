@@ -8,6 +8,8 @@ const getAlerts = asyncHandler(async (req, res) => {
     severity: req.query.severity,
     verificationLevel: req.query.verificationLevel,
     county: req.query.county,
+    settlement: req.query.settlement,
+    ward: req.query.ward,
     search: req.query.search,
     page: req.query.page,
     limit: req.query.limit,
@@ -30,17 +32,21 @@ const createAlert = asyncHandler(async (req, res) => {
 });
 
 const updateAlert = asyncHandler(async (req, res) => {
-  const existing = await AlertRepository.findById(req.params.id);
-  if (!existing) return res.status(404).json({ success: false, error: 'Alert not found' });
-  if (existing.author_id && existing.author_id !== req.user.id && !['admin', 'moderator'].includes(req.user.role)) return res.status(403).json({ success: false, error: 'Not authorized to update this alert' });
+  const authorId = await AlertRepository.getAuthorId(req.params.id);
+  if (!authorId) return res.status(404).json({ success: false, error: 'Alert not found' });
+  if (authorId !== req.user.id && !['admin', 'moderator'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, error: 'Not authorized to update this alert' });
+  }
   const alert = await AlertRepository.update(req.params.id, req.body);
   res.json({ success: true, message: 'Alert updated successfully', data: alert });
 });
 
 const deleteAlert = asyncHandler(async (req, res) => {
-  const existing = await AlertRepository.findById(req.params.id);
-  if (!existing) return res.status(404).json({ success: false, error: 'Alert not found' });
-  if (existing.author_id && existing.author_id !== req.user.id && !['admin', 'moderator'].includes(req.user.role)) return res.status(403).json({ success: false, error: 'Not authorized to delete this alert' });
+  const authorId = await AlertRepository.getAuthorId(req.params.id);
+  if (!authorId) return res.status(404).json({ success: false, error: 'Alert not found' });
+  if (authorId !== req.user.id && !['admin', 'moderator'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, error: 'Not authorized to delete this alert' });
+  }
   await AlertRepository.remove(req.params.id);
   res.json({ success: true, message: 'Alert removed successfully' });
 });
@@ -73,10 +79,21 @@ const verifyAlert = asyncHandler(async (req, res) => {
 });
 
 const getAlertStats = asyncHandler(async (req, res) => {
-  const result = await require('../config/postgres').query(`SELECT category, COUNT(*)::int AS count, AVG(views)::float AS "avgViews" FROM alerts GROUP BY category ORDER BY count DESC`);
-  const severity = await require('../config/postgres').query(`SELECT severity AS id, COUNT(*)::int AS count FROM alerts GROUP BY severity`);
-  const verification = await require('../config/postgres').query(`SELECT verification_level AS id, COUNT(*)::int AS count FROM alerts GROUP BY verification_level`);
-  res.json({ success: true, data: { byCategory: result.rows, bySeverity: severity.rows, byVerification: verification.rows } });
+  const { query } = require('../config/postgres');
+  const byCategory = await query(`SELECT category, COUNT(*)::int AS count, AVG(views)::float AS "avgViews" FROM alerts GROUP BY category ORDER BY count DESC`);
+  const bySeverity = await query(`SELECT severity AS id, COUNT(*)::int AS count FROM alerts GROUP BY severity`);
+  const byVerification = await query(`SELECT verification_level AS id, COUNT(*)::int AS count FROM alerts GROUP BY verification_level`);
+  const summary = await query(`
+    SELECT
+      COUNT(*)::int AS active,
+      COUNT(*) FILTER (WHERE severity = 'critical')::int AS critical,
+      COUNT(*) FILTER (WHERE severity = 'warning')::int AS warning,
+      COUNT(*) FILTER (WHERE severity = 'info')::int AS info,
+      COUNT(*) FILTER (WHERE verification_level != 'unverified')::int AS verified,
+      COUNT(*) FILTER (WHERE expires_at IS NOT NULL AND expires_at < NOW() + INTERVAL '24 hours')::int AS "expiringSoon"
+    FROM alerts WHERE status = 'active'
+  `);
+  res.json({ success: true, data: { byCategory: byCategory.rows, bySeverity: bySeverity.rows, byVerification: byVerification.rows, summary: summary.rows[0] } });
 });
 
 module.exports = { getAlerts, getAlertById, createAlert, updateAlert, deleteAlert, confirmAlert, unconfirmAlert, verifyAlert, getAlertStats };

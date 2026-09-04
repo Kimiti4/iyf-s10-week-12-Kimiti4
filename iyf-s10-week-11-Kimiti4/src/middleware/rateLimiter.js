@@ -1,9 +1,15 @@
 /**
  * 🔹 Rate Limiter Middleware
  * Prevents abuse and DDoS attacks
+ *
+ * Rate limiting is BYPASSED in the test environment (NODE_ENV=test)
+ * so contract tests can exercise validation + authorization without
+ * hitting the per-IP limit. Each limiter still applies in production.
  */
 
 const rateLimit = require('express-rate-limit');
+
+const isTestEnv = () => process.env.NODE_ENV === 'test';
 
 /**
  * General API rate limiter: 100 requests per 15 minutes
@@ -15,8 +21,8 @@ const generalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    // Skip for health checks
-    return req.path === '/api/health' || req.path === '/health';
+    // Skip for health checks + test environment
+    return isTestEnv() || req.path === '/api/health' || req.path === '/health';
   }
 });
 
@@ -29,7 +35,8 @@ const authLimiter = rateLimit({
   max: 5,
   message: 'Too many authentication attempts, please try again later.',
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: () => isTestEnv()
 });
 
 /**
@@ -41,7 +48,8 @@ const alertLimiter = rateLimit({
   max: 10,
   message: 'Too many alerts created. Please try again later.',
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: () => isTestEnv()
 });
 
 module.exports = {
