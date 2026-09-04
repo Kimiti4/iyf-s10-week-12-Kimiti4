@@ -15,10 +15,17 @@ const pool = new Pool({
 });
 
 // Founder account details
+const FOUNDER_PASSWORD = process.env.FOUNDER_PASSWORD;
+if (!FOUNDER_PASSWORD) {
+  console.error('❌ FOUNDER_PASSWORD environment variable is required to seed the founder account.');
+  console.error('   Example: $env:FOUNDER_PASSWORD="your-password" ; node src/seeds/founder-postgres.js');
+  process.exit(1);
+}
+
 const FOUNDER_DATA = {
   username: 'Snooz3',
   email: 'kimiti.kariuki75@gmail.com',
-  password: 'FOUNDER_PASSWORD_REDACTED',
+  password: FOUNDER_PASSWORD,
   role: 'founder',
   isFounder: true,
   profile: {
@@ -146,7 +153,7 @@ async function seedFounderAccount() {
     console.log('   1. Start frontend: cd iyf-s10-week-09-Kimiti4 && npm run dev');
     console.log('   2. Go to: http://localhost:5173/login');
     console.log('   3. Email: amos.kimiti@jamiilink.ke');
-    console.log('   4. Password: FOUNDER_PASSWORD_REDACTED');
+    console.log('   4. Password: provided via the FOUNDER_PASSWORD env var');
     console.log('   5. Click "👑 Founder" button in navbar');
     console.log('   6. Access dashboard at: /admin/founder');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
