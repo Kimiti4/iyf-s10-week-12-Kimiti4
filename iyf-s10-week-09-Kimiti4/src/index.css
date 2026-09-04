@@ -9,10 +9,6 @@
    (type scale, z-index).
 */
 :root {
-  --spacing-sm: 0.75rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -80,6 +76,9 @@ button {
 }
 
 /* ─── Layout ─── */
+/* .App + .app-shell: full-height flex column shell
+   See styles/AppShell.css for .app-main, .app-content, .social-layout
+   .main-content is an alias kept for legacy components — inherits .app-main */
 .App {
   display: flex;
   flex-direction: column;
@@ -87,35 +86,29 @@ button {
   position: relative;
 }
 
-.main-content {
+.main-content,
+.app-main {
   flex: 1;
   width: 100%;
-  max-width: 1200px;
   margin: 0 auto;
-  padding: var(--space-lg) var(--space-md) calc(80px + env(safe-area-inset-bottom, 20px));
+  padding: var(--space-6) var(--space-4) calc(80px + env(safe-area-inset-bottom, 20px));
   transition: all 0.3s ease;
   z-index: 1;
   position: relative;
 }
 
-@media (min-width: 768px) {
-  .main-content {
-    margin-left: var(--sidebar-collapsed-width, 80px);
-    max-width: calc(100% - var(--sidebar-collapsed-width, 80px));
-    padding-bottom: var(--space-xl);
-  }
-
-  .main-content.with-sidebar:not(.sidebar-collapsed) {
-    margin-left: var(--sidebar-width, 280px);
-    max-width: calc(100% - var(--sidebar-width, 280px));
-  }
+/* Sidebar offsets are owned by styles/AppShell.css (.app-main rules).
+   Only add the bottom padding here since .main-content may be used
+   outside the app shell wrapper. */
+.main-content {
+  max-width: 1200px;
 }
 
 /* ─── Typography ─── */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 800;
   letter-spacing: -0.03em;
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-3);
   color: var(--text-primary);
 }
 
@@ -125,7 +118,7 @@ h3 { font-size: 1.5rem; }
 
 p {
   line-height: 1.6;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-4);
   color: var(--text-primary);
 }
 
