@@ -56,6 +56,7 @@ src/seeds/
 !scripts/
 !scripts/migrate.js
 !scripts/migrate-all.js
+!scripts/rotate-founder.js
 !scripts/migrations/
 !scripts/migrations/*.js
 !tests/
