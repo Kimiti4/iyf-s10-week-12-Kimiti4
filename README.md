@@ -1,245 +1,181 @@
-# Week 12: Deployment & Final Project - JamiiLink
+# JamiiLink
 
-## Author
+> Full-stack community platform for sharing information, trading goods, and building trusted local communities.
 
-- **Name:** Amos Kimiti
+JamiiLink is a production-oriented full-stack application built around a React frontend, Express API, MongoDB persistence, and JWT-based authentication.
 
-- **GitHub:** [@Kimiti4](https://github.com/Kimiti4)
+The repository represents the final Week 12 implementation of the project and is presented here as a **full-stack engineering project**, rather than only as a course exercise.
 
-- **Date:** May 1, 2026
+## Product scope
 
+JamiiLink provides a community publishing workflow with authenticated users, posts, profiles, search, verification/credibility features, and responsive access across desktop and mobile layouts.
 
+### Core capabilities
 
-## Project Description
+- User registration, login, and JWT authentication
+- Protected frontend routes and authenticated API operations
+- Create, read, update, and delete posts
+- Search by post title, content, and category
+- User profiles and post history
+- Image upload support
+- Post credibility / verification workflow
+- Responsive UI
+- Backend health endpoint
+- Environment-based configuration for development and deployment
 
-JamiiLink is a full-stack community platform that connects Kenyan communities to share information, trade goods, and grow together. This final week project deploys the complete application with React frontend, Express backend, MongoDB database, and JWT authentication to production servers (Render + Vercel).
+## Architecture
 
-
-
-## Technologies Used
-
-- React 18
-
-- React Router v6
-
-- Vite
-
-- Node.js
-
-- Express.js
-
-- MongoDB
-
-- Mongoose
-
-- JWT Authentication
-
-- bcrypt
-
-- CORS
-
-- Render (Backend Hosting)
-
-- Vercel (Frontend Hosting)
-
-- MongoDB Atlas (Cloud Database)
-
-
-
-## Features
-
-- Secure user registration and authentication with JWT tokens
-
-- Protected routes requiring login
-
-- Create, read, update, delete posts (CRUD operations)
-
-- Search posts by title, content, or category
-
-- User profiles with post history
-
-- Image upload support for posts
-
-- Post credibility/verification system
-
-- Responsive design for mobile and desktop
-
-- Health check endpoint for monitoring
-
-- Production deployment on Render and Vercel
-
-## Lesson 23: Full-Stack Integration
-✅ Task 23.1: Connect React to API - COMPLETED
-Location: iyf-s10-week-09-Kimiti4/src/services/api.js/iyf-s10-week-12-Kimiti4/iyf-s10-week-09-Kimiti4/src/services/api.js)
-Full API service with auth headers, error handling, 401 redirect
-Auth, Posts, Comments, Users APIs all implemented
-✅ Task 23.2: Authentication Context - COMPLETED
-Location: iyf-s10-week-09-Kimiti4/src/context/AuthContext.jsx/iyf-s10-week-12-Kimiti4/iyf-s10-week-09-Kimiti4/src/context/AuthContext.jsx)
-Auth provider with login, register, logout
-Location: iyf-s10-week-09-Kimiti4/src/components/ProtectedRoute.jsx/iyf-s10-week-12-Kimiti4/iyf-s10-week-09-Kimiti4/src/components/ProtectedRoute.jsx)
-Protected route component for authenticated pages
-✅ Task 23.3: Enable CORS - COMPLETED
-Location: iyf-s10-week-11-Kimiti4/src/app.js/iyf-s10-week-12-Kimiti4/iyf-s10-week-11-Kimiti4/src/app.js#L17-L38)
-CORS configured with environment variables
-Supports localhost and production frontend URLs
-✅ Task 23.4: Environment Variables - COMPLETED
-Backend: iyf-s10-week-11-Kimiti4/.env.example/iyf-s10-week-12-Kimiti4/iyf-s10-week-11-Kimiti4/.env.example)
-MONGODB_URI, JWT_SECRET, FRONTEND_URL, PORT, NODE_ENV
-Frontend: Uses VITE_API_URL environment variable
-Database validation: iyf-s10-week-11-Kimiti4/src/config/database.js/iyf-s10-week-12-Kimiti4/iyf-s10-week-11-Kimiti4/src/config/database.js)
-✅ Task 23.5: Production Build - READY
-Frontend: npm run build (Vite configured)
-Backend: npm start (Express server)
-package.json scripts ready
-Lesson 24: Deployment
-✅ Task 24.1: Deploy Backend - READY FOR RAILWAY
-Root directory: iyf-s10-week-11-Kimiti4
-Build: npm install
-Start: npm start
-Health check: /api/health ✅
-Environment variables documented
-✅ Task 24.2: Deploy Frontend - READY FOR VERCEL
-Root directory: iyf-s10-week-09-Kimiti4
-Build: npm run build
-Output: dist
-Framework: Vite (auto-detected)
-✅ Task 24.3: Alternative - Full Deploy to Render - READY
-Can deploy both frontend + backend together
-Static file serving configured in backend
-✅ Task 24.4: Health Check & Monitoring - COMPLETED
-Location: iyf-s10-week-11-Kimiti4/src/routes/index.js/iyf-s10-week-12-Kimiti4/iyf-s10-week-11-Kimiti4/src/routes/index.js#L12-L19)
-Health endpoint at /api/health
-Returns status, timestamp, uptime, database connection
-✅ Task 24.5: Final Polish - IN PROGRESS
-All CRUD operations work ✅
-Authentication works ✅
-Protected routes ✅
-Error messages ✅
-Loading states ✅
-Responsive design ✅
-Environment variables configured ✅
-
-## How to Run
-
-1. Clone this repository
-
-```bash
-git clone https://github.com/Kimiti4/iyf-s10-week-12-Kimiti4.git
-cd iyf-s10-week-12-Kimiti4
+```text
+┌─────────────────────┐
+│   React + Vite UI   │
+│     Frontend        │
+└──────────┬──────────┘
+           │ HTTP / JSON
+           ▼
+┌─────────────────────┐
+│   Express.js API    │
+│ Authentication/CRUD │
+└──────────┬──────────┘
+           │ Mongoose
+           ▼
+┌─────────────────────┐
+│       MongoDB       │
+│   application data  │
+└─────────────────────┘
 ```
 
-2. Install backend dependencies
+### Main stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, React Router, Vite |
+| Backend | Node.js, Express.js |
+| Database | MongoDB, Mongoose |
+| Authentication | JWT, bcrypt |
+| API integration | REST / JSON |
+| Production hosting | Vercel + Railway/Render-compatible deployment |
+| Database hosting | MongoDB Atlas |
+
+## Repository structure
+
+The final project is assembled from the full-stack work developed across the preceding project stages:
+
+```text
+iyf-s10-week-12-Kimiti4/
+├── iyf-s10-week-09-Kimiti4/    # React frontend
+├── iyf-s10-week-11-Kimiti4/    # Express backend
+├── README.md
+└── ...
+```
+
+The nested frontend/backend directories are retained because they reflect the project's development progression and final integration structure.
+
+## Running locally
+
+### Prerequisites
+
+- Node.js
+- npm
+- MongoDB or MongoDB Atlas
+
+### Backend
 
 ```bash
 cd iyf-s10-week-11-Kimiti4
 npm install
-```
-
-3. Set up environment variables
-
-```bash
 cp .env.example .env
-# Edit .env with your MongoDB URI and JWT secret
 ```
 
-4. Start backend server
+Configure the required environment variables, including the MongoDB connection string, JWT secret, frontend origin, and port.
+
+Start the backend in development mode:
 
 ```bash
 npm run dev
 ```
 
-5. In a new terminal, install and start frontend
+### Frontend
+
+In a second terminal:
 
 ```bash
-cd ../iyf-s10-week-09-Kimiti4
+cd iyf-s10-week-09-Kimiti4
 npm install
 npm run dev
 ```
 
-6. Visit `http://localhost:5173` in your browser
+The Vite development server will provide the frontend URL shown in the terminal, normally `http://localhost:5173`.
 
+## Configuration
 
+The backend uses environment variables rather than committing secrets to source control. The frontend uses Vite environment configuration for the API base URL.
 
-## Lessons Learned
+Typical backend configuration includes:
 
-- How to connect React frontend to Express REST API with proper error handling
+```text
+MONGODB_URI=...
+JWT_SECRET=...
+FRONTEND_URL=...
+PORT=...
+NODE_ENV=development
+```
 
-- Implementing JWT-based authentication with token storage and verification
+Do **not** commit real credentials, tokens, database URLs containing secrets, or production configuration files.
 
-- Creating protected routes that redirect unauthenticated users
+## API and health monitoring
 
-- Managing global state with React Context API
+The backend exposes a health endpoint at:
 
-- Configuring CORS for cross-origin requests between frontend and backend
+```text
+GET /api/health
+```
 
-- Setting up environment variables for different deployment environments
+The endpoint is intended to provide basic service/database health information for deployment and operational checks.
 
-- Deploying full-stack applications to cloud platforms (Render + Vercel)
+## Verification
 
-- Implementing health check endpoints for monitoring application status
+The project has been through staged frontend and full-stack verification work, including linting, builds, end-to-end checks, accessibility review, and deployment-oriented checks.
 
-- Building production-ready applications with proper security practices
+Verification status should be interpreted against the specific audit/run recorded for the repository rather than as a blanket guarantee that every environment and browser configuration is defect-free.
 
-- Handling file uploads and image previews in React
+## Deployment
 
+The application has deployment configuration for a separate frontend and backend:
 
+```text
+Frontend  → Vercel-compatible static/Vite deployment
+Backend   → Railway/Render-compatible Node deployment
+Database  → MongoDB Atlas
+```
 
-## Challenges Faced
+Before redeploying, verify the current environment variables, allowed CORS origins, build commands, and health-check configuration for the selected provider.
 
-**Challenge 1: MongoDB Connection Issues**
+## Engineering lessons
 
-- Problem: Deprecated Mongoose options caused connection errors
+The project demonstrates practical full-stack concerns including:
 
-- Solution: Removed `useNewUrlParser` and `useUnifiedTopology` options (deprecated in Mongoose 6+)
+- REST API integration between independent frontend/backend layers
+- Authentication and authorization boundaries
+- Protected client-side routes
+- CORS configuration
+- Environment-specific configuration
+- Database connectivity and validation
+- CRUD lifecycle design
+- Loading/error states in the UI
+- Health monitoring
+- Production deployment configuration
+- Accessibility and responsive UI considerations
 
+## Project context
 
-**Challenge 2: CORS Configuration**
+JamiiLink is one of the three public-facing flagship projects used to demonstrate the engineering progression around the broader Tiannara work.
 
-- Problem: Frontend couldn't reach backend due to CORS restrictions
+It is deliberately presented separately from the **Main Tiannara** system and the **Tiannara Software Platform**, which have different scopes and architectural objectives.
 
-- Solution: Configured CORS middleware with dynamic allowed origins from environment variables
+## License
 
+See the repository's license and project documentation for applicable terms.
 
-**Challenge 3: Environment Variables Management**
+---
 
-- Problem: Secrets exposed in code or missing in production
-
-- Solution: Created .env.example templates, used import.meta.env for Vite, and configured secrets in Render dashboard
-
-
-**Challenge 4: Protected Routes Implementation**
-
-- Problem: Users could access protected pages without authentication
-
-- Solution: Created ProtectedRoute component that checks auth state and redirects to login
-
-
-**Challenge 5: Deployment Configuration**
-
-- Problem: Backend crashed on Render due to missing environment variables
-
-- Solution: Added all required env vars individually in Render dashboard and set NODE_ENV to production
-
-
-
-## Screenshots (optional)
-
-![JamiiLink Homepage](./screenshots/homepage.png)
-
-![User Registration](./screenshots/register.png)
-
-![Create Post](./screenshots/create-post.png)
-
-![Search Results](./screenshots/search.png)
-
-![User Profile](./screenshots/profile.png)
-
-
-
-## Live Demo (if deployed)
-
-- **Frontend:** [JamiiLink](https://jamii-link-ke.vercel.app/)
-
-- **Backend API:** [Railway Deployment](https://iyf-s10-week-12-kimiti4-production.up.railway.app/)
-
-
+**JamiiLink · Amos Kariuki · Nairobi, Kenya**
