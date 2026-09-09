@@ -1,1 +1,0 @@
-G13 persistence verification requires HTTP 200, matching task id, and persisted status done.
