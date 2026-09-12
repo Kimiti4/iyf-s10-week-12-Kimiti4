@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: jamiilink-api
+    runtime: node
+    plan: free
+    rootDir: iyf-s10-week-11-Kimiti4
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false
