@@ -5,6 +5,7 @@ import { OrganizationProvider } from './context/OrganizationContext'
 import { SidebarProvider, useSidebar } from './context/SidebarContext'
 import { ToastProvider } from './components/Toast'
 import ProtectedRoute from './components/ProtectedRoute'
+import ErrorBoundary from './components/ErrorBoundary'
 import FeedbackForm from './components/FeedbackForm'
 import TrendingChip from './components/TrendingChip'
 import JamiiModeToggle from './components/JamiiModeToggle'
@@ -345,7 +346,9 @@ function MainLayout() {
     <main className={`app-main main-content with-sidebar ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
       <div className="app-content">
         <Suspense fallback={<div className="route-loading" aria-label="Loading page">Loading&hellip;</div>}>
-          <AppRoutes />
+          <ErrorBoundary>
+            <AppRoutes />
+          </ErrorBoundary>
         </Suspense>
       </div>
     </main>

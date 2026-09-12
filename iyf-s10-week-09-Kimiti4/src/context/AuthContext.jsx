@@ -2,11 +2,18 @@
  * 🔹 Authentication Context
  * Manages user authentication state across the application
  * Provides login, register, logout, password change functionality
+ *
+ * R5 [P0-7]: the access JWT lives ONLY in module memory (authToken.js),
+ * never in localStorage/sessionStorage/IndexedDB. The refresh session
+ * travels in an HttpOnly cookie managed by the server. On mount the app
+ * restores the session via POST /api/auth/refresh (cookie) — stale local
+ * state is never treated as proof of authentication.
  */
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import { setAccessToken, clearAccessToken } from '../utils/authToken';
 import logger from '../utils/logger';
 
 const AuthContext = createContext(null);
@@ -19,60 +26,50 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    
-    // Check for existing session on mount
+
+    // Restore session on mount via the refresh cookie (R5). Never trusts
+    // stale local state: a stored user profile alone proves nothing.
     useEffect(() => {
         const initializeAuth = async () => {
-            const token = localStorage.getItem('token');
-            const storedUser = localStorage.getItem('user');
-            
-            if (token && storedUser) {
-                try {
-                    // Verify token is still valid by fetching current user
-                    const response = await authAPI.getMe();
-                    setUser(response.user || response);
-                    localStorage.setItem('user', JSON.stringify(response.user || response));
-                } catch (err) {
-                    // Token invalid or expired
-                    logger.auth('initialization_error', err.message);
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    setUser(null);
+            try {
+                // Ask the server for a fresh access token using the
+                // HttpOnly refresh cookie. Fails when logged out/expired.
+                const refresh = await authAPI.refresh();
+                if (refresh && refresh.token) {
+                    setAccessToken(refresh.token);
                 }
+                const response = await authAPI.getMe();
+                const me = response.user || response;
+                setUser(me);
+                localStorage.setItem('user', JSON.stringify(me));
+            } catch (err) {
+                // No valid session: clear everything.
+                logger.auth('initialization_error', err.message);
+                clearAccessToken();
+                localStorage.removeItem('user');
+                setUser(null);
             }
-            
+
             setLoading(false);
         };
-        
+
         initializeAuth();
     }, []);
 
-    // Listen for auth events from other tabs/windows
+    // Listen for auth events
     useEffect(() => {
-        const handleStorageChange = (e) => {
-            if (e.key === 'token') {
-                if (!e.newValue) {
-                    // Token was removed in another tab
-                    setUser(null);
-                    navigate('/login');
-                }
-            }
-        };
-
         const handleLogout = () => {
             setUser(null);
             setError(null);
         };
 
-        window.addEventListener('storage', handleStorageChange);
         window.addEventListener('auth:logout', handleLogout);
 
         return () => {
-            window.removeEventListener('storage', handleStorageChange);
             window.removeEventListener('auth:logout', handleLogout);
         };
     }, [navigate]);
-    
+
     /**
      * Login user with email and password
      */
@@ -80,19 +77,19 @@ export function AuthProvider({ children }) {
         try {
             setError(null);
             setLoading(true);
-            
+
             const response = await authAPI.login(credentials);
-            
-            // Store token and user info
+
+            // R5: access token goes to memory only (never localStorage).
             if (response.token) {
-                localStorage.setItem('token', response.token);
+                setAccessToken(response.token);
             }
-            
+
             // Backend returns { success: true, message, token, user: {...} }
             const userData = response.user || response;
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
-            
+
             return userData;
         } catch (err) {
             logger.auth('login_error', err.message);
@@ -102,7 +99,7 @@ export function AuthProvider({ children }) {
             setLoading(false);
         }
     };
-    
+
     /**
      * Register new user
      */
@@ -110,18 +107,18 @@ export function AuthProvider({ children }) {
         try {
             setError(null);
             setLoading(true);
-            
+
             const response = await authAPI.register(userData);
-            
-            // Store token and user info
+
+            // R5: access token goes to memory only (never localStorage).
             if (response.token) {
-                localStorage.setItem('token', response.token);
+                setAccessToken(response.token);
             }
-            
+
             const newUser = response.user || response;
             setUser(newUser);
             localStorage.setItem('user', JSON.stringify(newUser));
-            
+
             return newUser;
         } catch (err) {
             logger.auth('registration_error', err.message);
@@ -131,43 +128,43 @@ export function AuthProvider({ children }) {
             setLoading(false);
         }
     };
-    
+
     /**
      * Logout user with proper cleanup
      */
     const logout = async () => {
         try {
             setLoading(true);
-            
-            // Call logout endpoint (backend can do cleanup if needed)
+
+            // Call logout endpoint (R5: server revokes the refresh session).
             try {
                 await authAPI.logout();
             } catch (err) {
                 logger.auth('logout_api_error', err.message);
                 // Continue with client-side logout even if API fails
             }
-            
-            // Clear all stored data
-            localStorage.removeItem('token');
+
+            // Clear all stored data (R5: memory token, never persisted).
+            clearAccessToken();
             localStorage.removeItem('user');
             localStorage.removeItem('preferences');
-            
+
             // Clear state
             setUser(null);
             setError(null);
-            
+
             // Dispatch logout event
             window.dispatchEvent(new CustomEvent('auth:logout'));
-            
+
             // Navigate to login
             navigate('/login', { replace: true });
-            
+
             logger.auth('logout_success', 'User logged out');
         } catch (err) {
             logger.auth('logout_error', err.message);
             setError('Logout failed, but clearing local data');
             // Force local logout anyway
-            localStorage.removeItem('token');
+            clearAccessToken();
             localStorage.removeItem('user');
             setUser(null);
             navigate('/login', { replace: true });
@@ -175,15 +172,21 @@ export function AuthProvider({ children }) {
             setLoading(false);
         }
     };
-    
+
     /**
-     * Change user password
+     * Change user password. R5: the backend revokes ALL sessions (including
+     * this one), so the client must re-authenticate afterwards.
      */
     const changePassword = async (passwordData) => {
         try {
             setError(null);
             const response = await authAPI.changePassword(passwordData);
             logger.auth('password_changed', 'Password changed successfully');
+            // Sessions revoked server-side: drop local session and log out.
+            clearAccessToken();
+            localStorage.removeItem('user');
+            setUser(null);
+            navigate('/login', { replace: true });
             return response;
         } catch (err) {
             logger.auth('password_change_error', err.message);
@@ -191,7 +194,7 @@ export function AuthProvider({ children }) {
             throw err;
         }
     };
-    
+
     /**
      * Update user profile
      */
@@ -208,14 +211,14 @@ export function AuthProvider({ children }) {
             throw err;
         }
     };
-    
+
     /**
      * Clear error message
      */
     const clearError = () => {
         setError(null);
     };
-    
+
     // Context value
     const value = {
         user,
@@ -229,7 +232,7 @@ export function AuthProvider({ children }) {
         updateProfile,
         clearError
     };
-    
+
     return (
         <AuthContext.Provider value={value}>
             {!loading && children}

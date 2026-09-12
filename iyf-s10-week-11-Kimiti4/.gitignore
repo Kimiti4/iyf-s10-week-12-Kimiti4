@@ -27,6 +27,9 @@ Thumbs.db
 coverage/
 .nyc_output/
 
+# User uploads (runtime files, never commit)
+public/uploads/
+
 # Misc
 package-lock.json
 
@@ -46,6 +49,7 @@ src/seeds/
 !src/routes/
 !src/routes/*.js
 !src/services/
+!src/services/*.js
 !src/utils/
 !src/database/
 !src/database/*.js

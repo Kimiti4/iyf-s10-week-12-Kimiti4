@@ -74,7 +74,32 @@ async function smoke() {
 
   try {
     const read = await req('GET', api(`/tasks/${taskId}`), { token });
-    step('smoke', 'persistence verified', read.status === 200);
+
+    const persistedTask =
+      read.json?.task ||
+      read.json?.data?.task ||
+      read.json?.data;
+
+    const persistenceVerified =
+      read.status === 200 &&
+      !!persistedTask &&
+      String(persistedTask.id) === String(taskId) &&
+      persistedTask.status === 'done';
+
+    step(
+      'smoke',
+      'persistence verified',
+      persistenceVerified,
+      persistenceVerified
+        ? undefined
+        : {
+            status: read.status,
+            expectedTaskId: taskId,
+            actualTaskId: persistedTask?.id,
+            expectedStatus: 'done',
+            actualStatus: persistedTask?.status,
+          }
+    );
   } catch (e) {
     step('smoke', 'persistence verified', false, e.message);
   }

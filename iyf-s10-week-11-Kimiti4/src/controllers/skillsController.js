@@ -60,6 +60,8 @@ exports.getMatches = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
   // Find users who are offering what I am seeking, AND seeking what I am offering
+  // R3 note: this query was never executed while the router was unmounted;
+  // the params array was missing. Fixed as part of mounting (P1-8).
   const result = await query(`
     SELECT 
       u.id as user_id, u.username, u.avatar_icon,
@@ -78,15 +80,12 @@ exports.getMatches = asyncHandler(async (req, res) => {
         SELECT LOWER(skill_name) FROM user_skills WHERE user_id = s1.user_id AND is_seeking = true
       )
     LIMIT 10
-  `);
+  `, [userId]);
 
   const matches = result.rows.map(row => ({
-    match_id: `temp_${row.user_id}`,
     user: { id: row.user_id, name: row.username, avatar: row.avatar_icon },
     their_skills: [row.their_skills_you_need],
-    your_skills_they_need: [row.your_skills_they_need],
-    match_score: 0.95, // mock for now
-    testimonials: Math.floor(Math.random() * 5)
+    your_skills_they_need: [row.your_skills_they_need]
   }));
 
   res.json({ success: true, data: matches });
@@ -94,13 +93,16 @@ exports.getMatches = asyncHandler(async (req, res) => {
 
 /**
  * Complete an exchange with a review
+ *
+ * R3 [P1-6]: explicitly unavailable. The previous implementation returned
+ * fake success with no persistence. Per the MOCK DATA RULE no synthetic
+ * success is manufactured; exchange completion stays 501 until a real
+ * persistence model exists (R6 owns storage).
  */
 exports.completeExchange = asyncHandler(async (req, res) => {
-  const { match_id } = req.params;
-  const { quality_rating, testimonial } = req.body;
-  const userId = req.user.id;
-
-  // In a full implementation, we'd look up the match_id and update it.
-  // For now we just mock success.
-  res.json({ success: true, message: 'Exchange completed and reviewed!' });
+  return res.status(501).json({
+    success: false,
+    error: 'Exchange completion is not available',
+    code: 'EXCHANGE_NOT_IMPLEMENTED'
+  });
 });

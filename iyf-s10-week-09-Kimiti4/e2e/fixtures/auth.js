@@ -34,6 +34,17 @@ async function seedAuth(context, user = DEFAULT_USER) {
     localStorage.setItem('user', JSON.stringify(user));
   }, { token, user });
 
+  // R5 session contract: AuthContext restores via POST /api/auth/refresh
+  // (HttpOnly cookie flow) and ignores any localStorage token. Mock the
+  // refresh round-trip so the harness authenticates under the R5 model.
+  await context.route('**/api/auth/refresh', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, token, tokenType: 'Bearer' }),
+    })
+  );
+
   await context.route('**/api/auth/me', (route) =>
     route.fulfill({
       status: 200,
@@ -48,6 +59,14 @@ async function seedUnauthenticated(context) {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   });
+
+  await context.route('**/api/auth/refresh', (route) =>
+    route.fulfill({
+      status: 401,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: false, error: 'No refresh session' }),
+    })
+  );
 
   await context.route('**/api/auth/me', (route) =>
     route.fulfill({

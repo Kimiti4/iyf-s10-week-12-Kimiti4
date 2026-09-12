@@ -26,6 +26,13 @@ test.describe('JamiiLink Critical Path', () => {
         role: 'user',
       }));
     });
+    await context.route('**/api/auth/refresh', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, token: 'test-token-for-feed', tokenType: 'Bearer' }),
+      })
+    );
     await context.route('**/api/auth/me', (route) =>
       route.fulfill({
         status: 200,
@@ -66,6 +73,14 @@ test.describe('JamiiLink Critical Path', () => {
     // AuthContext verifies the seeded token via GET /api/auth/me on boot;
     // without this mock the fake token fails and initializeAuth() clears the
     // session, bouncing us to /login before DraftsPage can render.
+    // R5: init restores via POST /api/auth/refresh first; mock it too.
+    await context.route('**/api/auth/refresh', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, token: 'test-token-for-e2e', tokenType: 'Bearer' }),
+      })
+    );
     await context.route('**/api/auth/me', (route) =>
       route.fulfill({
         status: 200,

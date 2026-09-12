@@ -23,6 +23,15 @@ async function mockAllRoutes(page) {
   await page.route('**/api/alerts**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ alerts: [] }) })
   );
+  // Mock socket.io polling to prevent uncontrolled external traffic
+  // (the app auto-connects a realtime socket on boot).
+  await page.route('**/socket.io/**', (route) =>
+    route.fulfill({ status: 200, contentType: 'text/plain', body: 'ok' })
+  );
+  // Mock discovery endpoints visited via /discover navigation.
+  await page.route('**/api/discover**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
+  );
 }
 
 test.describe('Smoke: App Launch', () => {

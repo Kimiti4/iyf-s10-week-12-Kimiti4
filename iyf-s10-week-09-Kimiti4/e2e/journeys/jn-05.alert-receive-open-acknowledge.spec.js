@@ -10,7 +10,7 @@ const MOCK_ALERTS = [
 ];
 
 async function mockRoutes(page) {
-  await page.route('**/api/alerts', (route) => {
+  await page.route('**/api/alerts*', (route) => {
     if (route.request().method() === 'PUT' || route.request().method() === 'PATCH') {
       return route.fulfill({
         status: 200,
@@ -18,7 +18,9 @@ async function mockRoutes(page) {
         body: JSON.stringify({ success: true, alert: { ...MOCK_ALERTS[0], status: 'acknowledged' } }),
       });
     }
-    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: MOCK_ALERTS }) });
+    // R5-final: match the real backend envelope {success, data:[...]} which
+    // AlertFeedPage reads via response.data.
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: MOCK_ALERTS }) });
   });
   await page.route('**/api/alerts/**', (route) => {
     if (route.request().method() === 'PUT' || route.request().method() === 'PATCH') {
@@ -28,7 +30,7 @@ async function mockRoutes(page) {
         body: JSON.stringify({ success: true, alert: { ...MOCK_ALERTS[0], status: 'acknowledged' } }),
       });
     }
-    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: MOCK_ALERTS }) });
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: MOCK_ALERTS }) });
   });
   await page.route('**/api/notifications', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ notifications: [] }) })

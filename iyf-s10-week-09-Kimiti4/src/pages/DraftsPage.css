@@ -79,9 +79,11 @@
   margin-bottom: var(--space-4);
 }
 
-.drafts-empty h3 {
+.drafts-empty h2.drafts-empty-title {
   color: var(--color-zinc-900);
   margin-bottom: var(--space-2);
+  /* Preserve the previous h3 visual size after the h2 hierarchy fix */
+  font-size: 1.17em;
 }
 
 .drafts-empty p {

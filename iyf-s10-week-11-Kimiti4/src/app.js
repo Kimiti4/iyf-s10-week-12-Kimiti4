@@ -8,7 +8,7 @@ const cors = require('cors');
 const logger = require('./middleware/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 const securityHeaders = require('./middleware/securityHeaders');
-const { generalLimiter, authLimiter, alertLimiter } = require('./middleware/rateLimiter');
+const { generalLimiter, authLimiter, alertLimiter, verificationLimiter } = require('./middleware/rateLimiter');
 const routes = require('./routes');
 
 const app = express();
@@ -55,6 +55,8 @@ app.use(logger);
 app.use('/api/', generalLimiter);
 app.use('/api/auth/register', authLimiter);
 app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/send-verification', verificationLimiter);
+app.use('/api/auth/verify-code', verificationLimiter);
 app.use('/api/alerts', alertLimiter);
 
 // 🌐 Serve static frontend files from /public
@@ -67,6 +69,17 @@ if (process.env.NODE_ENV === 'staging') {
   const testRoutes = require('./routes/test');
   app.use('/api/test', testRoutes);
 }
+
+// R4: unknown /api/* paths must return a truthful JSON 404. Without this,
+// the SPA fallback below serves index.html with 200 for unknown API GETs,
+// which misrepresents absent capabilities as successful responses.
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'API endpoint not found',
+    code: 'API_NOT_FOUND'
+  });
+});
 
 // Health check endpoint (not rate limited)
 app.get('/health', async (req, res) => {

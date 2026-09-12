@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logger from '../utils/logger';
+import { authStorage } from '../utils/storage';
 import './TiannaraAssistant.css';
 
 /**
@@ -59,7 +60,13 @@ export default function TiannaraAssistant({ currentUser }) {
 
       const res = await fetch(apiEndpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        // R4 [M4]: the tiannara endpoints require authentication (R1 gate).
+        // Send the stored bearer token so privileged users receive the
+        // truthful 501 instead of a 401.
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authStorage.getToken() ? { Authorization: `Bearer ${authStorage.getToken()}` } : {})
+        },
         body: JSON.stringify({ message, userId: currentUser?._id })
       });
 

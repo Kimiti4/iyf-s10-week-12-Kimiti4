@@ -23,6 +23,12 @@ function classify(metric, value) {
 }
 
 function recordVital(metric, data) {
+  // Guard: web-vitals v6 invokes the callback with a single Metric object.
+  // Callers below adapt it to (name, metric); this guard keeps telemetry
+  // from throwing if invoked with an unexpected shape.
+  if (!data || typeof data.value !== 'number') {
+    return null;
+  }
   const entry = registry.record({
     metric: metric,
     value: data.value,
@@ -44,11 +50,19 @@ function recordVital(metric, data) {
 export function initWebVitals(options = {}) {
   const { reportAllChanges = false } = options;
 
-  onCLS(recordVital, { reportAllChanges });
-  onFCP(recordVital, { reportAllChanges });
-  onLCP(recordVital, { reportAllChanges });
-  onINP(recordVital, { reportAllChanges });
-  onTTFB(recordVital, { reportAllChanges });
+  // web-vitals v6 callback signature: (metric) => void, where metric is
+  // { name, value, rating, delta, id, navigationType, attribution }.
+  const handle = (metric) => {
+    if (metric && typeof metric.name === 'string') {
+      recordVital(metric.name, metric);
+    }
+  };
+
+  onCLS(handle, { reportAllChanges });
+  onFCP(handle, { reportAllChanges });
+  onLCP(handle, { reportAllChanges });
+  onINP(handle, { reportAllChanges });
+  onTTFB(handle, { reportAllChanges });
 }
 
 export function getWebVitalsSummary() {

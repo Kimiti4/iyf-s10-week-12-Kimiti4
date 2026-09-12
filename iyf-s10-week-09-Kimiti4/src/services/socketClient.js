@@ -4,12 +4,18 @@
  */
 
 import { io } from 'socket.io-client';
+import { getAccessToken } from '../utils/authToken';
 
 let socket = null;
 
 /**
  * Initialize Socket.IO connection
  * @param {string} backendUrl - Backend URL (e.g., http://localhost:3000)
+ *
+ * R5 [P0-7]: the current access token is presented in the handshake auth
+ * payload. The server validates it (authorizeSocket) and scopes rooms.
+ * No token is persisted here; callers should disconnect + reconnect after
+ * a token refresh (see refreshSocketAuth).
  */
 export function initializeSocket(backendUrl) {
   if (socket) {
@@ -23,7 +29,10 @@ export function initializeSocket(backendUrl) {
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionAttempts: 5,
-    timeout: 20000
+    timeout: 20000,
+    auth: (cb) => {
+      cb({ token: getAccessToken() });
+    }
   });
 
   // Connection events
@@ -125,6 +134,15 @@ export function disconnectSocket() {
     socket.disconnect();
     socket = null;
   }
+}
+
+/**
+ * R5 [P0-7]: reconnect with the current (possibly refreshed) access token.
+ * Call after login/refresh so the handshake carries a live credential.
+ */
+export function refreshSocketAuth(backendUrl) {
+  disconnectSocket();
+  return initializeSocket(backendUrl);
 }
 
 /**

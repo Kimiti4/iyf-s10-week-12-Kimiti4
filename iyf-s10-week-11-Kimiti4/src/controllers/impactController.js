@@ -23,11 +23,16 @@ exports.trackImpact = asyncHandler(async (req, res) => {
 
 /**
  * Get user's impact dashboard
+ *
+ * R3 [P1-5]: PARTIAL-REAL. The per-event sums and the rank COUNT come from
+ * authoritative DB rows. The previous fabricated conversions
+ * (`exchange_value * 500 KES`, `time_saved * 2 hours`), hardcoded badge
+ * thresholds, and the `people_helped` relabel are removed per the MOCK DATA
+ * RULE. Only DB-derived, unitless values are returned.
  */
 exports.getImpactDashboard = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  // Monthly impact calculation (mock logic for now using simple sums)
   const impactQuery = await query(`
     SELECT event_type, SUM(impact_value) as total
     FROM impact_metrics
@@ -36,7 +41,7 @@ exports.getImpactDashboard = asyncHandler(async (req, res) => {
   `, [id]);
 
   let help_provided = 0;
-  let exchange_value = 0;
+  let exchange_completed = 0;
   let time_saved = 0;
   let total_impact = 0;
 
@@ -44,11 +49,10 @@ exports.getImpactDashboard = asyncHandler(async (req, res) => {
     const total = parseInt(row.total);
     total_impact += total;
     if (row.event_type === 'help_provided') help_provided += total;
-    if (row.event_type === 'exchange_completed') exchange_value += total;
+    if (row.event_type === 'exchange_completed') exchange_completed += total;
     if (row.event_type === 'time_saved') time_saved += total;
   });
 
-  // Calculate Rank (mock)
   const rankQuery = await query(`
     SELECT COUNT(DISTINCT user_id) + 1 AS rank
     FROM impact_metrics
@@ -56,23 +60,15 @@ exports.getImpactDashboard = asyncHandler(async (req, res) => {
   `, [id]);
   const rank = `#${rankQuery.rows[0].rank} in JamiiLink`;
 
-  // Get Badges
-  const badges = [];
-  if (total_impact > 10) badges.push('Bronze Helper');
-  if (total_impact > 50) badges.push('Silver Catalyst');
-  if (total_impact > 100) badges.push('Gold Pillar');
-
   res.json({
     success: true,
     data: {
       monthly_impact: total_impact,
       impact_rank: rank,
-      badges,
       contribution_breakdown: {
         help_provided,
-        exchange_value: `${exchange_value * 500} KES`, // Mock value conversion
-        time_saved: `${time_saved * 2} hours`,
-        people_helped: help_provided
+        exchange_completed,
+        time_saved
       }
     }
   });

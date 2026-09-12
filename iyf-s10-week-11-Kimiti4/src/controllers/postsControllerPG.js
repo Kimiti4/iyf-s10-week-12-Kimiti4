@@ -71,21 +71,18 @@ const createPost = asyncHandler(async (req, res) => {
   }
 
   // 🔹 STEP 1: Moderate content BEFORE saving (Tiannara integration)
+  // R3 [P1-4]: FAIL-CLOSED. If moderation is unavailable the post is NOT
+  // created (503). No synthetic `{ safe: true }` fallback, no
+  // `moderationChecked: true` row for an unmoderated post.
   let moderationResult = null;
   try {
     moderationResult = await tiannaraService.moderateContent(content);
   } catch (error) {
-    console.warn('Tiannara moderation failed, proceeding without moderation:', error.message);
-    // Fallback: allow content but mark as unchecked
-    moderationResult = {
-      safe: true,
-      toxicity_score: 0,
-      spam_probability: 0,
-      scam_probability: 0,
-      categories_flagged: [],
-      confidence: 0,
-      explanation: 'Moderation service unavailable'
-    };
+    return res.status(503).json({
+      success: false,
+      error: 'Content moderation is unavailable; post not created',
+      code: 'MODERATION_UNAVAILABLE'
+    });
   }
 
   // 🔹 STEP 2: Check if content is safe
@@ -197,18 +194,26 @@ const likePost = asyncHandler(async (req, res) => {
     throw new ApiError('Post not found', 404);
   }
 
-  res.json({
-    success: true,
-    data: post
-  });
-});
+  // Record per-user like for the Liked tab (idempotent)
+  const { query } = require('../config/postgres');
+  await query(
+    `INSERT INTO post_likes (user_id, post_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+    [req.user.id, req.params.id]
+  ).catch(() => {});
 
-// UPVOTE post (for alerts)
-const upvotePost = asyncHandler(async (req, res) => {
-  const post = await PostRepository.upvote(req.params.id);
-
-  if (!post) {
-    throw new ApiError('Post not found', 404);
+  // Notify the post author (not for self-likes; best-effort)
+  try {
+    const authorId = post.author?.id;
+    if (authorId && String(authorId) !== String(req.user.id)) {
+      const { createNotification, emitToUser } = require('./notificationsControllerPG');
+      const note = await createNotification({
+        userId: authorId,
+        actorId: req.user.id, type: 'like', targetType: 'post', referenceId: post.id
+      });
+      emitToUser(authorId, 'notification:new', { id: note.id, type: 'like' });
+    }
+  } catch {
+    // Notification delivery is best-effort
   }
 
   res.json({
@@ -216,6 +221,63 @@ const upvotePost = asyncHandler(async (req, res) => {
     data: post
   });
 });
+
+  // UPVOTE post (for alerts)
+  const upvotePost = asyncHandler(async (req, res) => {
+    const post = await PostRepository.upvote(req.params.id);
+
+    if (!post) {
+      throw new ApiError('Post not found', 404);
+    }
+
+    res.json({
+      success: true,
+      data: post
+    });
+  });
+
+  // R3 [P1-9 U1]: unified engage endpoint used by the live frontend
+  // (postApi.js, distributionApi.js). like/unlike operate on the real
+  // `likes` counter. repost/unrepost/save/unsave have no backing storage
+  // (creating it is R6 schema work) and therefore return explicit 501
+  // instead of fabricated counters.
+  const engagePost = asyncHandler(async (req, res) => {
+    const { type } = req.query;
+
+    if (type === 'like') {
+      const post = await PostRepository.like(req.params.id);
+      if (!post) {
+        throw new ApiError('Post not found', 404);
+      }
+      return res.json({ success: true, data: post });
+    }
+
+    if (type === 'unlike') {
+      const post = await PostRepository.unlike(req.params.id);
+      if (!post) {
+        throw new ApiError('Post not found', 404);
+      }
+      const { query: q2 } = require('../config/postgres');
+      await q2(
+        `DELETE FROM post_likes WHERE user_id = $1 AND post_id = $2`,
+        [req.user.id, req.params.id]
+      ).catch(() => {});
+      return res.json({ success: true, data: post });
+    }
+
+    if (type === 'repost' || type === 'unrepost') {
+      return res.status(501).json({
+        success: false,
+        error: `Engagement type '${type}' is not available`,
+        code: 'ENGAGE_NOT_IMPLEMENTED'
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      error: `Unknown engagement type '${type}'. Expected like, unlike, repost, or unrepost.`
+    });
+  });
 
 // GET user's posts
 const getUserPosts = asyncHandler(async (req, res) => {
@@ -286,15 +348,16 @@ const getTrendingTags = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = {
-  getAllPosts,
-  getPostById,
-  createPost,
-  updatePost,
-  deletePost,
-  likePost,
-  upvotePost,
-  getUserPosts,
-  getOrganizationPosts,
-  getTrendingTags
-};
+  module.exports = {
+    getAllPosts,
+    getPostById,
+    createPost,
+    updatePost,
+    deletePost,
+    likePost,
+    upvotePost,
+    engagePost,
+    getUserPosts,
+    getOrganizationPosts,
+    getTrendingTags
+  };

@@ -289,6 +289,48 @@ const createTables = async () => {
       )
     `);
 
+    // 6. Jams (flagship creator-led content primitive)
+    await query(`
+      CREATE TABLE IF NOT EXISTS jams (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(120) NOT NULL,
+        description TEXT,
+        prompt VARCHAR(500),
+        category VARCHAR(50) NOT NULL DEFAULT 'creator',
+        status VARCHAR(20) NOT NULL DEFAULT 'draft'
+          CHECK (status IN ('draft', 'scheduled', 'active', 'ended', 'archived')),
+        participation_types TEXT[] NOT NULL DEFAULT '{post}',
+        deadline TIMESTAMP,
+        cover_media_url TEXT,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    await query(`
+      CREATE TABLE IF NOT EXISTS jam_participants (
+        jam_id UUID NOT NULL REFERENCES jams(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        joined_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (jam_id, user_id)
+      )
+    `);
+    await query(`
+      CREATE TABLE IF NOT EXISTS jam_contributions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        jam_id UUID NOT NULL REFERENCES jams(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        type VARCHAR(20) NOT NULL DEFAULT 'post'
+          CHECK (type IN ('video', 'image', 'post', 'poll', 'location', 'skill', 'gig')),
+        text_content TEXT,
+        content_url TEXT,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending'
+          CHECK (status IN ('pending', 'approved', 'rejected', 'featured')),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        CHECK (text_content IS NOT NULL OR content_url IS NOT NULL)
+      )
+    `);
+
     // 6. MFA Methods Table
     await query(`
       CREATE TABLE IF NOT EXISTS mfa_methods (
@@ -321,6 +363,150 @@ const createTables = async () => {
       )
     `);
 
+    // 8. R2 [P0-6] Verification Codes (durable, single-use, purpose-bound)
+    await query(`
+      CREATE TABLE IF NOT EXISTS verification_codes (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        purpose VARCHAR(40) NOT NULL,
+        contact VARCHAR(255) NOT NULL,
+        code_hash VARCHAR(255) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        attempt_count INTEGER NOT NULL DEFAULT 0,
+        used_at TIMESTAMP,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    // Indexes: fast lookup of an active (un-consumed, un-expired) code by (contact, purpose).
+    await query(`CREATE INDEX IF NOT EXISTS idx_verification_codes_active
+                 ON verification_codes (contact, purpose) WHERE used_at IS NULL`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_verification_codes_expires
+                 ON verification_codes (expires_at)`);
+
+    // 9. R5 [P0-7] Refresh Sessions ( rotating opaque refresh tokens ).
+    // Single-table R5 exception (authorized): server-side state required for
+    // refresh rotation, reuse detection, and logout/password-change revocation.
+    // Only the refresh token SHA-256 hash is stored — never the raw token.
+    await query(`
+      CREATE TABLE IF NOT EXISTS refresh_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token_hash VARCHAR(255) NOT NULL UNIQUE,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        rotated_at TIMESTAMP,
+        revoked_at TIMESTAMP,
+        user_agent TEXT,
+        ip VARCHAR(64)
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_refresh_sessions_user
+                 ON refresh_sessions (user_id) WHERE revoked_at IS NULL`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_refresh_sessions_hash
+                 ON refresh_sessions (token_hash)`);
+
+    // 10. Direct-message conversations (minimal DM system).
+    // participant_one < participant_two is enforced so each unordered pair
+    // maps to exactly one row (duplicate-DM prevention at the DB level).
+    await query(`
+      CREATE TABLE IF NOT EXISTS conversations (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        participant_one UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        participant_two UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        CHECK (participant_one < participant_two),
+        UNIQUE (participant_one, participant_two)
+      )
+    `);
+    await query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+        sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        content TEXT NOT NULL CHECK (char_length(content) > 0 AND char_length(content) <= 2000),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        read_at TIMESTAMP
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_conversations_participants
+                 ON conversations (participant_one, participant_two)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_messages_conversation
+                 ON messages (conversation_id, created_at)`);
+
+    // 11. Follows (minimal follow system for profiles).
+    await query(`
+      CREATE TABLE IF NOT EXISTS follows (
+        follower_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        following_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        CHECK (follower_id <> following_id),
+        PRIMARY KEY (follower_id, following_id)
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_follows_following
+                 ON follows (following_id)`);
+
+    // 12. Notifications (persisted user notifications).
+    await query(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        actor_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        type VARCHAR(30) NOT NULL,
+        reference_id UUID,
+        target_type VARCHAR(30) NOT NULL DEFAULT 'post',
+        message TEXT,
+        is_read BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_notifications_user
+                 ON notifications (user_id, created_at DESC)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_notifications_unread
+                 ON notifications (user_id) WHERE is_read = FALSE`);
+
+    // 13. Post likes (per-user like records back the Liked tab + counts).
+    await query(`
+      CREATE TABLE IF NOT EXISTS post_likes (
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (user_id, post_id)
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_post_likes_post
+                 ON post_likes (post_id)`);
+
+    // 14. Profile views (distinct-viewer counts; one row per viewer/viewed pair).
+    await query(`
+      CREATE TABLE IF NOT EXISTS profile_views (
+        viewer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        viewed_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        last_viewed_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        CHECK (viewer_id <> viewed_id),
+        PRIMARY KEY (viewer_id, viewed_id)
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_profile_views_viewed
+                 ON profile_views (viewed_id)`);
+
+    // 15. Stories (24h ephemeral posts; image_url is client-provided, same
+    // URL-only pattern as jam cover_media_url — no upload backend exists).
+    await query(`
+      CREATE TABLE IF NOT EXISTS stories (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        text_content TEXT,
+        image_url TEXT,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMP NOT NULL DEFAULT NOW() + INTERVAL '24 hours',
+        CHECK (text_content IS NOT NULL OR image_url IS NOT NULL)
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_stories_user
+                 ON stories (user_id, created_at DESC)`);
+
     // Create indexes for performance
     console.log(' Creating indexes...');
     await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
@@ -342,6 +528,17 @@ const createTables = async () => {
       console.log('ℹ️  Reputation columns may already exist or cannot be added');
     }
     await query(`CREATE INDEX IF NOT EXISTS idx_users_reputation ON users(reputation_score DESC)`);
+
+    // R6 Option A (authorized): login-streak columns expected by the
+    // stats queries (UsersRepository.getUserStats, metrics getUserMetrics).
+    // ADD COLUMN IF NOT EXISTS + DEFAULT covers all rows; no backfill, no
+    // writers, no behavior change beyond the queries succeeding.
+    try {
+      await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS login_streak INTEGER DEFAULT 0`);
+      await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMP`);
+    } catch (err) {
+      console.log('ℹ️  Login-streak columns may already exist or cannot be added');
+    }
     
     await query(`CREATE INDEX IF NOT EXISTS idx_org_slug ON organizations(slug)`);
     
@@ -383,6 +580,13 @@ const createTables = async () => {
     await query(`CREATE INDEX IF NOT EXISTS idx_comments_author ON comments(author_id)`);
     
     await query(`CREATE INDEX IF NOT EXISTS idx_mfa_user ON mfa_methods(user_id)`);
+
+    await query(`CREATE INDEX IF NOT EXISTS idx_jams_creator ON jams(creator_id)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_jams_status ON jams(status)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_jams_category ON jams(category)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_jams_created ON jams(created_at DESC)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_jam_participants_user ON jam_participants(user_id)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_jam_contributions_jam ON jam_contributions(jam_id, created_at)`);
 
     // Add radius_km column if it doesn't exist (P3: persist alert radius)
     try { await query(`ALTER TABLE alerts ADD COLUMN IF NOT EXISTS radius_km NUMERIC(6,2)`); } catch {}

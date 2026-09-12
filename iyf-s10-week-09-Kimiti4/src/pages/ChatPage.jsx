@@ -1,99 +1,128 @@
 /**
- * 💬 Community Chat - Let's Talk!
+ * 💬 Community Chat - Direct messages backed by the real API.
  */
-
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { colors } from '../styles/designSystem'
 import { formatRelativeTime } from '../utils/formatTime'
+import { request } from '../services/apiClient'
+import { initializeSocket } from '../services/socketClient'
 import './ChatPage.css'
+
+const IDLE = 'idle'
+const LOADING = 'loading'
+const LOADED = 'loaded'
+const ERROR = 'error'
 
 const ChatPage = () => {
   const { user } = useAuth()
-  const [selectedConversation, setSelectedConversation] = useState(null)
+  const [conversations, setConversations] = useState([])
+  const [selectedId, setSelectedId] = useState(null)
+  const [messages, setMessages] = useState([])
   const [messageInput, setMessageInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [status, setStatus] = useState(IDLE)
+  const [error, setError] = useState('')
+  const [sending, setSending] = useState(false)
   const messagesEndRef = useRef(null)
+  const selectedIdRef = useRef(null)
+  selectedIdRef.current = selectedId
 
-  const conversations = [
-    {
-      id: 1,
-      participant: {
-        id: 2,
-        name: 'Jane Doe',
-        avatar: null,
-        online: true,
-        emoji: '👩‍💻'
-      },
-      lastMessage: 'Hey! How are you doing?',
-      unreadCount: 3,
-      timestamp: Date.now() - 3600000,
-      messages: [
-        { id: 1, senderId: 2, text: 'Hi there! 👋', timestamp: Date.now() - 7200000 },
-        { id: 2, senderId: user?.id || 1, text: 'Hello! How are you?', timestamp: Date.now() - 7100000 },
-        { id: 3, senderId: 2, text: 'I\'m great! Want to join the skill swap quest? 🎯', timestamp: Date.now() - 3600000 },
-      ]
-    },
-    {
-      id: 2,
-      participant: {
-        id: 3,
-        name: 'Tech Hub Nairobi',
-        avatar: null,
-        online: false,
-        emoji: '💻'
-      },
-      lastMessage: 'The event was amazing! 🎉',
-      unreadCount: 0,
-      timestamp: Date.now() - 86400000,
-      messages: [
-        { id: 1, senderId: 3, text: 'Thanks for coming to our event! 🎪', timestamp: Date.now() - 172800000 },
-        { id: 2, senderId: user?.id || 1, text: 'It was fantastic!', timestamp: Date.now() - 86400000 },
-      ]
+  const loadConversations = useCallback(async () => {
+    setStatus(LOADING)
+    setError('')
+    try {
+      const res = await request('/messages/conversations')
+      setConversations(res.data || [])
+      setStatus(LOADED)
+    } catch (err) {
+      setError(err.message || 'Failed to load conversations')
+      setStatus(ERROR)
     }
-  ]
+  }, [])
 
-  const filteredConversations = conversations.filter(conv => 
-    conv.participant.name.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    loadConversations()
+  }, [loadConversations])
+
+  const loadMessages = useCallback(async (conversationId) => {
+    if (!conversationId) return
+    try {
+      const res = await request(`/messages/conversations/${conversationId}`)
+      setMessages(res.data || [])
+    } catch (err) {
+      setError(err.message || 'Failed to load messages')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (selectedId) loadMessages(selectedId)
+    else setMessages([])
+  }, [selectedId, loadMessages])
+
+  // Realtime delivery on the existing Socket.IO infrastructure.
+  // Dedupe against REST responses by message id.
+  useEffect(() => {
+    let cleanup = null
+    try {
+      const socket = initializeSocket()
+      const onNew = (msg) => {
+        if (!msg || String(msg.conversationId) !== String(selectedIdRef.current)) return
+        setMessages((prev) => (prev.some((m) => String(m.id) === String(msg.id)) ? prev : [...prev, msg]))
+      }
+      socket.on('message:new', onNew)
+      cleanup = () => socket.off('message:new', onNew)
+    } catch {
+      // Socket unavailable — REST polling via selection remains functional
+    }
+    return () => { if (cleanup) cleanup() }
+  }, [])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault()
+    if (!messageInput.trim() || !selectedId || sending) return
+    setSending(true)
+    try {
+      const res = await request(`/messages/conversations/${selectedId}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({ content: messageInput.trim() })
+      })
+      const sent = res.data
+      // Dedupe: the socket echo of this same message may arrive separately
+      setMessages((prev) => (prev.some((m) => String(m.id) === String(sent.id)) ? prev : [...prev, sent]))
+      setMessageInput('')
+      setConversations((prev) => prev.map((c) =>
+        String(c.id) === String(selectedId)
+          ? { ...c, lastMessage: sent.content, lastMessageAt: sent.createdAt }
+          : c
+      ))
+    } catch (err) {
+      setError(err.message || 'Failed to send message')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const filteredConversations = conversations.filter((conv) =>
+    (conv.participant?.username || '').toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handleSendMessage = (e) => {
-    e.preventDefault()
-    if (!messageInput.trim() || !selectedConversation) return
-
-    const response = {
-      id: Date.now() + 1,
-      senderId: selectedConversation.participant.id,
-      text: 'Thanks for your message! 👍',
-      timestamp: Date.now()
-    }
-
-    setSelectedConversation(prev => ({
-      ...prev,
-      messages: [...prev.messages, {
-        id: Date.now(),
-        senderId: user?.id || 1,
-        text: messageInput,
-        timestamp: Date.now()
-      }, response]
-    }))
-
-    setMessageInput('')
-  }
+  const selectedConversation = conversations.find((c) => String(c.id) === String(selectedId)) || null
 
   return (
     <main className="chat-page" role="main" aria-label="Chat">
-      <motion.div 
+      <motion.div
         className="chat-sidebar"
         initial={{ x: -50, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
       >
         <div className="sidebar-header">
           <h2>💬 Messages</h2>
-          <motion.button className="btn-new-chat" whileHover={{ rotate: 90 }}>
-            +
-          </motion.button>
         </div>
 
         <div className="search-box">
@@ -106,28 +135,40 @@ const ChatPage = () => {
         </div>
 
         <div className="conversations-list">
+          {status === LOADING && conversations.length === 0 && (
+            <div className="chat-loading">Loading conversations…</div>
+          )}
+          {status === ERROR && (
+            <div className="chat-error" role="alert">
+              {error}
+              <button onClick={loadConversations}>Try again</button>
+            </div>
+          )}
+          {status === LOADED && filteredConversations.length === 0 && (
+            <div className="chat-empty">
+              <p>No conversations yet.</p>
+              <p>Start one from another user's profile.</p>
+            </div>
+          )}
           {filteredConversations.map(conv => (
             <motion.div
               key={conv.id}
-              className={`conversation-item ${selectedConversation?.id === conv.id ? 'active' : ''}`}
-              onClick={() => setSelectedConversation(conv)}
+              className={`conversation-item ${String(selectedId) === String(conv.id) ? 'active' : ''}`}
+              onClick={() => setSelectedId(conv.id)}
               whileHover={{ backgroundColor: colors.primary[50] }}
             >
               <div className="conv-avatar">
-                {conv.participant.avatar ? (
-                  <img src={conv.participant.avatar} alt={conv.participant.name} />
-                ) : (
-                  <span>{conv.participant.emoji}</span>
-                )}
-                {conv.participant.online && <div className="online-indicator"></div>}
+                <span>{conv.participant?.avatarIcon || '🦁'}</span>
               </div>
-              
+
               <div className="conv-info">
                 <div className="conv-header">
-                  <h3>{conv.participant.name}</h3>
-                  <span className="conv-time">{formatRelativeTime(conv.timestamp)}</span>
+                  <h3>{conv.participant?.username || 'Unknown'}</h3>
+                  {conv.lastMessageAt && (
+                    <span className="conv-time">{formatRelativeTime(conv.lastMessageAt)}</span>
+                  )}
                 </div>
-                <p className="conv-last-message">{conv.lastMessage}</p>
+                <p className="conv-last-message">{conv.lastMessage || ''}</p>
               </div>
 
               {conv.unreadCount > 0 && (
@@ -144,37 +185,27 @@ const ChatPage = () => {
             <div className="chat-header">
               <div className="chat-participant-info">
                 <div className="participant-avatar">
-                  {selectedConversation.participant.avatar ? (
-                    <img src={selectedConversation.participant.avatar} alt="" />
-                  ) : (
-                    <span>{selectedConversation.participant.emoji}</span>
-                  )}
-                  {selectedConversation.participant.online && (
-                    <div className="online-indicator large"></div>
-                  )}
+                  <span>{selectedConversation.participant?.avatarIcon || '🦁'}</span>
                 </div>
                 <div>
-                  <h3>{selectedConversation.participant.name}</h3>
-                  <span className="participant-status">
-                    {selectedConversation.participant.online ? 'Online 🟢' : 'Offline ⚪'}
-                  </span>
+                  <h3>{selectedConversation.participant?.username || 'Unknown'}</h3>
                 </div>
               </div>
             </div>
 
             <div className="messages-container">
               <AnimatePresence>
-                {selectedConversation.messages.map((msg) => (
+                {messages.map((msg) => (
                   <motion.div
                     key={msg.id}
-                    className={`message ${msg.senderId === (user?.id || 1) ? 'sent' : 'received'}`}
+                    className={`message ${String(msg.senderId) === String(user?.id) ? 'sent' : 'received'}`}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
                     <div className="message-bubble">
-                      <p>{msg.text}</p>
+                      <p>{msg.content}</p>
                       <span className="message-time">
-                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                       </span>
                     </div>
                   </motion.div>
@@ -190,10 +221,10 @@ const ChatPage = () => {
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
               />
-              <motion.button 
-                type="submit" 
-                className="btn-send" 
-                disabled={!messageInput.trim()}
+              <motion.button
+                type="submit"
+                className="btn-send"
+                disabled={!messageInput.trim() || sending}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >

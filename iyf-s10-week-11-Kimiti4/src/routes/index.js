@@ -13,6 +13,12 @@ const metricsRoutes = require('./metrics');
 const tiannaraRoutes = require('./tiannara');
 const authRoutes = require('./auth');
 const alertsRoutes = require('./alerts');
+const impactRoutes = require('./impact');
+const skillsRoutes = require('./skills');
+const reputationRoutes = require('./reputation');
+const distributionRoutes = require('./distribution');
+const messagesRoutes = require('./messages');
+const jamsRoutes = require('./jams');
 const { query } = require('../config/postgres');
 
 // Health check
@@ -59,5 +65,30 @@ router.use('/posts', postsRoutes);
 
 // Mount users routes
 router.use('/users', usersRoutes);
+
+// R3 [P1-8]: mount previously-unmounted routers with live frontend callers
+router.use('/impact', impactRoutes);
+router.use('/skills', skillsRoutes);
+router.use('/reputation', reputationRoutes);
+// R3 [P1-9 U4]: distribution capability does not exist; explicit 501s
+router.use('/distribution', distributionRoutes);
+
+// Direct messages
+router.use('/messages', messagesRoutes);
+
+// Notifications
+router.use('/notifications', require('./notifications'));
+
+// Activity feed (own actions, aggregated from persisted records)
+router.use('/activity', require('./activity'));
+
+// Stories (24h ephemeral)
+router.use('/stories', require('./stories'));
+
+// Uploads (authenticated image uploads served from public/uploads)
+router.use('/uploads', require('./uploads'));
+
+// Jams (flagship creator-led content primitive)
+router.use('/jams', jamsRoutes);
 
 module.exports = router;

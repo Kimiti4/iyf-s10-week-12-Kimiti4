@@ -56,10 +56,11 @@ function assert(condition, label) {
 }
 
 function token(userId, role = 'user') {
+  // R5: strict claim contract (iss/aud enforced by authPG).
   return jwt.sign(
     { id: userId, role },
     process.env.JWT_SECRET || 'test-secret',
-    { expiresIn: '1h' }
+    { expiresIn: '1h', issuer: 'jamiilink', audience: 'jamiilink-api' }
   );
 }
 

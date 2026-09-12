@@ -10,41 +10,46 @@ const MOCK_JAMS = [makeJam(), makeJam({ status: 'completed' })];
 const MOCK_REELS = [makeReel(), makeReel()];
 
 async function mockAllRoutes(page) {
-  await page.route('**/api/posts', (route) =>
+  await page.route('**/api/posts*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ posts: MOCK_POSTS, total: MOCK_POSTS.length }) })
   );
   await page.route('**/api/posts/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ posts: MOCK_POSTS, total: MOCK_POSTS.length }) })
   );
-  await page.route('**/api/alerts', (route) =>
+  await page.route('**/api/alerts*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ alerts: MOCK_ALERTS }) })
   );
   await page.route('**/api/alerts/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ alerts: MOCK_ALERTS }) })
   );
-  await page.route('**/api/discover', (route) =>
+  await page.route('**/api/discover*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ trending: MOCK_DISCOVERY }) })
   );
   await page.route('**/api/discover/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ trending: MOCK_DISCOVERY }) })
   );
-  await page.route('**/api/jams', (route) =>
+  await page.route('**/api/jams*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ jams: MOCK_JAMS }) })
   );
   await page.route('**/api/jams/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ jams: MOCK_JAMS }) })
   );
-  await page.route('**/api/reels', (route) =>
+  await page.route('**/api/reels*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ reels: MOCK_REELS }) })
   );
   await page.route('**/api/reels/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ reels: MOCK_REELS }) })
   );
-  await page.route('**/api/notifications', (route) =>
+  await page.route('**/api/notifications*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ notifications: [] }) })
   );
   await page.route('**/api/notifications/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ notifications: [] }) })
+  );
+  // Mock socket.io polling to prevent uncontrolled external traffic
+  // (the app auto-connects a realtime socket on boot).
+  await page.route('**/socket.io/**', (route) =>
+    route.fulfill({ status: 200, contentType: 'text/plain', body: 'ok' })
   );
 }
 

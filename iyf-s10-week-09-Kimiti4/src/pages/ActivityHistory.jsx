@@ -1,61 +1,59 @@
 /**
- * 📊 Activity History - Your Journey Through JamiiLink!
+ * 📊 Activity History - backed by the real /api/activity/me endpoint,
+ * which aggregates the authenticated user's own persisted actions.
  */
-
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { colors } from '../styles/designSystem'
 import { formatRelativeTime } from '../utils/formatTime'
+import { request } from '../services/apiClient'
 import './ActivityHistory.css'
+
+const TYPE_ICONS = {
+  post: '📝',
+  comment: '💬',
+  follow: '🤝',
+  jam: '🔥',
+  contribution: '🎨'
+}
 
 const ActivityHistory = () => {
   const [activeFilter, setActiveFilter] = useState('all')
   const [activities, setActivities] = useState([])
+  const [stats, setStats] = useState({ posts: 0, comments: 0, follows: 0, contributions: 0 })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  const loadActivity = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await request('/activity/me?limit=50')
+      setActivities(res.data || [])
+      setStats(res.stats || { posts: 0, comments: 0, follows: 0, contributions: 0 })
+    } catch (err) {
+      setError(err.message || 'Failed to load activity')
+      setActivities([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    setTimeout(() => {
-      setActivities([
-        {
-          id: 1,
-          type: 'view',
-          action: 'Viewed post',
-          target: 'Community Event Announcement',
-          author: 'Jane Doe',
-          timestamp: Date.now() - 3600000
-        },
-        {
-          id: 2,
-          type: 'like',
-          action: 'Liked post',
-          target: 'New Marketplace Features',
-          author: 'Tech Hub',
-          timestamp: Date.now() - 7200000
-        },
-        {
-          id: 3,
-          type: 'comment',
-          action: 'Commented on',
-          target: 'Weekly Community Update',
-          author: 'Community Leader',
-          timestamp: Date.now() - 14400000,
-          comment: 'This is amazing! 🎉'
-        }
-      ])
-      setLoading(false)
-    }, 500)
-  }, [])
+    loadActivity()
+  }, [loadActivity])
 
   const filters = [
     { id: 'all', label: 'All My Adventures', icon: '🚀' },
-    { id: 'view', label: 'Views', icon: '👁️' },
-    { id: 'like', label: 'Likes', icon: '❤️' },
-    { id: 'reshare', label: 'Reshares', icon: '🔄' },
-    { id: 'comment', label: 'Comments', icon: '💬' }
+    { id: 'post', label: 'Posts', icon: '📝' },
+    { id: 'comment', label: 'Comments', icon: '💬' },
+    { id: 'follow', label: 'Follows', icon: '🤝' },
+    { id: 'jam', label: 'Jams', icon: '🔥' },
+    { id: 'contribution', label: 'Contributions', icon: '🎨' }
   ]
 
-  const filteredActivities = activeFilter === 'all' 
-    ? activities 
+  const filteredActivities = activeFilter === 'all'
+    ? activities
     : activities.filter(a => a.type === activeFilter)
 
   if (loading) {
@@ -69,7 +67,7 @@ const ActivityHistory = () => {
 
   return (
     <main className="activity-history-page" role="main" aria-label="Activity history">
-      <motion.div 
+      <motion.div
         className="activity-header"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -79,11 +77,18 @@ const ActivityHistory = () => {
       </motion.div>
 
       <div className="stats-overview">
-        <ActivityStat icon="👁️" value="12" label="Views" color={colors.info} />
-        <ActivityStat icon="❤️" value="8" label="Likes" color={colors.danger} />
-        <ActivityStat icon="🔄" value="3" label="Shares" color={colors.accent[500]} />
-        <ActivityStat icon="💬" value="5" label="Comments" color={colors.success} />
+        <ActivityStat icon="📝" value={stats.posts} label="Posts" color={colors.info} />
+        <ActivityStat icon="💬" value={stats.comments} label="Comments" color={colors.success} />
+        <ActivityStat icon="🤝" value={stats.follows} label="Follows" color={colors.accent[500]} />
+        <ActivityStat icon="🎨" value={stats.contributions} label="Contributions" color={colors.danger} />
       </div>
+
+      {error && (
+        <div className="activity-error" role="alert">
+          {error}
+          <button onClick={loadActivity}>Try again</button>
+        </div>
+      )}
 
       <div className="activity-filters">
         {filters.map(filter => (
@@ -102,7 +107,7 @@ const ActivityHistory = () => {
       <div className="activity-list">
         <AnimatePresence>
           {filteredActivities.length === 0 ? (
-            <motion.div 
+            <motion.div
               className="empty-state"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -121,19 +126,13 @@ const ActivityHistory = () => {
                 whileHover={{ x: 5 }}
               >
                 <span className="activity-icon">
-                  {activity.type === 'view' && '👁️'}
-                  {activity.type === 'like' && '❤️'}
-                  {activity.type === 'reshare' && '🔄'}
-                  {activity.type === 'comment' && '💬'}
+                  {TYPE_ICONS[activity.type] || '📌'}
                 </span>
                 <div>
                   <p>
                     <strong>{activity.action}</strong> "{activity.target}"
                     {activity.author && ` by ${activity.author}`}
                   </p>
-                  {activity.comment && (
-                    <p className="activity-comment">💭 "{activity.comment}"</p>
-                  )}
                   <span className="activity-time">{formatRelativeTime(activity.timestamp)}</span>
                 </div>
               </motion.div>
@@ -146,7 +145,7 @@ const ActivityHistory = () => {
 }
 
 const ActivityStat = ({ icon, value, label, color }) => (
-  <motion.div 
+  <motion.div
     className="activity-stat"
     whileHover={{ scale: 1.05 }}
     style={{ backgroundColor: `${color}20` }}

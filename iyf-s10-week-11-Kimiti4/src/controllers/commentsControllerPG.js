@@ -7,13 +7,17 @@ const { ApiError } = require('../middleware/errorHandler');
 
 /**
  * GET comments for a post
+ *
+ * R3 note: the nested posts router registers this as `/:id/comments`, so the
+ * post id arrives as either `postId` or `id` depending on the mount style.
  */
 const getComments = asyncHandler(async (req, res) => {
-  const comments = await CommentRepository.findByPost(req.params.postId, 50);
+  const postId = req.params.postId || req.params.id;
+  const comments = await CommentRepository.findByPost(postId, 50);
   
   res.json({
     success: true,
-    postId: req.params.postId,
+    postId,
     count: comments.length,
     data: comments
   });
@@ -24,7 +28,7 @@ const getComments = asyncHandler(async (req, res) => {
  */
 const createComment = asyncHandler(async (req, res) => {
   const { content, parentId } = req.body;
-  const postId = req.params.postId;
+  const postId = req.params.postId || req.params.id;
   
   // Verify post exists
   const post = await PostRepository.findById(postId);
@@ -41,10 +45,25 @@ const createComment = asyncHandler(async (req, res) => {
   
   // Get author info for response
   const commentWithAuthor = await CommentRepository.findById(comment.id);
-  
-  res.status(201).json({ 
-    success: true, 
-    data: commentWithAuthor 
+
+  // Notify the post author (not for self-comments; best-effort)
+  try {
+    const authorId = post.author?.id;
+    if (authorId && String(authorId) !== String(req.user.id)) {
+      const { createNotification, emitToUser } = require('./notificationsControllerPG');
+      const note = await createNotification({
+        userId: authorId,
+        actorId: req.user.id, type: 'comment', targetType: 'post', referenceId: postId
+      });
+      emitToUser(authorId, 'notification:new', { id: note.id, type: 'comment' });
+    }
+  } catch {
+    // Notification delivery is best-effort
+  }
+
+  res.status(201).json({
+    success: true,
+    data: commentWithAuthor
   });
 });
 
@@ -68,4 +87,28 @@ const deleteComment = asyncHandler(async (req, res) => {
   res.status(204).send();
 });
 
-module.exports = { getComments, createComment, deleteComment };
+/**
+ * LIKE comment (protected; any authenticated user; R3 [P1-8/P1-9 U3])
+ */
+const likeComment = asyncHandler(async (req, res) => {
+  const comment = await CommentRepository.findById(req.params.commentId);
+
+  if (!comment) {
+    throw new ApiError('Comment not found', 404);
+  }
+
+  // The comment must belong to the post in the path (nested-route integrity).
+  const postId = req.params.postId || req.params.id;
+  if (postId && comment.post_id !== postId) {
+    throw new ApiError('Comment does not belong to this post', 404);
+  }
+
+  const liked = await CommentRepository.like(comment.id);
+
+  res.json({
+    success: true,
+    data: { id: liked.id, likes: liked.likes }
+  });
+});
+
+module.exports = { getComments, createComment, deleteComment, likeComment };

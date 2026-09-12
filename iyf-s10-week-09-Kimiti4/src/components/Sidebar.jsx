@@ -137,7 +137,11 @@ const Sidebar = memo(function Sidebar({ isOpen = false, onClose = () => {} }) {
       {/* ── User Footer ── */}
       <div className="sidebar-footer">
         <div className="user-card">
-          <Link to={`/profile/${user._id || user.id}`} className="user-avatar-link">
+          <Link
+            to={`/profile/${user._id || user.id}`}
+            className="user-avatar-link"
+            aria-label={`View profile of ${user?.name || user?.username || 'user'}`}
+          >
             <div className="user-avatar" aria-hidden="true">
               {user?.avatar_icon || '🦁'}
             </div>

@@ -65,7 +65,8 @@ export function useComments(postId) {
 
   const likeComment = useCallback(async (commentId) => {
     try {
-      const result = await commentsAPI.like(commentId);
+      // R3 [P1-9 U3]: nested post-scoped comment-like path.
+      const result = await commentsAPI.like(commentId, postId);
       setComments((prev) =>
         prev.map((c) =>
           c.id === commentId
@@ -76,7 +77,7 @@ export function useComments(postId) {
     } catch {
       // Silent
     }
-  }, []);
+  }, [postId]);
 
   return {
     comments,

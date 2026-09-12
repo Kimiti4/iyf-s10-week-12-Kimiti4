@@ -119,8 +119,9 @@ export default function DraftsPage() {
           </motion.div>
         ) : drafts.length === 0 ? (
           <motion.div key="empty" className="drafts-empty" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="empty-illustration">🗂️</div>
-            <h3>No pending drafts</h3>
+              <div className="empty-illustration">🗂️</div>
+              {/* D3 a11y: h2 keeps heading order h1 -> h2 (was h3) */}
+              <h2 className="drafts-empty-title">No pending drafts</h2>
             <p>
               When you create a post offline, it'll appear here and sync the
               moment you're back online.
@@ -137,8 +138,9 @@ export default function DraftsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -40 }}
               >
-                <div className="draft-content">
-                  <h4 className="draft-title">{draft.data?.title || 'Untitled post'}</h4>
+                  <div className="draft-content">
+                    {/* D3 a11y: h3 keeps heading order h1 -> h2 -> h3 (was h4) */}
+                    <h3 className="draft-title">{draft.data?.title || 'Untitled post'}</h3>
                   <p className="draft-preview">
                     {(draft.data?.content || draft.data?.description || '').slice(0, 160) ||
                       'No content preview available.'}

@@ -13,18 +13,23 @@ export const postsAPI = {
   getAll: async (params = {}) => {
     const query = new URLSearchParams(params).toString();
     const data = await request(`/posts${query ? `?${query}` : ''}`);
-    const posts = data.posts || data || [];
+    // R4 [M1]: backend returns {success,count,total,pages,currentPage,data:[]}.
+    // Read the canonical `data` array with fallbacks; never treat the envelope
+    // object itself as the list. hasMore/page derived truthfully.
+    const posts = data.data ?? data.posts ?? (Array.isArray(data) ? data : []);
+    const page = data.page ?? data.currentPage ?? 1;
+    const pages = data.pages ?? 1;
     return {
-      posts: posts.map(normalizePost),
-      total: data.total || posts.length,
-      page: data.page || 1,
-      hasMore: data.hasMore ?? false,
+      posts: normalizePosts(posts),
+      total: data.total ?? posts.length,
+      page,
+      hasMore: data.hasMore ?? (page < pages),
     };
   },
 
   getById: async (id) => {
     const data = await request(`/posts/${id}`);
-    return normalizePost(data.post || data);
+    return normalizePost(data.data ?? data.post ?? data);
   },
 
   create: async (postData) => {
@@ -32,7 +37,7 @@ export const postsAPI = {
       method: 'POST',
       body: JSON.stringify(postData),
     });
-    return normalizePost(data.post || data);
+    return normalizePost(data.data ?? data.post ?? data);
   },
 
   update: async (id, postData) => {
@@ -40,7 +45,7 @@ export const postsAPI = {
       method: 'PUT',
       body: JSON.stringify(postData),
     });
-    return normalizePost(data.post || data);
+    return normalizePost(data.data ?? data.post ?? data);
   },
 
   delete: async (id) => {
@@ -49,22 +54,23 @@ export const postsAPI = {
 
   like: async (id) => {
     const data = await request(`/posts/${id}/engage?type=like`, { method: 'PATCH' });
-    return { likeCount: data.likes ?? data.likeCount ?? 0, isLiked: true };
+    // R4: backend returns {success, data: post} with post.likes.
+    return { likeCount: data.data?.likes ?? data.likes ?? data.likeCount ?? 0, isLiked: true };
   },
 
   unlike: async (id) => {
     const data = await request(`/posts/${id}/engage?type=unlike`, { method: 'PATCH' });
-    return { likeCount: data.likes ?? data.likeCount ?? 0, isLiked: false };
+    return { likeCount: data.data?.likes ?? data.likes ?? data.likeCount ?? 0, isLiked: false };
   },
 
   repost: async (id) => {
     const data = await request(`/posts/${id}/engage?type=repost`, { method: 'PATCH' });
-    return { repostCount: data.reblogs ?? data.repostCount ?? 0, isReposted: true };
+    return { repostCount: data.data?.reposts ?? data.reblogs ?? data.repostCount ?? 0, isReposted: true };
   },
 
   unrepost: async (id) => {
     const data = await request(`/posts/${id}/engage?type=unrepost`, { method: 'PATCH' });
-    return { repostCount: data.reblogs ?? data.repostCount ?? 0, isReposted: false };
+    return { repostCount: data.data?.reposts ?? data.reblogs ?? data.repostCount ?? 0, isReposted: false };
   },
 
   save: async (id) => {
@@ -80,19 +86,20 @@ export const postsAPI = {
   getTrending: async (params = {}) => {
     const query = new URLSearchParams(params).toString();
     const data = await request(`/posts/trending${query ? `?${query}` : ''}`);
-    return (data.posts || data || []).map(normalizePost);
+    // R4: backend returns {success,count,data:[]} — read data.data first.
+    return normalizePosts(data.data ?? data.posts ?? data ?? []);
   },
 
   getByAuthor: async (authorId, params = {}) => {
     const query = new URLSearchParams({ author: authorId, ...params }).toString();
     const data = await request(`/posts?${query}`);
-    return (data.posts || data || []).map(normalizePost);
+    return normalizePosts(data.data ?? data.posts ?? data ?? []);
   },
 
   getSaved: async (params = {}) => {
     const query = new URLSearchParams(params).toString();
     const data = await request(`/posts/saved${query ? `?${query}` : ''}`);
-    return (data.posts || data || []).map(normalizePost);
+    return normalizePosts(data.data ?? data.posts ?? data ?? []);
   },
 };
 
@@ -100,7 +107,8 @@ export const commentsAPI = {
   getByPost: async (postId, params = {}) => {
     const query = new URLSearchParams(params).toString();
     const data = await request(`/posts/${postId}/comments${query ? `?${query}` : ''}`);
-    return (data.comments || data || []).map(normalizeComment);
+    // R4: backend returns {success,postId,count,data:[]} — read data.data first.
+    return (data.data ?? data.comments ?? data ?? []).map(normalizeComment);
   },
 
   create: async (postId, content, parentCommentId = null) => {
@@ -110,15 +118,17 @@ export const commentsAPI = {
       method: 'POST',
       body: JSON.stringify(body),
     });
-    return normalizeComment(data.comment || data);
+    return normalizeComment(data.data ?? data.comment ?? data);
   },
 
   delete: async (postId, commentId) => {
     await request(`/posts/${postId}/comments/${commentId}`, { method: 'DELETE' });
   },
 
-  like: async (commentId) => {
-    const data = await request(`/comments/${commentId}/like`, { method: 'PATCH' });
-    return { likeCount: data.likes ?? data.likeCount ?? 0, isLiked: true };
+  like: async (commentId, postId) => {
+    // R3 [P1-9 U3]: nested post-scoped path (replaces the unmatched
+    // flat /comments/:commentId/like which has no backend route).
+    const data = await request(`/posts/${postId}/comments/${commentId}/like`, { method: 'PATCH' });
+    return { likeCount: data.data?.likes ?? data.likes ?? data.likeCount ?? 0, isLiked: true };
   },
 };

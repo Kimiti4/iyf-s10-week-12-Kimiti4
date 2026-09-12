@@ -32,6 +32,17 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
+  // R4: malformed identifier (e.g. non-UUID in an :id path parameter).
+  // Postgres raises 22P02 (invalid_text_representation). The resource cannot
+  // exist under a malformed id, so this is a 404 — never a 500, and never
+  // a driver message leak.
+  if (err.code === '22P02') {
+    return res.status(404).json({
+      success: false,
+      error: { message: 'Resource not found', statusCode: 404 }
+    });
+  }
+
   // Default 500
   const statusCode = err.statusCode || 500;
   const message = process.env.NODE_ENV === 'development'

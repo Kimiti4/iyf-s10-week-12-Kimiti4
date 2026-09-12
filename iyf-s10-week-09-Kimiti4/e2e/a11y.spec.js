@@ -76,6 +76,14 @@ test.describe('Accessibility Compliance', () => {
     // Mock the boot-time token verification so the seeded session survives
     // AuthContext.initializeAuth() and we actually scan DraftsPage (not the
     // login page we'd otherwise be redirected to).
+    // R5: init restores via POST /api/auth/refresh first; mock it too.
+    await context.route('**/api/auth/refresh', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, token: 'test-token-for-a11y', tokenType: 'Bearer' }),
+      })
+    );
     await context.route('**/api/auth/me', (route) =>
       route.fulfill({
         status: 200,

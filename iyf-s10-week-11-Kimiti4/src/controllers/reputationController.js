@@ -97,31 +97,57 @@ exports.getLeaderboard = async (req, res) => {
 };
 
 /**
- * Get user badges (Mock)
+ * Get user badges
+ *
+ * R3 [P1-7]: explicitly unavailable. The previous `[]` implied "no badges",
+ * which is a fabricated fact. Per the MOCK DATA RULE this returns 501.
  */
 exports.getUserBadges = async (req, res) => {
-  res.json({ success: true, data: [] });
+  res.status(501).json({
+    success: false,
+    error: 'User badges are not available',
+    code: 'NOT_IMPLEMENTED'
+  });
 };
 
 /**
- * Get reputation ledger (Mock)
+ * Get reputation ledger
+ *
+ * R3 [P1-7]: explicitly unavailable (same rationale as getUserBadges).
  */
 exports.getReputationLedger = async (req, res) => {
-  res.json({ success: true, data: [] });
+  res.status(501).json({
+    success: false,
+    error: 'Reputation ledger is not available',
+    code: 'NOT_IMPLEMENTED'
+  });
 };
 
 /**
- * Get user feedback (Mock)
+ * Get user feedback
+ *
+ * R3 [P1-7]: explicitly unavailable (same rationale as getUserBadges).
  */
 exports.getUserFeedback = async (req, res) => {
-  res.json({ success: true, data: [] });
+  res.status(501).json({
+    success: false,
+    error: 'User feedback is not available',
+    code: 'NOT_IMPLEMENTED'
+  });
 };
 
 /**
  * Submit feedback
+ *
+ * R3 [P1-7]: explicitly unavailable. The previous implementation returned
+ * fake success with no persistence. No synthetic success is manufactured.
  */
 exports.submitFeedback = async (req, res) => {
-  res.json({ success: true, message: "Feedback submitted" });
+  res.status(501).json({
+    success: false,
+    error: 'Feedback submission is not available',
+    code: 'NOT_IMPLEMENTED'
+  });
 };
 
 /**
@@ -170,8 +196,9 @@ exports.exportPassport = async (req, res) => {
       },
       badges,
       works: activity,
-      export_date: new Date().toISOString(),
-      signature: `JAMII-VERIFIED-${userId.substring(0,8)}-${Date.now()}` // Mock signature for now
+      export_date: new Date().toISOString()
+      // R3 [P1-7]: the previous mock `signature` field is removed per the
+      // MOCK DATA RULE. No replacement signature is fabricated.
     };
 
     res.json({

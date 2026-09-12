@@ -221,6 +221,21 @@ class PostRepository {
   }
 
   /**
+   * Unlike a post (R3 [P1-9 U1]). Decrements the real `likes` counter for an
+   * explicit authenticated user action. GREATEST(...,0) keeps the counter
+   * truthful (never negative) since per-user like attribution does not exist.
+   */
+  async unlike(id) {
+    const result = await query(`
+      UPDATE posts SET likes = GREATEST(COALESCE(likes, 0) - 1, 0), updated_at = NOW()
+      WHERE id = $1
+      RETURNING *
+    `, [id]);
+
+    return this.formatPost(result.rows[0]);
+  }
+
+  /**
    * Upvote a post (for alerts)
    */
   async upvote(id) {

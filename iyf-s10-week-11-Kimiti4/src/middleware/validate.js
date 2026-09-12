@@ -1,13 +1,18 @@
 /**
  * 🔹 Task 20.2: Validation Middleware
+ *
+ * R4 [M5]: the `author` body requirement is removed from post/comment
+ * validation. Authorship is authoritatively derived server-side from the
+ * JWT (authorId = req.user.id); a client-supplied `author` string must not
+ * determine ownership. Authorization is unchanged (author/admin checks in
+ * the controllers still apply).
  */
 const validatePost = (req, res, next) => {
-  const { title, content, author, category } = req.body;
+  const { title, content, category } = req.body;
   const errors = [];
 
   if (!title || title.trim().length < 3) errors.push('Title ≥3 chars');
   if (!content || content.trim().length < 10) errors.push('Content ≥10 chars');
-  if (!author || author.trim().length < 2) errors.push('Author name required');
 
   const validCategories = ['mtaani', 'skill', 'farm', 'gig', 'alert'];
   if (!category || !validCategories.includes(category)) {
@@ -21,18 +26,16 @@ const validatePost = (req, res, next) => {
   // Sanitize
   req.body.title = title.trim();
   req.body.content = content.trim();
-  req.body.author = author.trim();
 
   next();
 };
 
 const validateComment = (req, res, next) => {
-  const { content, author } = req.body;
+  const { content } = req.body;
   if (!content?.trim()) return res.status(400).json({ success: false, error: 'Comment required' });
-  if (!author?.trim()) return res.status(400).json({ success: false, error: 'Author required' });
 
   req.body.content = content.trim();
-  req.body.author = author.trim();
+
   next();
 };
 

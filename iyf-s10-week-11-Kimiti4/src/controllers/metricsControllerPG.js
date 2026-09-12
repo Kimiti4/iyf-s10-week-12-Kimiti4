@@ -56,14 +56,26 @@ const getTrendingContent = asyncHandler(async (req, res) => {
 });
 
 // GET /api/metrics/users/:userId/activity - User activity stats
+// R1 [P0-3]: requester must be self OR admin / founder / moderator.
 const getUserMetrics = asyncHandler(async (req, res) => {
   const { userId } = req.params;
-  
+
+  // Route-level protect guarantees req.user; defensive check.
+  if (!req.user) {
+    throw new ApiError('Authentication required', 401);
+  }
+
+  const isSelf = userId === req.user.id;
+  const isPrivileged = ['admin', 'founder', 'moderator'].includes(req.user.role);
+  if (!isSelf && !isPrivileged) {
+    throw new ApiError('You can only read your own activity', 403);
+  }
+
   const user = await UserRepository.findById(userId);
   if (!user) {
     throw new ApiError('User not found', 404);
   }
-  
+
   const stats = await query(`
     SELECT
       (SELECT COUNT(*) FROM posts WHERE author_id = $1) as post_count,
@@ -76,7 +88,7 @@ const getUserMetrics = asyncHandler(async (req, res) => {
     FROM users
     WHERE id = $1
   `, [userId]);
-  
+
   res.json({
     success: true,
     data: {

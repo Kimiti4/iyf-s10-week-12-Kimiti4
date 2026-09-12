@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getAccessToken } from '../utils/authToken'; // R5: memory-only token
 import JamCreationWizard from '../components/jam/JamCreationWizard';
 import '../components/jam/jam.css';
 
@@ -20,7 +21,7 @@ export default function JamCreationPage() {
     setErrorMessage('');
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getAccessToken(); // R5: memory-only (never localStorage)
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/jams`, {
         method: 'POST',
         headers: {

@@ -35,7 +35,10 @@ export const openOfflineDB = () => {
 }
 
 // Queue a post for offline submission
-export const queueOfflinePost = async (postData, userToken = null) => {
+// R5 [P0-7]: the queue stores the payload ONLY — never an authentication
+// token. Authorization is attached at flush time from the live memory
+// token (imported lazily to avoid cycles).
+export const queueOfflinePost = async (postData) => {
   const postId = `offline_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
   
   const pendingPost = {
@@ -45,7 +48,6 @@ export const queueOfflinePost = async (postData, userToken = null) => {
       createdAt: new Date().toISOString(),
       isOffline: true
     },
-    token: userToken,
     createdAt: Date.now(),
     status: 'pending',
     retries: 0,
@@ -136,8 +138,12 @@ export const flushPendingPosts = async () => {
 
     for (const post of pending) {
       try {
-        const headers = { 'Content-Type': 'application/json' }
-        if (post.token) headers.Authorization = `Bearer ${post.token}`
+        // R5: Authorization comes from the live memory token, never from
+        // persisted queue state.
+        const { getAccessToken } = await import('./authToken.js');
+        const headers = { 'Content-Type': 'application/json' };
+        const liveToken = getAccessToken();
+        if (liveToken) headers.Authorization = `Bearer ${liveToken}`;
         const res = await fetch('/api/posts', {
           method: 'POST',
           headers,

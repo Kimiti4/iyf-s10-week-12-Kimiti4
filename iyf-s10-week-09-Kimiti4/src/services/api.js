@@ -7,34 +7,63 @@
 import logger from '../utils/logger';
 import { fetchWithTelemetry } from '../utils/telemetry';
 import { fetchWithRetry } from '../utils/apiRetry';
+import { getAccessToken, setAccessToken, clearAccessToken } from '../utils/authToken';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-// Helper for auth headers
+// Helper for auth headers (R5: memory-only access token)
 const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
+    const token = getAccessToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+async function tryRefresh() {
+    try {
+        const res = await fetch(`${API_URL}/auth/refresh`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+        if (!res.ok) return false;
+        const data = await res.json();
+        if (data && data.token) {
+            setAccessToken(data.token);
+            return true;
+        }
+        return false;
+    } catch {
+        return false;
+    }
+}
+
 // Generic request function with error handling
-const request = async (endpoint, options = {}) => {
+const request = async (endpoint, options = {}, _retried = false) => {
     const url = `${API_URL}${endpoint}`;
-    
+
     const config = {
         ...options,
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
             ...getAuthHeaders(),
             ...options.headers
         }
     };
-    
+
     try {
         const response = await fetchWithRetry(() => fetchWithTelemetry(url, config));
-        
-        // Handle 401 (unauthorized) - redirect to login
+
+        // Handle 401 (unauthorized) — R5: single silent refresh, then expire.
+        if (response.status === 401 && !_retried
+            && !endpoint.startsWith('/auth/refresh')
+            && !endpoint.startsWith('/auth/login')
+            && !endpoint.startsWith('/auth/register')) {
+            const refreshed = await tryRefresh();
+            if (refreshed) {
+                return request(endpoint, options, true);
+            }
+        }
         if (response.status === 401) {
-            localStorage.removeItem('token');
+            clearAccessToken();
             localStorage.removeItem('user');
             // Use window.location as fallback since this is a service layer
             // In production, consider using a custom event or callback
@@ -126,6 +155,13 @@ export const authAPI = {
     verifyCode: (data) => request('/auth/verify-code', {
         method: 'POST',
         body: JSON.stringify(data)
+    }),
+
+    /**
+     * Refresh session (R5: HttpOnly cookie transport; returns fresh access token)
+     */
+    refresh: () => request('/auth/refresh', {
+        method: 'POST'
     })
 };
 
@@ -216,12 +252,14 @@ export const postsAPI = {
     uploadImage: async (postId, imageFile) => {
         const formData = new FormData();
         formData.append('image', imageFile);
-        
-        const token = localStorage.getItem('token');
+
+        // R5: memory-only access token.
+        const token = getAccessToken();
         const response = await fetch(`${API_URL}/posts/${postId}/image`, {
             method: 'POST',
+            credentials: 'include',
             headers: {
-                Authorization: `Bearer ${token}`
+                ...(token ? { Authorization: `Bearer ${token}` } : {})
             },
             body: formData
         });
@@ -382,6 +420,12 @@ export const usersAPI = {
     follow: (userId) => request(`/users/${userId}/follow`, {
         method: 'POST'
     }),
+
+    /**
+     * Get follow state + follower/following counts for a user
+     * @param {string} userId - User ID
+     */
+    getFollowState: (userId) => request(`/users/${userId}/follow`),
     
     /**
      * Unfollow a user
@@ -400,10 +444,11 @@ export const usersAPI = {
 // ===== UTILITY FUNCTIONS =====
 
 /**
- * Check if user is authenticated
+ * Check if user is authenticated (R5: memory token presence; the backend
+ * remains authoritative — AuthContext revalidates via refresh/getMe).
  */
 export const isAuthenticated = () => {
-    return !!localStorage.getItem('token');
+    return !!getAccessToken();
 };
 
 /**
@@ -415,10 +460,10 @@ export const getCurrentUser = () => {
 };
 
 /**
- * Logout user
+ * Logout user (R5: memory token only; the server revokes the session).
  */
 export const logout = () => {
-    localStorage.removeItem('token');
+    clearAccessToken();
     localStorage.removeItem('user');
     if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('auth:logout'));

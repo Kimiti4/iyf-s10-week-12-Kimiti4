@@ -8,14 +8,23 @@ const router = express.Router();
 const { query } = require('../config/postgres');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const TEST_EMAIL = 'test@jamii.link';
-const TEST_PASSWORD = 'TestPass123!';
 const TEST_USERNAME = 'testuser';
+// Staging seed credential: explicit env override wins; otherwise a fresh
+// random password is generated per seed call so no hardcoded credential
+// ever authenticates a seeded account.
+function seedPassword() {
+  if (process.env.TEST_SEED_PASSWORD && process.env.TEST_SEED_PASSWORD.length >= 12) {
+    return process.env.TEST_SEED_PASSWORD;
+  }
+  return crypto.randomBytes(24).toString('hex');
+}
 
 router.post('/seed', async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(TEST_PASSWORD, 10);
+    const hashedPassword = await bcrypt.hash(seedPassword(), 10);
 
     const result = await query(`
       INSERT INTO users (username, email, password, role, is_founder)
@@ -33,7 +42,8 @@ router.post('/seed', async (req, res) => {
     const token = jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      // R5: strict claim contract (iss/aud enforced by authPG).
+      { expiresIn: process.env.JWT_EXPIRES_IN || '15m', issuer: 'jamiilink', audience: 'jamiilink-api' }
     );
 
     res.json({ id: user.id, token, email: user.email, username: user.username });

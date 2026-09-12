@@ -1,12 +1,15 @@
 /**
- * 👤 Enhanced User Profile Page
- * Features: Views, Likes (private), Stories, Posts, User Stats
+ * 👤 User Profile Page - backed by the real API.
+ * /profile -> authenticated user's own profile.
+ * /profile/:userId -> another user's public profile + real follow state.
  */
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usersAPI } from '../services/api';
+import { postsAPI } from '../services/postApi';
+import { request } from '../services/apiClient';
 import CreatorStats from '../components/analytics/CreatorStats';
 import './UserProfilePage.css';
 
@@ -16,65 +19,121 @@ const UserProfilePage = () => {
   const { user: currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
   const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
+  const [likedPosts, setLikedPosts] = useState([]);
+  const [stories, setStories] = useState([]);
   const [showStoryModal, setShowStoryModal] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [storyText, setStoryText] = useState('');
+  const [storyFile, setStoryFile] = useState(null);
+  const [storyBusy, setStoryBusy] = useState(false);
+  const [profileViews, setProfileViews] = useState(0);
+  const [follow, setFollow] = useState({ isFollowing: false, followers: 0, following: 0, isOwnProfile: false });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [followBusy, setFollowBusy] = useState(false);
 
-  const isOwnProfile = currentUser?._id === userId || currentUser?.id === userId;
+  const targetId = userId || currentUser?.id;
+  const isOwnProfile = !userId || String(currentUser?.id) === String(userId);
 
-  // Mock data - Replace with actual API calls
-  useEffect(() => {
-    setTimeout(() => {
-      setUserProfile({
-        id: userId || currentUser?._id,
-        name: isOwnProfile ? currentUser?.name : 'John Kamau',
-        username: isOwnProfile ? currentUser?.username : '@johnkamau',
-        avatar: currentUser?.avatar || null,
-        bio: 'Community builder | Tech enthusiast | Nairobi 🇪',
-        location: 'Nairobi, Kenya',
-        website: 'johndoe.co.ke',
-        joinedDate: 'January 2024',
-        verified: true,
-        stats: {
-          posts: 142,
-          followers: 1234,
-          following: 567,
-          views: 45678,
-          likes: 8923, // Private - only visible to owner
-        },
-        stories: [
-          { id: 1, thumbnail: 'https://via.placeholder.com/150', viewed: false, timestamp: Date.now() - 3600000 },
-          { id: 2, thumbnail: 'https://via.placeholder.com/150', viewed: true, timestamp: Date.now() - 7200000 },
-          { id: 3, thumbnail: 'https://via.placeholder.com/150', viewed: false, timestamp: Date.now() - 10800000 },
-        ],
-        posts: [
-          { id: 1, content: 'Just launched my new project! ', image: 'https://via.placeholder.com/400x300', likes: 234, comments: 45, timestamp: Date.now() - 86400000 },
-          { id: 2, content: 'Beautiful sunset in Nairobi today', image: 'https://via.placeholder.com/400x300', likes: 567, comments: 89, timestamp: Date.now() - 172800000 },
-          { id: 3, content: 'Working on something exciting...', image: null, likes: 123, comments: 34, timestamp: Date.now() - 259200000 },
-        ],
-        likedPosts: [
-          { id: 101, content: 'Amazing community event!', author: 'Jane Doe', likes: 890, timestamp: Date.now() - 43200000 },
-          { id: 102, content: 'New marketplace features are awesome', author: 'Tech Hub', likes: 456, timestamp: Date.now() - 86400000 },
-        ]
-      });
-      setIsFollowing(Math.random() > 0.5);
+  const loadProfile = useCallback(async () => {
+    if (!targetId) {
       setLoading(false);
-    }, 500);
-  }, [userId, currentUser, isOwnProfile]);
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const [profileRes, followRes, userPosts, likedRes, storiesRes] = await Promise.all([
+        usersAPI.getById(targetId),
+        usersAPI.getFollowState(targetId),
+        postsAPI.getByAuthor(targetId),
+        isOwnProfile ? request('/users/likes/me') : Promise.resolve(null),
+        request(`/stories/user/${targetId}`)
+      ]);
+      setUserProfile(profileRes.data || profileRes.user || profileRes);
+      setPosts(Array.isArray(userPosts) ? userPosts : (userPosts?.posts || []));
+      setLikedPosts(likedRes?.data || []);
+      setStories(storiesRes?.data || []);
+      if (followRes?.data) {
+        setFollow({
+          isFollowing: !!followRes.data.isFollowing,
+          followers: followRes.data.followers || 0,
+          following: followRes.data.following || 0,
+          isOwnProfile: !!followRes.data.isOwnProfile
+        });
+        setProfileViews(followRes.data.profileViews || 0);
+      } else {
+        setFollow((f) => ({ ...f, isOwnProfile: true }));
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to load profile');
+      setUserProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [targetId, isOwnProfile]);
 
-  const formatNumber = (num) => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toString();
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  const handleFollowToggle = async () => {
+    if (isOwnProfile || followBusy) return;
+    setFollowBusy(true);
+    try {
+      if (follow.isFollowing) {
+        await usersAPI.unfollow(targetId);
+        setFollow((f) => ({ ...f, isFollowing: false, followers: Math.max(0, f.followers - 1) }));
+      } else {
+        await usersAPI.follow(targetId);
+        setFollow((f) => ({ ...f, isFollowing: true, followers: f.followers + 1 }));
+      }
+    } catch (err) {
+      setError(err.message || 'Follow action failed');
+    } finally {
+      setFollowBusy(false);
+    }
   };
 
-  const formatDate = (timestamp) => {
-    const diff = Date.now() - timestamp;
-    const hours = Math.floor(diff / 3600000);
-    if (hours < 1) return 'Just now';
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+  const handleCreateStory = async () => {
+    if ((!storyText.trim() && !storyFile) || storyBusy) return;
+    setStoryBusy(true);
+    try {
+      let imageUrl = null;
+      if (storyFile) {
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error('Could not read file'));
+          reader.readAsDataURL(storyFile);
+        });
+        const up = await request('/uploads', {
+          method: 'POST',
+          body: JSON.stringify({ filename: storyFile.name, mimeType: storyFile.type, data: dataUrl })
+        });
+        imageUrl = up.data?.url || null;
+        if (!imageUrl) throw new Error('Image upload failed');
+      }
+      const res = await request('/stories', {
+        method: 'POST',
+        body: JSON.stringify({ textContent: storyText.trim() || undefined, imageUrl })
+      });
+      if (res.data) setStories((prev) => [res.data, ...prev]);
+      setStoryText('');
+      setStoryFile(null);
+      setShowStoryModal(false);
+    } catch (err) {
+      setError(err.message || 'Failed to create story');
+    } finally {
+      setStoryBusy(false);
+    }
+  };
+
+  const formatNumber = (num) => {
+    const n = Number(num) || 0;
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+    return n.toString();
   };
 
   if (loading) {
@@ -86,6 +145,28 @@ const UserProfilePage = () => {
     );
   }
 
+  if (error || !userProfile) {
+    return (
+      <main className="user-profile-page" role="main" aria-label="User profile">
+        <div className="profile-error" role="alert">
+          <p>{error || 'Profile not found.'}</p>
+          <button onClick={loadProfile}>Try again</button>
+        </div>
+      </main>
+    );
+  }
+
+  const displayName = userProfile.username || 'Unknown';
+  const bio = userProfile.profile?.bio || userProfile.bio || '';
+  const location = userProfile.profile?.location
+    ? [userProfile.profile.location.county, userProfile.profile.location.settlement].filter(Boolean).join(', ')
+    : (userProfile.location_county || '');
+  const avatarIcon = userProfile.profile?.avatarIcon || userProfile.avatar_icon || '🦁';
+  const isVerified = userProfile.verification?.isVerified || userProfile.verification_is_verified || false;
+  const joinedDate = userProfile.createdAt || userProfile.created_at
+    ? new Date(userProfile.createdAt || userProfile.created_at).toLocaleDateString([], { year: 'numeric', month: 'long' })
+    : '';
+
   return (
     <main className="user-profile-page" role="main" aria-label="User profile">
       {/* Profile Header */}
@@ -93,29 +174,26 @@ const UserProfilePage = () => {
         <div className="profile-cover">
           <div className="cover-gradient"></div>
         </div>
-        
+
         <div className="profile-info">
           <div className="profile-avatar-section">
             <div className="profile-avatar">
-              {userProfile.avatar ? (
-                <img src={userProfile.avatar} alt={userProfile.name} />
-              ) : (
-                <span>{userProfile.name?.charAt(0)?.toUpperCase()}</span>
-              )}
-              {userProfile.verified && <div className="verified-badge">✓</div>}
+              <span>{avatarIcon}</span>
+              {isVerified && <div className="verified-badge">✓</div>}
             </div>
-            
+
             {isOwnProfile ? (
               <button className="btn-edit-profile" onClick={() => navigate('/settings')}>
                 Edit Profile
               </button>
             ) : (
               <div className="profile-actions">
-                <button 
-                  className={`btn-follow ${isFollowing ? 'following' : ''}`}
-                  onClick={() => setIsFollowing(!isFollowing)}
+                <button
+                  className={`btn-follow ${follow.isFollowing ? 'following' : ''}`}
+                  onClick={handleFollowToggle}
+                  disabled={followBusy}
                 >
-                  {isFollowing ? 'Following' : 'Follow'}
+                  {follow.isFollowing ? 'Following' : 'Follow'}
                 </button>
                 <button className="btn-message" onClick={() => navigate('/chat')}>
                   Message
@@ -125,47 +203,39 @@ const UserProfilePage = () => {
           </div>
 
           <div className="profile-details">
-            <h1 className="profile-name">{userProfile.name}</h1>
-            <p className="profile-username">{userProfile.username}</p>
-            <p className="profile-bio">{userProfile.bio}</p>
-            
+            <h1 className="profile-name">{displayName}</h1>
+            {bio && <p className="profile-bio">{bio}</p>}
+
             <div className="profile-meta">
-              <span className="meta-item">📍 {userProfile.location}</span>
-              <span className="meta-item">🔗 {userProfile.website}</span>
-              <span className="meta-item">📅 Joined {userProfile.joinedDate}</span>
+              {location && <span className="meta-item">📍 {location}</span>}
+              {joinedDate && <span className="meta-item">📅 Joined {joinedDate}</span>}
             </div>
           </div>
 
           {/* Stats */}
           <div className="profile-stats">
             <div className="stat-item">
-              <span className="stat-value">{formatNumber(userProfile.stats.posts)}</span>
+              <span className="stat-value">{formatNumber(posts.length)}</span>
               <span className="stat-label">Posts</span>
             </div>
             <div className="stat-item">
-              <span className="stat-value">{formatNumber(userProfile.stats.followers)}</span>
+              <span className="stat-value">{formatNumber(follow.followers)}</span>
               <span className="stat-label">Followers</span>
             </div>
             <div className="stat-item">
-              <span className="stat-value">{formatNumber(userProfile.stats.following)}</span>
+              <span className="stat-value">{formatNumber(follow.following)}</span>
               <span className="stat-label">Following</span>
             </div>
             <div className="stat-item">
-              <span className="stat-value">{formatNumber(userProfile.stats.views)}</span>
-              <span className="stat-label">Views</span>
+              <span className="stat-value">{formatNumber(profileViews)}</span>
+              <span className="stat-label">Profile Views</span>
             </div>
-            {isOwnProfile && (
-              <div className="stat-item private-stat" title="Only visible to you">
-                <span className="stat-value">❤️ {formatNumber(userProfile.stats.likes)}</span>
-                <span className="stat-label">Likes Given</span>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
       {/* Creator Analytics (own profile only) */}
-      {isOwnProfile && <CreatorStats userId={userId || currentUser?._id} compact />}
+      {isOwnProfile && <CreatorStats userId={targetId} compact />}
 
       {/* Stories Section */}
       <div className="stories-section">
@@ -177,15 +247,22 @@ const UserProfilePage = () => {
               <span>Add Story</span>
             </div>
           )}
-          {userProfile.stories.map((story) => (
-            <motion.div 
+          {stories.length === 0 && !isOwnProfile && (
+            <p className="stories-empty">No active stories.</p>
+          )}
+          {stories.map((story) => (
+            <motion.div
               key={story.id}
-              className={`story-item ${story.viewed ? 'viewed' : 'unviewed'}`}
+              className="story-item"
               whileHover={{ scale: 1.05 }}
             >
-              <img src={story.thumbnail} alt="Story" />
+              {story.image_url ? (
+                <img src={story.image_url} alt="Story" />
+              ) : (
+                <div className="story-text">{story.text_content}</div>
+              )}
               <div className="story-overlay">
-                <span>{formatDate(story.timestamp)}</span>
+                <span>{story.created_at ? new Date(story.created_at).toLocaleDateString() : ''}</span>
               </div>
             </motion.div>
           ))}
@@ -194,27 +271,21 @@ const UserProfilePage = () => {
 
       {/* Tabs */}
       <div className="profile-tabs">
-        <button 
+        <button
           className={`tab-btn ${activeTab === 'posts' ? 'active' : ''}`}
           onClick={() => setActiveTab('posts')}
         >
            Posts
         </button>
         {isOwnProfile && (
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'liked' ? 'active' : ''}`}
             onClick={() => setActiveTab('liked')}
           >
             ❤️ Liked (Private)
           </button>
         )}
-        <button 
-          className={`tab-btn ${activeTab === 'media' ? 'active' : ''}`}
-          onClick={() => setActiveTab('media')}
-        >
-           Media
-        </button>
-        <button 
+        <button
           className={`tab-btn ${activeTab === 'about' ? 'active' : ''}`}
           onClick={() => setActiveTab('about')}
         >
@@ -226,39 +297,40 @@ const UserProfilePage = () => {
       <div className="tab-content">
         <AnimatePresence mode="wait">
           {activeTab === 'posts' && (
-            <motion.div 
+            <motion.div
               key="posts"
               className="posts-grid"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              {userProfile.posts.map((post) => (
-                <motion.div 
-                  key={post.id}
-                  className="post-card"
-                  whileHover={{ y: -5 }}
-                >
-                  {post.image && (
-                    <div className="post-image">
-                      <img src={post.image} alt="Post" />
+              {posts.length === 0 ? (
+                <div className="profile-empty">
+                  <p>No posts yet.</p>
+                </div>
+              ) : (
+                posts.map((post) => (
+                  <motion.div
+                    key={post.id}
+                    className="post-card"
+                    whileHover={{ y: -5 }}
+                  >
+                    <div className="post-content">
+                      <p>{post.content}</p>
+                      <div className="post-stats">
+                        <span>❤️ {post.likes ?? 0}</span>
+                        <span>💬 {post.commentCount ?? post.comments ?? 0}</span>
+                        <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ''}</span>
+                      </div>
                     </div>
-                  )}
-                  <div className="post-content">
-                    <p>{post.content}</p>
-                    <div className="post-stats">
-                      <span>❤️ {post.likes}</span>
-                      <span>💬 {post.comments}</span>
-                      <span>{formatDate(post.timestamp)}</span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))
+              )}
             </motion.div>
           )}
 
           {activeTab === 'liked' && isOwnProfile && (
-            <motion.div 
+            <motion.div
               key="liked"
               className="liked-posts"
               initial={{ opacity: 0, y: 20 }}
@@ -268,41 +340,26 @@ const UserProfilePage = () => {
               <div className="privacy-notice">
                 🔒 These posts are only visible to you
               </div>
-              {userProfile.likedPosts.map((post) => (
-                <div key={post.id} className="liked-post-card">
-                  <p>{post.content}</p>
-                  <div className="post-author">by {post.author}</div>
-                  <div className="post-stats">
-                    <span>❤️ {post.likes}</span>
-                    <span>{formatDate(post.timestamp)}</span>
-                  </div>
+              {likedPosts.length === 0 ? (
+                <div className="profile-empty">
+                  <p>No liked posts yet.</p>
                 </div>
-              ))}
-            </motion.div>
-          )}
-
-          {activeTab === 'media' && (
-            <motion.div 
-              key="media"
-              className="media-grid"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              {userProfile.posts.filter(p => p.image).map((post) => (
-                <div key={post.id} className="media-item">
-                  <img src={post.image} alt="Media" />
-                  <div className="media-overlay">
-                    <span>❤️ {post.likes}</span>
-                    <span>💬 {post.comments}</span>
+              ) : (
+                likedPosts.map((post) => (
+                  <div key={post.id} className="liked-post-card">
+                    <p>{post.content}</p>
+                    <div className="post-stats">
+                      <span>❤️ {post.likes ?? 0}</span>
+                      <span>{post.created_at ? new Date(post.created_at).toLocaleDateString() : ''}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </motion.div>
           )}
 
           {activeTab === 'about' && (
-            <motion.div 
+            <motion.div
               key="about"
               className="about-section"
               initial={{ opacity: 0, y: 20 }}
@@ -310,43 +367,38 @@ const UserProfilePage = () => {
               exit={{ opacity: 0, y: -20 }}
             >
               <div className="about-card">
-                <h3>About {userProfile.name}</h3>
-                <p className="about-bio">{userProfile.bio}</p>
+                <h3>About {displayName}</h3>
+                {bio && <p className="about-bio">{bio}</p>}
                 <div className="about-details">
-                  <div className="detail-item">
-                    <span className="detail-icon">📍</span>
-                    <span>Location: {userProfile.location}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-icon">🔗</span>
-                    <span>Website: {userProfile.website}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-icon">📅</span>
-                    <span>Joined: {userProfile.joinedDate}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-icon">👁️</span>
-                    <span>Profile Views: {formatNumber(userProfile.stats.views)}</span>
-                  </div>
+                  {location && (
+                    <div className="detail-item">
+                      <span className="detail-icon">📍</span>
+                      <span>Location: {location}</span>
+                    </div>
+                  )}
+                  {joinedDate && (
+                    <div className="detail-item">
+                      <span className="detail-icon">📅</span>
+                      <span>Joined: {joinedDate}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
       {/* Story Modal */}
       <AnimatePresence>
         {showStoryModal && (
-          <motion.div 
+          <motion.div
             className="story-modal-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowStoryModal(false)}
           >
-            <motion.div 
+            <motion.div
               className="story-modal"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -355,8 +407,26 @@ const UserProfilePage = () => {
             >
               <h3>Add New Story</h3>
               <div className="story-upload-area">
-                <p>📷 Upload Photo or Video</p>
-                <button className="btn-upload">Choose File</button>
+                <textarea
+                  placeholder="Share a moment (expires in 24h)..."
+                  value={storyText}
+                  onChange={(e) => setStoryText(e.target.value)}
+                  maxLength={500}
+                  rows={3}
+                />
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  aria-label="Attach a photo"
+                  onChange={(e) => setStoryFile(e.target.files?.[0] || null)}
+                />
+                <button
+                  className="btn-upload"
+                  onClick={handleCreateStory}
+                  disabled={(!storyText.trim() && !storyFile) || storyBusy}
+                >
+                  {storyBusy ? 'Sharing…' : 'Share Story'}
+                </button>
               </div>
               <button className="btn-close-modal" onClick={() => setShowStoryModal(false)}>
                 Cancel

@@ -4,6 +4,7 @@ import { FaUsers, FaChartLine, FaCog, FaPlus, FaEdit, FaTrash, FaCheck, FaTimes,
 import { motion, AnimatePresence } from 'framer-motion';
 import logger from '../../utils/logger';
 import { useToast } from '../../components/Toast';
+import { getAccessToken } from '../../utils/authToken'; // R5: memory-only token
 import './AdminDashboard.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -26,7 +27,7 @@ export default function AdminDashboard() {
   const fetchOrganizations = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = getAccessToken(); // R5: memory-only (never localStorage)
       const response = await fetch(`${API_BASE_URL}/organizations/my`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -50,7 +51,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Are you sure you want to archive this organization?')) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getAccessToken(); // R5: memory-only (never localStorage)
       const response = await fetch(`${API_BASE_URL}/organizations/${orgId}`, {
         method: 'DELETE',
         headers: {
@@ -267,7 +268,7 @@ function MembersTab({ organizations }) {
   const fetchMembers = async (orgId) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = getAccessToken(); // R5: memory-only (never localStorage)
       const response = await fetch(`${API_BASE_URL}/organizations/${orgId}/members`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -287,7 +288,7 @@ function MembersTab({ organizations }) {
 
   const handleRoleChange = async (membershipId, newRole) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getAccessToken(); // R5: memory-only (never localStorage)
       const response = await fetch(`${API_BASE_URL}/organizations/memberships/${membershipId}/role`, {
         method: 'PUT',
         headers: {
@@ -399,7 +400,7 @@ function SettingsTab({ organization }) {
     setSaving(true);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getAccessToken(); // R5: memory-only (never localStorage)
       const response = await fetch(`${API_BASE_URL}/organizations/${organization._id}`, {
         method: 'PUT',
         headers: {
@@ -517,7 +518,7 @@ function CreateOrganizationModal({ onClose, onSuccess }) {
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getAccessToken(); // R5: memory-only (never localStorage)
       const response = await fetch(`${API_BASE_URL}/organizations`, {
         method: 'POST',
         headers: {

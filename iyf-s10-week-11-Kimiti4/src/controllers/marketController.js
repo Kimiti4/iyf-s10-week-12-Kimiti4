@@ -1,27 +1,19 @@
 /**
  * 🔹 Market Controller (FarmLink price transparency)
+ *
+ * R3 [P1-2]: the previous implementation returned hardcoded in-memory prices
+ * from data/store.js as if they were live market data. Per the MOCK DATA
+ * RULE that behavior is removed. Until a real price feed exists, the
+ * endpoint truthfully reports UNAVAILABLE (501).
  */
-const store = require('../data/store');
 const asyncHandler = require('../utils/asyncHandler');
 
-// GET farm produce prices
+// GET farm produce prices — explicitly unavailable (no authoritative source in R3)
 const getPrices = asyncHandler(async (req, res) => {
-  const { crop, county } = req.query;
-
-  let result = [...store.marketPrices];
-
-  if (crop) {
-    result = result.filter(p => p.crop.toLowerCase() === crop.toLowerCase());
-  }
-  if (county) {
-    result = result.filter(p => p.county.toLowerCase() === county.toLowerCase());
-  }
-
-  res.json({
-    success: true,
-    count: result.length,
-    note: 'Farmers: Compare farm gate vs market prices to negotiate better',
-    data: result
+  return res.status(501).json({
+    success: false,
+    error: 'Market prices are not available',
+    code: 'MARKET_UNAVAILABLE'
   });
 });
 

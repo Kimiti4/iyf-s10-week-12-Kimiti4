@@ -52,8 +52,23 @@ const alertLimiter = rateLimit({
   skip: () => isTestEnv()
 });
 
+/**
+ * R2 [P2-1, P2-2]: Verification / MFA limiter
+ * 5 requests per 15 minutes per IP for send-verification + verify-code.
+ * Per-contact attempt counters in the controller still apply (defense in depth).
+ */
+const verificationLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Too many verification attempts, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isTestEnv()
+});
+
 module.exports = {
   generalLimiter,
   authLimiter,
-  alertLimiter
+  alertLimiter,
+  verificationLimiter
 };

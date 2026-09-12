@@ -40,7 +40,11 @@
 }
 
 .chip-count {
-  background: rgba(255, 255, 255, 0.3);
+  /* D1 a11y: solid dark badge so white text meets WCAG AA contrast on any
+     page background (translucent backgrounds blend through and fail axe).
+     Ratio white-on-#1f2937 is ~14:1. */
+  background: #1f2937;
+  color: #ffffff;
   padding: 0.25rem 0.5rem;
   border-radius: var(--radius-full);
   font-size: 0.75rem;

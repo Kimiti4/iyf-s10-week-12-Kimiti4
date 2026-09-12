@@ -12,7 +12,7 @@ class CommentRepository {
     const { content, authorId, postId, parentId } = commentData;
 
     const result = await query(`
-      INSERT INTO comments (content, author_id, post_id, parent_id)
+      INSERT INTO comments (content, author_id, post_id, parent_comment_id)
       VALUES ($1, $2, $3, $4)
       RETURNING *
     `, [content, authorId, postId, parentId || null]);
@@ -77,6 +77,19 @@ class CommentRepository {
   }
 
   /**
+   * Increment likes for a comment (R3 [P1-8/P1-9 U3])
+   */
+  async like(commentId) {
+    const result = await query(`
+      UPDATE comments SET likes = COALESCE(likes, 0) + 1, updated_at = NOW()
+      WHERE id = $1
+      RETURNING id, likes
+    `, [commentId]);
+
+    return result.rows[0] || null;
+  }
+
+  /**
    * Get replies to a comment (threaded comments)
    */
   async getReplies(parentId, limit = 20) {
@@ -90,7 +103,7 @@ class CommentRepository {
         ) as author
       FROM comments c
       LEFT JOIN users u ON c.author_id = u.id
-      WHERE c.parent_id = $1
+      WHERE c.parent_comment_id = $1
       ORDER BY c.created_at ASC
       LIMIT $2
     `, [parentId, limit]);
