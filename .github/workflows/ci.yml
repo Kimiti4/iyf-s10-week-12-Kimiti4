@@ -44,9 +44,8 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
       - run: npx playwright install --with-deps chromium
         working-directory: iyf-s10-week-09-Kimiti4
-      # Build the static bundle first: the e2e suite serves dist via `vite
-      # preview` (deterministic, no cold dev-server compile) and mocks every
-      # API call, so it passes with any backend or none.
+      # These browser suites intentionally intercept API calls. They certify
+      # frontend/UI behavior and are not a substitute for backend integration.
       - run: npm run build
         working-directory: iyf-s10-week-09-Kimiti4
       - run: npx playwright test e2e/ --reporter=html
@@ -57,6 +56,66 @@ jobs:
           name: playwright-report
           path: iyf-s10-week-09-Kimiti4/playwright-report/
           retention-days: 7
+
+  backend-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: jamii_link_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d jamii_link_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      NODE_ENV: test
+      PORT: 3333
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jamii_link_test
+      JWT_SECRET: ci-only-jwt-secret-change-me
+      JWT_EXPIRES_IN: 1h
+      CORS_ORIGIN: http://127.0.0.1:4173
+      DEMO_TOKEN: ci-only-demo-token
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: iyf-s10-week-11-Kimiti4/package-lock.json
+      - run: npm ci
+        working-directory: iyf-s10-week-11-Kimiti4
+      - run: npm run db:migrate:all
+        working-directory: iyf-s10-week-11-Kimiti4
+      - run: npm run test:ci
+        working-directory: iyf-s10-week-11-Kimiti4
+      - name: Start backend
+        working-directory: iyf-s10-week-11-Kimiti4
+        run: |
+          nohup npm start > /tmp/jamiilink-backend.log 2>&1 &
+          echo $! > /tmp/jamiilink-backend.pid
+      - name: Wait for backend health
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3333/api/health; then
+              echo
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Backend failed health check"
+          cat /tmp/jamiilink-backend.log
+          exit 1
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f /tmp/jamiilink-backend.pid ]; then kill "$(cat /tmp/jamiilink-backend.pid)" || true; fi
 
   lighthouse-ci:
     needs: lint-and-build
@@ -71,8 +130,6 @@ jobs:
           cache-dependency-path: iyf-s10-week-09-Kimiti4/package-lock.json
       - run: npm ci
         working-directory: iyf-s10-week-09-Kimiti4
-      # Point the bundle's API base at the LHCI stub server (overrides .env,
-      # which bakes in the Railway URL and causes CORS console errors).
       - run: npm run build
         working-directory: iyf-s10-week-09-Kimiti4
         env:
@@ -87,15 +144,15 @@ jobs:
           retention-days: 7
 
   deploy-preview:
-    needs: [e2e, lighthouse-ci]
+    needs: [e2e, backend-integration, lighthouse-ci]
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "✅ All checks passed. Ready for Vercel preview deploy."
+      - run: echo "All frontend and backend checks passed. Ready for Vercel preview deploy."
 
   deploy-production:
-    needs: [e2e, lighthouse-ci]
+    needs: [e2e, backend-integration, lighthouse-ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:

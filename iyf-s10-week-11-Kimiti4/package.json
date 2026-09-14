@@ -9,6 +9,7 @@
     "test": "node daily-challenges.test.js",
     "test:alerts": "node tests/alerts.contract.test.js",
     "test:ratelimit": "node tests/rateLimiter.test.js",
+    "test:ci": "npm run test:alerts && npm run test:ratelimit",
     "db:migrate": "node scripts/migrate.js",
     "db:migrate:002": "node scripts/migrations/002_add_alert_constraints.js",
     "db:migrate:004": "node scripts/migrations/004_geographic_and_fts.js",
