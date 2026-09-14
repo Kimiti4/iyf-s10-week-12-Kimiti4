@@ -2,7 +2,7 @@
 
 > Full-stack community platform for sharing information, trading goods, and building trusted local communities.
 
-JamiiLink is a production-oriented full-stack application built around a React frontend, Express API, MongoDB persistence, and JWT-based authentication.
+JamiiLink is a production-oriented full-stack application built around a React frontend, Express API, **PostgreSQL persistence**, and JWT-based authentication.
 
 The repository represents the final Week 12 implementation of the project and is presented here as a **full-stack engineering project**, rather than only as a course exercise.
 
@@ -23,7 +23,7 @@ JamiiLink provides a community publishing workflow with authenticated users, pos
 - Backend health endpoint
 - Environment-based configuration for development and deployment
 
-## Architecture
+## Current architecture
 
 ```text
 ┌─────────────────────┐
@@ -34,15 +34,17 @@ JamiiLink provides a community publishing workflow with authenticated users, pos
            ▼
 ┌─────────────────────┐
 │   Express.js API    │
-│ Authentication/CRUD │
+│ Auth / CRUD / HTTP  │
 └──────────┬──────────┘
-           │ Mongoose
+           │ pg / SQL
            ▼
 ┌─────────────────────┐
-│       MongoDB       │
-│   application data  │
+│     PostgreSQL      │
+│ application data   │
 └─────────────────────┘
 ```
+
+The backend uses the Node `pg` driver and a `DATABASE_URL` connection string. The documented deployment database is Supabase PostgreSQL-compatible infrastructure; the application is not currently a MongoDB/Mongoose application.
 
 ### Main stack
 
@@ -50,33 +52,33 @@ JamiiLink provides a community publishing workflow with authenticated users, pos
 |---|---|
 | Frontend | React 18, React Router, Vite |
 | Backend | Node.js, Express.js |
-| Database | MongoDB, Mongoose |
-| Authentication | JWT, bcrypt |
+| Database | PostgreSQL, `pg` |
+| Authentication | JWT, bcryptjs |
 | API integration | REST / JSON |
-| Production hosting | Vercel + Railway/Render-compatible deployment |
-| Database hosting | MongoDB Atlas |
+| Security | Helmet, CORS, rate limiting, parameterized SQL |
+| Realtime | Socket.IO (degraded operation is supported if realtime initialization fails) |
+| Production hosting | Separate frontend/backend deployment; Vercel-compatible frontend and Node-compatible backend |
+| Database hosting | Supabase PostgreSQL-compatible deployment |
 
 ## Repository structure
-
-The final project is assembled from the full-stack work developed across the preceding project stages:
 
 ```text
 iyf-s10-week-12-Kimiti4/
 ├── iyf-s10-week-09-Kimiti4/    # React frontend
-├── iyf-s10-week-11-Kimiti4/    # Express backend
+├── iyf-s10-week-11-Kimiti4/    # Express/PostgreSQL backend
+├── docs/                       # Project and audit documentation
+├── .github/workflows/          # CI/CD
 ├── README.md
 └── ...
 ```
-
-The nested frontend/backend directories are retained because they reflect the project's development progression and final integration structure.
 
 ## Running locally
 
 ### Prerequisites
 
-- Node.js
+- Node.js 20+
 - npm
-- MongoDB or MongoDB Atlas
+- PostgreSQL (local or hosted)
 
 ### Backend
 
@@ -86,11 +88,10 @@ npm install
 cp .env.example .env
 ```
 
-Configure the required environment variables, including the MongoDB connection string, JWT secret, frontend origin, and port.
-
-Start the backend in development mode:
+Set `DATABASE_URL`, a strong `JWT_SECRET`, and the frontend origin before starting the API.
 
 ```bash
+npm run db:migrate:all
 npm run dev
 ```
 
@@ -101,54 +102,72 @@ In a second terminal:
 ```bash
 cd iyf-s10-week-09-Kimiti4
 npm install
+cp .env.example .env
 npm run dev
 ```
 
-The Vite development server will provide the frontend URL shown in the terminal, normally `http://localhost:5173`.
+The Vite development server normally runs at `http://localhost:5173`.
 
 ## Configuration
 
-The backend uses environment variables rather than committing secrets to source control. The frontend uses Vite environment configuration for the API base URL.
+### Backend
 
-Typical backend configuration includes:
+The authoritative backend variables are documented in `iyf-s10-week-11-Kimiti4/.env.example`:
 
 ```text
-MONGODB_URI=...
+DATABASE_URL=postgresql://...
 JWT_SECRET=...
-FRONTEND_URL=...
-PORT=...
+JWT_EXPIRES_IN=7d
+CORS_ORIGIN=http://localhost:5173
+PORT=3001
 NODE_ENV=development
 ```
 
-Do **not** commit real credentials, tokens, database URLs containing secrets, or production configuration files.
+Never commit real credentials, tokens, production database URLs, or `.env` files.
+
+### Frontend
+
+The frontend uses Vite environment configuration for the API base URL. See `iyf-s10-week-09-Kimiti4/.env.example`.
 
 ## API and health monitoring
 
-The backend exposes a health endpoint at:
+The backend exposes:
 
 ```text
 GET /api/health
 ```
 
-The endpoint is intended to provide basic service/database health information for deployment and operational checks.
+Health verification is part of backend CI and should be checked after deployment. A deployment is not considered operational merely because the frontend builds successfully.
 
-## Verification
+## Verification model
 
-The project has been through staged frontend and full-stack verification work, including linting, builds, end-to-end checks, accessibility review, and deployment-oriented checks.
+JamiiLink deliberately separates three verification layers:
 
-Verification status should be interpreted against the specific audit/run recorded for the repository rather than as a blanket guarantee that every environment and browser configuration is defect-free.
+1. **Frontend E2E:** Playwright verifies UI, navigation, accessibility, and user journeys with browser-level API interception. These tests do not prove that the deployed backend or database works.
+2. **Backend integration/contract tests:** Node tests exercise the Express API, PostgreSQL repositories, validation, authorization, database constraints, and rate limiting against a real test database.
+3. **Production verification:** deployment-specific checks must verify the actual frontend URL, backend URL, CORS configuration, database connectivity, authentication, and critical workflows.
+
+This distinction prevents a green mocked browser suite from being misrepresented as full-stack certification.
+
+## CI
+
+GitHub Actions now treats frontend verification and backend verification as separate gates. Frontend build/E2E/Lighthouse checks remain in place, while the backend gate installs the backend, runs PostgreSQL-backed migrations and contract tests, verifies rate limiting, and performs a live health check against the started API.
+
+See `.github/workflows/ci.yml` and `docs/CURRENT_ARCHITECTURE_AND_VERIFICATION.md` for the current verification boundary.
 
 ## Deployment
 
-The application has deployment configuration for a separate frontend and backend:
+The intended production topology is:
 
 ```text
-Frontend  → Vercel-compatible static/Vite deployment
-Backend   → Railway/Render-compatible Node deployment
-Database  → MongoDB Atlas
+Frontend  → Vercel-compatible static/Vite hosting
+Backend   → Node-compatible managed hosting
+Database  → PostgreSQL (Supabase-compatible)
 ```
 
-Before redeploying, verify the current environment variables, allowed CORS origins, build commands, and health-check configuration for the selected provider.
+The exact backend provider is deployment configuration, not part of the application architecture. Before deploying, set the frontend API URL and backend `CORS_ORIGIN` to the actual deployed origins and verify `GET /api/health`.
+
+Historical audit documents may mention Railway, Render, Fly, MongoDB, or other earlier arrangements. Those references describe historical work and are not the authoritative current architecture unless explicitly marked current.
 
 ## Engineering lessons
 
@@ -159,12 +178,14 @@ The project demonstrates practical full-stack concerns including:
 - Protected client-side routes
 - CORS configuration
 - Environment-specific configuration
-- Database connectivity and validation
+- PostgreSQL connectivity and migrations
+- Parameterized SQL
 - CRUD lifecycle design
 - Loading/error states in the UI
 - Health monitoring
-- Production deployment configuration
+- Rate limiting and HTTP security headers
 - Accessibility and responsive UI considerations
+- Explicit separation of mocked UI tests from real backend verification
 
 ## Project context
 
