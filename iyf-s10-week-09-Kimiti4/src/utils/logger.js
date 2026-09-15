@@ -5,7 +5,7 @@
  * - Production: Only errors logged (console.log/warn disabled)
  */
 
-const isDevelopment = import.meta.env.DEV || process.env.NODE_ENV === 'development';
+const isDevelopment = import.meta.env.DEV;
 
 const logger = {
   /**

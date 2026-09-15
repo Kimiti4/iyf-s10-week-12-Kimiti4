@@ -74,7 +74,7 @@ class ErrorBoundary extends Component {
             <h2>Something went wrong</h2>
             <p>We're sorry, but something unexpected happened.</p>
             
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <details className="error-details">
                 <summary>Error Details (Development Only)</summary>
                 <pre>{this.state.error.toString()}</pre>
