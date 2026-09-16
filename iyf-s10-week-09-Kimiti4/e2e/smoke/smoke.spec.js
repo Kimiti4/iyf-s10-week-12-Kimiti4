@@ -63,7 +63,8 @@ test.describe('Smoke: App Launch', () => {
     // 4. One interaction succeeds - click a nav link back to feed
     const homeLink = page.getByRole('link', { name: /home|feed|jamii/i }).first();
     if (await homeLink.isVisible()) {
-      await homeLink.click();
+      await homeLink.scrollIntoViewIfNeeded();
+      await homeLink.click({ force: true });
       await page.waitForTimeout(500);
     }
 
