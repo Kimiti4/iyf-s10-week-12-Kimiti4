@@ -30,4 +30,4 @@ playwright-report/
 .lighthouseci/
 
 # Misc
-package-lock.json
+node_modules_backup/
