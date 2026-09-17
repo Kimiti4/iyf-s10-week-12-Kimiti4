@@ -6,7 +6,7 @@ services:
     rootDir: iyf-s10-week-11-Kimiti4
     buildCommand: npm install
     startCommand: node server.js
-    healthCheckPath: /health
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
