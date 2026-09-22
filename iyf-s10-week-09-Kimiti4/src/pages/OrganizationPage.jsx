@@ -110,7 +110,7 @@ export default function OrganizationPage() {
         <section className="org-feed" aria-labelledby="org-feed-title">
           <div className="feed-header">
             <h2 id="org-feed-title">Community feed</h2>
-            {user && <button className="btn-primary" onClick={() => navigate('/create')}>Create post</button>}
+
           </div>
           <div className="empty-feed">
             <h3>No organization posts are available yet</h3>
