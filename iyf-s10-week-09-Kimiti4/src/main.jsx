@@ -13,6 +13,7 @@ import './styles/Features.css'
 import './styles/Trust.css'
 import './styles/Analytics.css'
 import './index.css'
+import './styles/JamiiRedesign.css'
 import './components/ErrorBoundary.css'
 
 initTelemetry()
