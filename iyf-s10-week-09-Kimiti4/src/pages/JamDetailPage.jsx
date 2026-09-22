@@ -93,8 +93,12 @@ export default function JamDetailPage() {
   if (status === ERROR) {
     return (
       <div className="jam-detail-error" role="alert">
-        {error}
-        <button onClick={() => navigate(-1)}>Go back</button>
+        <div className="jam-detail-error-title">We couldn't load this Jam</div>
+        <p>{error}</p>
+        <div className="jam-detail-error-actions">
+          <button onClick={fetchJam}>Retry</button>
+          <button onClick={() => navigate('/jams')}>Back to Jams</button>
+        </div>
       </div>
     );
   }
