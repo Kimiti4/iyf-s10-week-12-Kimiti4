@@ -648,3 +648,109 @@ input:focus, textarea:focus, select:focus {
 }
 .feature-page .empty-state h2, .feature-page .error-state h2 { color:var(--jl-ink); margin-top:0; }
 .feature-page .feature-hero + .feature-header { margin-top:4px; }
+
+/* ── Launch theme: complete dark-mode surface coverage ── */
+[data-theme='dark'] body,
+.dark-mode body { background: #0b0f19; color: #f9fafb; }
+[data-theme='dark'] .topbar,
+.dark-mode .topbar,
+[data-theme='dark'] .app-sidebar,
+.dark-mode .app-sidebar,
+[data-theme='dark'] .post-composer,
+.dark-mode .post-composer,
+[data-theme='dark'] .discovery-card,
+.dark-mode .discovery-card,
+[data-theme='dark'] .card,
+.dark-mode .card,
+[data-theme='dark'] .panel,
+.dark-mode .panel,
+[data-theme='dark'] .settings-card,
+.dark-mode .settings-card,
+[data-theme='dark'] .profile-header,
+.dark-mode .profile-header,
+[data-theme='dark'] .marketplace-card,
+.dark-mode .marketplace-card,
+[data-theme='dark'] .chat-panel,
+.dark-mode .chat-panel,
+[data-theme='dark'] .notification-card,
+.dark-mode .notification-card,
+[data-theme='dark'] .feature-card,
+.dark-mode .feature-card,
+[data-theme='dark'] .discovery-section,
+.dark-mode .discovery-section,
+[data-theme='dark'] .search-section,
+.dark-mode .search-section,
+[data-theme='dark'] .jam-feed-filters,
+.dark-mode .jam-feed-filters,
+[data-theme='dark'] .jam-feed-loading,
+.dark-mode .jam-feed-loading,
+[data-theme='dark'] .jam-feed-error,
+.dark-mode .jam-feed-error,
+[data-theme='dark'] .chat-page,
+.dark-mode .chat-page,
+[data-theme='dark'] .chat-main,
+.dark-mode .chat-main,
+[data-theme='dark'] .creator-studio-section,
+.dark-mode .creator-studio-section,
+[data-theme='dark'] .marketplace-page .marketplace-search,
+.dark-mode .marketplace-page .marketplace-search,
+[data-theme='dark'] .page-error,
+.dark-mode .page-error,
+[data-theme='dark'] .page-empty,
+.dark-mode .page-empty,
+[data-theme='dark'] .page-loading,
+.dark-mode .page-loading {
+  background: #111827;
+  color: #f9fafb;
+  border-color: #273244;
+}
+[data-theme='dark'] .post,
+.dark-mode .post { border-color:#273244; }
+[data-theme='dark'] .post-author,
+.dark-mode .post-author,
+[data-theme='dark'] .page-header h1,
+.dark-mode .page-header h1,
+[data-theme='dark'] .section-header h1,
+.dark-mode .section-header h1,
+[data-theme='dark'] .feature-card-title,
+.dark-mode .feature-card-title,
+[data-theme='dark'] .feature-header-title,
+.dark-mode .feature-header-title,
+[data-theme='dark'] .discovery-header h1,
+.dark-mode .discovery-header h1,
+[data-theme='dark'] .jam-feed-title,
+.dark-mode .jam-feed-title,
+[data-theme='dark'] .chat-sidebar .sidebar-header h2,
+.dark-mode .chat-sidebar .sidebar-header h2,
+[data-theme='dark'] .creator-studio-header h1,
+.dark-mode .creator-studio-header h1 {
+  color:#f9fafb;
+}
+[data-theme='dark'] .feature-card-desc,
+.dark-mode .feature-card-desc,
+[data-theme='dark'] .page-header p,
+.dark-mode .page-header p,
+[data-theme='dark'] .section-header p,
+.dark-mode .section-header p,
+[data-theme='dark'] .discovery-header p,
+.dark-mode .discovery-header p {
+  color:#aab5c4;
+}
+[data-theme='dark'] input,
+[data-theme='dark'] textarea,
+[data-theme='dark'] select,
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+  background:#18202f;
+  color:#f9fafb;
+  border-color:#344054;
+}
+[data-theme='dark'] .mobile-bottom-nav,
+.dark-mode .mobile-bottom-nav {
+  background:rgba(17,24,39,.96);
+  border-color:#273244;
+}
+@media (prefers-reduced-motion: reduce) {
+  .feature-card:hover { transform:none; }
+}
