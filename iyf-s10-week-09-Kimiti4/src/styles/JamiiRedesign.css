@@ -635,3 +635,16 @@ input:focus, textarea:focus, select:focus {
 }
 .jam-detail-error-actions { display:flex; gap:8px; }
 .jam-detail-error-actions button:last-child { background:#eef3f0; color:var(--jl-ink); }
+
+/* J021 consolidation: shared states for pages previously missing robust
+   loading/empty/error treatment. Feature pages remain data-source honest. */
+.page-error, .page-empty, .page-loading,
+.feature-page .empty-state, .feature-page .error-state {
+  padding:28px;
+  border:1px solid var(--jl-line);
+  border-radius:16px;
+  background:#fff;
+  color:var(--jl-muted);
+}
+.feature-page .empty-state h2, .feature-page .error-state h2 { color:var(--jl-ink); margin-top:0; }
+.feature-page .feature-hero + .feature-header { margin-top:4px; }
