@@ -1,203 +1,124 @@
-/**
- * 🛍️ JamiiLink Marketplace - Treasure Hunt!
- */
-
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth } from '../context/AuthContext'
-import ProductCard from '../components/ProductCard'
-import StoreCard from '../components/StoreCard'
-import { useToast } from '../components/Toast'
-import './MarketplacePage.css'
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { request } from '../services/apiClient';
+import ProductCard from '../components/ProductCard';
+import StoreCard from '../components/StoreCard';
+import './MarketplacePage.css';
 
 export default function MarketplacePage() {
-  const { user } = useAuth()
-  const toast = useToast()
-  const [activeTab, setActiveTab] = useState('products')
-  const [loading, setLoading] = useState(true)
-  const [products, setProducts] = useState([])
-  const [stores, setStores] = useState([])
-  const [searchQuery, setSearchQuery] = useState('')
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('products');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [products, setProducts] = useState([]);
+  const [stores, setStores] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    setTimeout(() => {
-      setProducts(mockProducts)
-      setStores(mockStores)
-      setLoading(false)
-    }, 800)
-  }, [])
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const [productRes, storeRes] = await Promise.all([
+          request('/marketplace/products'),
+          request('/marketplace/stores'),
+        ]);
+        if (cancelled) return;
+        setProducts(Array.isArray(productRes?.data) ? productRes.data : (Array.isArray(productRes) ? productRes : []));
+        setStores(Array.isArray(storeRes?.data) ? storeRes.data : (Array.isArray(storeRes) ? storeRes : []));
+      } catch (err) {
+        if (!cancelled) setError(err.message || 'Marketplace is temporarily unavailable.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, []);
 
-  const filteredProducts = products.filter(p => 
-    !searchQuery || p.title.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-  
-  const filteredStores = stores.filter(s => 
-    !searchQuery || s.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredProducts = useMemo(
+    () => products.filter((p) => !normalizedQuery || String(p.title || '').toLowerCase().includes(normalizedQuery)),
+    [products, normalizedQuery]
+  );
+  const filteredStores = useMemo(
+    () => stores.filter((s) => !normalizedQuery || String(s.name || '').toLowerCase().includes(normalizedQuery)),
+    [stores, normalizedQuery]
+  );
 
   return (
-    <div className="marketplace-page">
-      <motion.div 
-        className="marketplace-header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1>🛍️ JamiiLink Marketplace</h1>
-        <p>Discover treasures from verified sellers in your community! 🎁</p>
-      </motion.div>
+    <main className="marketplace-page" aria-label="Marketplace">
+      <header className="marketplace-header">
+        <p className="feature-eyebrow">Community commerce</p>
+        <h1>Marketplace</h1>
+        <p>Discover products and local sellers available through JamiiLink.</p>
+      </header>
 
       <div className="marketplace-search">
+        <label htmlFor="marketplace-search">Search marketplace</label>
         <input
-          type="text"
-          placeholder="Search for amazing finds... 🔍"
+          id="marketplace-search"
+          type="search"
+          placeholder="Search products or stores"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
-      <div className="marketplace-tabs">
-        <button
-          className={`tab-button ${activeTab === 'products' ? 'active' : ''}`}
-          onClick={() => setActiveTab('products')}
-        >
-          📦 Products ({filteredProducts.length})
+      <div className="marketplace-tabs" role="tablist" aria-label="Marketplace sections">
+        <button role="tab" aria-selected={activeTab === 'products'} className={activeTab === 'products' ? 'marketplace-tab active' : 'marketplace-tab'} onClick={() => setActiveTab('products')}>
+          Products
         </button>
-        <button
-          className={`tab-button ${activeTab === 'stores' ? 'active' : ''}`}
-          onClick={() => setActiveTab('stores')}
-        >
-          🏪 Stores ({filteredStores.length})
+        <button role="tab" aria-selected={activeTab === 'stores'} className={activeTab === 'stores' ? 'marketplace-tab active' : 'marketplace-tab'} onClick={() => setActiveTab('stores')}>
+          Stores
         </button>
       </div>
 
-      <AnimatePresence mode="wait">
-        {loading ? (
-          <motion.div
-            key="loading"
-            className="loading-state"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <div className="loading-spinner"></div>
-            <p>Loading marketplace magic... ✨</p>
-          </motion.div>
-        ) : activeTab === 'products' ? (
-          <motion.div
-            key="products"
-            className="products-section"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            {filteredProducts.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-illustration">📭</div>
-                <h3>No products found</h3>
-                <p>Try a different search term!</p>
-              </div>
-            ) : (
-              <div className="products-grid">
-                {filteredProducts.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <ProductCard product={product} />
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </motion.div>
+      {loading && <div className="page-loading" role="status">Loading marketplace…</div>}
+
+      {!loading && error && (
+        <div className="page-error" role="alert">
+          <h2>Marketplace unavailable</h2>
+          <p>{error}</p>
+          <button className="btn-primary" onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      )}
+
+      {!loading && !error && activeTab === 'products' && (
+        filteredProducts.length ? (
+          <div className="products-grid" aria-live="polite">
+            {filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+          </div>
         ) : (
-          <motion.div
-            key="stores"
-            className="stores-section"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <div className="verification-banner">
-              <span>✅ All stores are verified for your safety!</span>
-            </div>
-            {filteredStores.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-illustration">🏪</div>
-                <h3>No stores found</h3>
-                <p>Try a different search!</p>
-              </div>
-            ) : (
-              <div className="stores-grid">
-                {filteredStores.map((store, index) => (
-                  <motion.div
-                    key={store.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <StoreCard store={store} />
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          <div className="page-empty">
+            <h2>No products found</h2>
+            <p>{normalizedQuery ? 'Try a different search.' : 'There are no marketplace products available yet.'}</p>
+          </div>
+        )
+      )}
+
+      {!loading && !error && activeTab === 'stores' && (
+        filteredStores.length ? (
+          <div className="stores-grid" aria-live="polite">
+            {filteredStores.map((store) => <StoreCard key={store.id} store={store} />)}
+          </div>
+        ) : (
+          <div className="page-empty">
+            <h2>No stores found</h2>
+            <p>{normalizedQuery ? 'Try a different search.' : 'There are no marketplace stores available yet.'}</p>
+          </div>
+        )
+      )}
 
       {user && (
-        <motion.button
-          className="create-listing-btn"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => toast.info('Listing feature coming soon! 🚀')}
-        >
+        <button className="create-listing-btn" onClick={() => navigate('/marketplace/create')}>
           <span className="btn-icon">+</span>
-          <span className="btn-text">Sell Something</span>
-        </motion.button>
+          <span className="btn-text">Sell something</span>
+        </button>
       )}
-    </div>
-  )
+    </main>
+  );
 }
-
-const mockProducts = [
-  {
-    id: '1',
-    title: 'Fresh Organic Tomatoes - 5kg Box 🍅',
-    description: 'Farm-fresh organic tomatoes harvested daily from Kiambu.',
-    price: 400,
-    currency: 'KSh',
-    type: 'physical',
-    seller: { name: 'Kiambu Organic Farms', verified: true, rating: 4.9 }
-  },
-  {
-    id: '2',
-    title: 'React Course - Beginner to Advanced ⚛️',
-    description: 'Learn React.js with hands-on projects. Includes certificates!',
-    price: 2500,
-    currency: 'KSh',
-    type: 'digital',
-    seller: { name: 'TechAcademy KE', verified: true, rating: 4.8 }
-  }
-]
-
-const mockStores = [
-  {
-    id: 's1',
-    name: 'TechAcademy KE',
-    description: 'Leading online education platform for Kenyan tech enthusiasts.',
-    category: 'Education',
-    verified: true,
-    verificationLevel: 'gold',
-    rating: 4.8,
-    products: 45
-  },
-  {
-    id: 's2',
-    name: 'Kiambu Organic Farms',
-    description: 'Fresh produce directly from our family farm to your table.',
-    category: 'Agriculture',
-    verified: true,
-    verificationLevel: 'gold',
-    rating: 4.9,
-    products: 28
-  }
-]
