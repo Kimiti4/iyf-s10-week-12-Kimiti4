@@ -6,16 +6,16 @@
 
 :root {
   /* ─── Brand (indigo) ─── */
-  --brand-50: #eef2ff;
-  --brand-100: #e0e7ff;
-  --brand-200: #c7d2fe;
-  --brand-300: #a5b4fc;
-  --brand-400: #818cf8;
-  --brand-500: #4f46e5;
-  --brand-600: #4338ca;
-  --brand-700: #3730a3;
-  --brand-800: #312e81;
-  --brand-900: #1e1b4b;
+  --brand-50: #e8f6f0;
+  --brand-100: #d2eee3;
+  --brand-200: #a9ddc9;
+  --brand-300: #78c5a7;
+  --brand-400: #3fa77f;
+  --brand-500: #087f5b;
+  --brand-600: #066c4d;
+  --brand-700: #05583f;
+  --brand-800: #064632;
+  --brand-900: #032e22;
 
   /* ─── Community (lime) ─── */
   --community-400: #a3e635;
