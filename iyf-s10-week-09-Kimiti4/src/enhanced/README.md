@@ -141,7 +141,7 @@ src/enhanced/
 │   ├── EnhancedRegisterPage.jsx       # Registration with verification
 │   ├── EnhancedRegisterPage.css
 │   ├── EnhancedFeedPage.jsx           # Social feed
-│   └── EnhancedFeedPage.css
+│   └── (shared enhanced styles/components)
 └── index.js                           # Export all components
 ```
 
