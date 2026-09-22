@@ -39,7 +39,7 @@ export default function JamFeedPage() {
       const params = { sort };
       if (category) params.category = category;
       const data = await jamsAPI.getAll(params);
-      setJams(data.jams || data || []);
+      setJams(Array.isArray(data?.jams) ? data.jams : []);
       setStatus(LOADED);
     } catch (err) {
       setError(err.message || 'Failed to load Jams');
@@ -101,16 +101,17 @@ export default function JamFeedPage() {
       {/* Content */}
       <div className="jam-feed-content">
         {status === LOADING && (
-          <div className="jam-feed-loading" aria-label="Loading Jams">
+          <div className="jam-feed-loading" role="status" aria-live="polite" aria-label="Loading Jams">
             <div className="jam-feed-spinner" />
           </div>
         )}
 
         {status === ERROR && (
           <div className="jam-feed-error" role="alert">
-            {error}
+            <div className="jam-feed-error-title">Jams are temporarily unavailable</div>
+            <p className="jam-feed-error-copy">${error || "The Jam service could not be reached."}</p>
             <button className="jam-feed-retry" onClick={fetchJams}>
-              Try again
+              Retry
             </button>
           </div>
         )}
