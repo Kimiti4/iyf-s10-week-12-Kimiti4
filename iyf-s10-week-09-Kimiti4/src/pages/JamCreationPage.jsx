@@ -29,7 +29,7 @@ export default function JamCreationPage() {
 
       // Redirect to the new Jam after a brief moment
       setTimeout(() => {
-        navigate(`/jams/${result.id || result._id}`);
+        navigate(`/jams/${jamId}`);
       }, 1000);
     } catch (err) {
       setStatus(ERROR);
