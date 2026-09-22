@@ -607,3 +607,31 @@ input:focus, textarea:focus, select:focus {
 .feature-page .feature-card:hover { transform:translateY(-2px); }
 .feature-page .feature-header { padding:0 2px; }
 .feature-page .feature-header-title { color:var(--jl-ink); }
+
+.jam-feed-loading {
+  min-height: 260px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--jl-line);
+  border-radius:18px;
+  background:#fff;
+}
+.jam-feed-spinner {
+  width:30px; height:30px; border:3px solid #dce7e2;
+  border-top-color:var(--jl-green); border-radius:50%;
+  animation:jl-spin .7s linear infinite;
+}
+@keyframes jl-spin { to { transform:rotate(360deg); } }
+.jam-feed-error-title, .jam-detail-error-title { font-weight:800; font-size:18px; }
+.jam-feed-error-copy, .jam-detail-error p { color:var(--jl-muted); margin:7px 0 16px; }
+.jam-feed-retry, .jam-detail-error-actions button {
+  border:0; border-radius:10px; padding:10px 15px;
+  background:var(--jl-green); color:#fff; font-weight:750;
+}
+.jam-detail-error {
+  max-width:700px; margin:50px auto; padding:28px;
+  background:#fff; border:1px solid var(--jl-line); border-radius:18px;
+  box-shadow:var(--jl-shadow);
+}
+.jam-detail-error-actions { display:flex; gap:8px; }
+.jam-detail-error-actions button:last-child { background:#eef3f0; color:var(--jl-ink); }
