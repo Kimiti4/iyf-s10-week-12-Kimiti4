@@ -598,3 +598,12 @@ input:focus, textarea:focus, select:focus {
   .creator-studio-btn { flex:1; text-align:center; }
   .user-profile-page .profile-info { padding:0 16px 18px; }
 }
+
+/* ── Visual language for existing enhanced ecosystem pages ── */
+.feature-page .feature-card,
+.feature-page .stat-card,
+.feature-page .feature-hero { box-sizing:border-box; }
+.feature-page .feature-card { transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+.feature-page .feature-card:hover { transform:translateY(-2px); }
+.feature-page .feature-header { padding:0 2px; }
+.feature-page .feature-header-title { color:var(--jl-ink); }
