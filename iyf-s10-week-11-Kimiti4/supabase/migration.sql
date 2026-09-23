@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS user_skills (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   skill_name VARCHAR(100) NOT NULL,
-  proficiency INTEGER DEFAULT 3,
+  proficiency INTEGER DEFAULT 3 CHECK (proficiency >= 1 AND proficiency <= 5),
   is_offering BOOLEAN DEFAULT true,
   is_seeking BOOLEAN DEFAULT false,
   description TEXT,
@@ -73,11 +73,15 @@ CREATE TABLE IF NOT EXISTS skill_matches (
   user2_id UUID REFERENCES users(id) ON DELETE CASCADE,
   skill1 VARCHAR(100) NOT NULL,
   skill2 VARCHAR(100) NOT NULL,
-  status VARCHAR(20) DEFAULT 'pending',
-  quality_rating INTEGER,
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'cancelled')),
+  quality_rating INTEGER CHECK (quality_rating >= 1 AND quality_rating <= 5),
   testimonial TEXT,
+  match_score NUMERIC(4,2),
+  matching_skills INT DEFAULT 0,
+  requested_skills INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT NOW(),
-  completed_at TIMESTAMP
+  completed_at TIMESTAMP,
+  CHECK (user1_id != user2_id)
 );
 
 -- 5. Organizations
@@ -396,6 +400,26 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_current_org ON users(current_organization_id);
 CREATE INDEX IF NOT EXISTS idx_users_reputation ON users(reputation_score DESC);
+
+-- Novel-feature indexes (impact / skills / matches) — parity with schema.js + 005/006
+CREATE UNIQUE INDEX IF NOT EXISTS uq_impact_metrics_event
+  ON impact_metrics (user_id, event_type, reference_id)
+  WHERE reference_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_impact_metrics_created
+  ON impact_metrics (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_impact_metrics_user_id ON impact_metrics(user_id);
+CREATE INDEX IF NOT EXISTS idx_impact_metrics_event_type ON impact_metrics(event_type);
+
+CREATE INDEX IF NOT EXISTS idx_user_skills_skill_name ON user_skills(skill_name);
+CREATE INDEX IF NOT EXISTS idx_user_skills_user_id ON user_skills(user_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_user_skills_normalized
+  ON user_skills (user_id, LOWER(skill_name), is_offering, is_seeking);
+
+CREATE INDEX IF NOT EXISTS idx_skill_matches_users ON skill_matches(user1_id, user2_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_skill_matches_pending_pair
+  ON skill_matches (user1_id, user2_id)
+  WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_skill_matches_user2 ON skill_matches(user2_id);
 
 CREATE INDEX IF NOT EXISTS idx_verification_codes_active
   ON verification_codes (contact, purpose) WHERE used_at IS NULL;

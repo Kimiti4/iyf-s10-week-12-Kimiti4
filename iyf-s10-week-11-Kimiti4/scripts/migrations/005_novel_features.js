@@ -2,30 +2,38 @@ const { query } = require('../../src/config/postgres');
 
 async function up() {
   console.log('Running migration 005_novel_features...');
-  
+
   try {
     await query('BEGIN');
 
-    // 1. Impact Metrics
+    // 1. Impact Metrics (canonical: reference_id nullable, NO global UNIQUE —
+    //    dual-credit SkillSwap completions share one match_id reference across
+    //    both users; per-(user,event,reference) dedupe lives in 006.)
     await query(`
       CREATE TABLE IF NOT EXISTS impact_metrics (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-        event_type VARCHAR(100) NOT NULL,
-        impact_value INTEGER NOT NULL,
-        reference_id VARCHAR(255) NOT NULL,
+        event_type VARCHAR(50) NOT NULL,
+        impact_value INTEGER DEFAULT 1,
+        reference_id VARCHAR(255),
         description TEXT,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        CONSTRAINT unique_impact_reference UNIQUE (reference_id)
+        created_at TIMESTAMP DEFAULT NOW()
       );
     `);
-    
+
     await query(`
       CREATE INDEX IF NOT EXISTS idx_impact_metrics_user_id ON impact_metrics(user_id);
       CREATE INDEX IF NOT EXISTS idx_impact_metrics_event_type ON impact_metrics(event_type);
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_impact_metrics_event
+        ON impact_metrics (user_id, event_type, reference_id)
+        WHERE reference_id IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_impact_metrics_created
+        ON impact_metrics (user_id, created_at DESC);
     `);
 
-    // 2. User Skills
+    // 2. User Skills (canonical: proficiency CHECK, normalized uniqueness —
+    //    case-sensitive unique_user_skill is intentionally NOT created; the
+    //    LOWER(skill_name) unique index prevents 'Plumbing'/'plumbing' dupes.)
     await query(`
       CREATE TABLE IF NOT EXISTS user_skills (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -35,17 +43,18 @@ async function up() {
         is_offering BOOLEAN DEFAULT true,
         is_seeking BOOLEAN DEFAULT false,
         description TEXT,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        CONSTRAINT unique_user_skill UNIQUE (user_id, skill_name, is_offering, is_seeking)
+        created_at TIMESTAMP DEFAULT NOW()
       );
     `);
-    
+
     await query(`
       CREATE INDEX IF NOT EXISTS idx_user_skills_skill_name ON user_skills(skill_name);
       CREATE INDEX IF NOT EXISTS idx_user_skills_user_id ON user_skills(user_id);
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_user_skills_normalized
+        ON user_skills (user_id, LOWER(skill_name), is_offering, is_seeking);
     `);
 
-    // 3. Skill Matches
+    // 3. Skill Matches (canonical: audit columns + domain CHECKs + indexes)
     await query(`
       CREATE TABLE IF NOT EXISTS skill_matches (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -56,14 +65,21 @@ async function up() {
         status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'cancelled')),
         quality_rating INTEGER CHECK (quality_rating >= 1 AND quality_rating <= 5),
         testimonial TEXT,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        completed_at TIMESTAMP WITH TIME ZONE,
-        CONSTRAINT prevent_self_match CHECK (user1_id != user2_id)
+        match_score NUMERIC(4,2),
+        matching_skills INT DEFAULT 0,
+        requested_skills INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW(),
+        completed_at TIMESTAMP,
+        CHECK (user1_id != user2_id)
       );
     `);
-    
+
     await query(`
       CREATE INDEX IF NOT EXISTS idx_skill_matches_users ON skill_matches(user1_id, user2_id);
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_skill_matches_pending_pair
+        ON skill_matches (user1_id, user2_id)
+        WHERE status = 'pending';
+      CREATE INDEX IF NOT EXISTS idx_skill_matches_user2 ON skill_matches(user2_id);
     `);
 
     await query('COMMIT');

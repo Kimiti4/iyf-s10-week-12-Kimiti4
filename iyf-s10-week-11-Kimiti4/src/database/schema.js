@@ -83,13 +83,18 @@ const createTables = async () => {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id UUID REFERENCES users(id) ON DELETE CASCADE,
         skill_name VARCHAR(100) NOT NULL,
-        proficiency INTEGER DEFAULT 3,
+        proficiency INTEGER DEFAULT 3 CHECK (proficiency >= 1 AND proficiency <= 5),
         is_offering BOOLEAN DEFAULT true,
         is_seeking BOOLEAN DEFAULT false,
         description TEXT,
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_user_skills_skill_name ON user_skills(skill_name)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_user_skills_user_id ON user_skills(user_id)`);
+    // Case-insensitive uniqueness: 'Plumbing' and 'plumbing' are the same skill.
+    await query(`CREATE UNIQUE INDEX IF NOT EXISTS uq_user_skills_normalized
+                 ON user_skills (user_id, LOWER(skill_name), is_offering, is_seeking)`);
 
     await query(`
       CREATE TABLE IF NOT EXISTS skill_matches (
@@ -98,16 +103,18 @@ const createTables = async () => {
         user2_id UUID REFERENCES users(id) ON DELETE CASCADE,
         skill1 VARCHAR(100) NOT NULL,
         skill2 VARCHAR(100) NOT NULL,
-        status VARCHAR(20) DEFAULT 'pending',
-        quality_rating INTEGER,
+        status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'cancelled')),
+        quality_rating INTEGER CHECK (quality_rating >= 1 AND quality_rating <= 5),
         testimonial TEXT,
         match_score NUMERIC(4,2),
         matching_skills INT DEFAULT 0,
         requested_skills INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT NOW(),
-        completed_at TIMESTAMP
+        completed_at TIMESTAMP,
+        CHECK (user1_id != user2_id)
       )
     `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_skill_matches_users ON skill_matches(user1_id, user2_id)`);
     await query(`CREATE UNIQUE INDEX IF NOT EXISTS uq_skill_matches_pending_pair
                  ON skill_matches (user1_id, user2_id)
                  WHERE status = 'pending'`);

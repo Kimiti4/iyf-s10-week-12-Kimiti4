@@ -22,7 +22,8 @@
     "db:migrate:005": "node scripts/migrations/005_novel_features.js",
     "db:migrate:006": "node scripts/migrations/006_impact_skills_enforcement.js",
     "db:migrate:004": "node scripts/migrations/004_geographic_and_fts.js",
-    "db:migrate:all": "node scripts/migrate.js"
+    "db:migrate:all": "node scripts/migrate.js",
+    "db:verify-parity": "node scripts/verify-migration-parity.js"
   },
   "keywords": [
     "jamii",
