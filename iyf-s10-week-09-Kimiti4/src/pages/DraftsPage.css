@@ -12,12 +12,12 @@
 .drafts-header h1 {
   font-size: var(--text-3xl);
   font-weight: var(--font-bold);
-  color: var(--color-zinc-900);
+  color: #f1f5f9;
   margin-bottom: var(--space-2);
 }
 
 .drafts-header p {
-  color: var(--color-zinc-600);
+  color: #94a3b8;
   margin: 0;
 }
 
@@ -80,14 +80,14 @@
 }
 
 .drafts-empty h2.drafts-empty-title {
-  color: var(--color-zinc-900);
+  color: #f1f5f9;
   margin-bottom: var(--space-2);
   /* Preserve the previous h3 visual size after the h2 hierarchy fix */
   font-size: 1.17em;
 }
 
 .drafts-empty p {
-  color: var(--color-zinc-600);
+  color: #94a3b8;
   max-width: 380px;
   margin: 0 auto;
 }

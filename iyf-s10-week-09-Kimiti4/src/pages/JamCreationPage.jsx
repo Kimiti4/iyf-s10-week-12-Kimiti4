@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAccessToken } from '../utils/authToken'; // R5: memory-only token
 import JamCreationWizard from '../components/jam/JamCreationWizard';
+import { jamsAPI } from '../services/jamApi';
 import '../components/jam/jam.css';
 
 const IDLE = 'idle';
@@ -21,22 +22,7 @@ export default function JamCreationPage() {
     setErrorMessage('');
 
     try {
-      const token = getAccessToken(); // R5: memory-only (never localStorage)
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/jams`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(jamData),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || data.message || 'Failed to create Jam');
-      }
-
-      const result = await response.json();
+      const result = await jamsAPI.create(jamData);
       setStatus(SUCCESS);
 
       // Redirect to the new Jam after a brief moment

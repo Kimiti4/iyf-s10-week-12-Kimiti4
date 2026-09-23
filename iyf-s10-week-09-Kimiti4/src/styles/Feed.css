@@ -1,6 +1,7 @@
 /* ==========================================================================
-   JAMII LINK 2.0 - FEED  (X-style) + RIGHT RAIL
-   Phase 3: spec feed primitives rendered inside the `.social-layout` shell.
+   JAMII LINK 2.0 — FEED  (X-style) + RIGHT RAIL
+   Primary content cards are SOLID (not glass) for hierarchy and readability.
+   Glass is only used on the discovery/secondary right rail panels.
    ========================================================================== */
 
 .feed {
@@ -12,39 +13,36 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   margin-bottom: 16px;
 }
 
 .feed-title {
   margin: 0;
-
   font-size: 22px;
-  font-weight: 750;
-
-  letter-spacing: -0.025em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
 }
 
+/* ─── Tabs ─── */
 .feed-tabs {
   display: flex;
-
   border-bottom: 1px solid var(--border);
-
   margin-bottom: 4px;
 }
 
 .feed-tab {
   position: relative;
-
   padding: 13px 18px;
-
   border: 0;
   background: transparent;
-
-  color: var(--text-tertiary);
-
+  color: #94a3b8;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
+  transition: color var(--transition-fast);
+  /* Touch target */
+  min-height: 44px;
 }
 
 .feed-tab:hover {
@@ -52,35 +50,31 @@
 }
 
 .feed-tab.active {
-  color: var(--brand-600);
+  color: var(--brand-400);
 }
 
 .feed-tab.active::after {
-  content: "";
-
+  content: '';
   position: absolute;
-
   left: 16px;
   right: 16px;
   bottom: -1px;
-
   height: 2px;
-
-  background: var(--brand-500);
-
-  border-radius: 999px;
+  background: var(--brand-gradient,
+    linear-gradient(90deg, #8b5cf6 0%, #6d28d9 100%));
+  border-radius: var(--radius-full);
 }
 
-/* ─── Post composer ─── */
+/* ─── Post Composer — glass surface ─── */
 .post-composer {
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-
+  background: var(--glass-bg-light, rgba(22, 32, 56, 0.60));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border, rgba(139, 92, 246, 0.18));
+  border-radius: var(--radius-xl);
   padding: 16px;
-
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .composer-row {
@@ -88,105 +82,96 @@
   gap: 12px;
 }
 
+/* Avatar */
 .avatar {
   width: 42px;
   height: 42px;
-
   flex: 0 0 auto;
-
   border-radius: 50%;
-
-  background: var(--brand-100);
-
+  background: var(--brand-gradient);
   display: grid;
   place-items: center;
-
   overflow: hidden;
-
   font-weight: 700;
-  color: var(--brand-700);
+  color: #fff;
+  font-size: 15px;
+  box-shadow: 0 0 0 2px var(--glass-border);
 }
 
 .avatar img {
   width: 100%;
   height: 100%;
-
   object-fit: cover;
-
   display: block;
 }
 
+.composer-input {
+  flex: 1;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-soft);
+  border: 1px solid var(--border-solid);
+  color: var(--text-muted);
+  cursor: text;
+  font-size: 15px;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.composer-input:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+.composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-border-subtle, rgba(255,255,255,0.06));
+}
+
+/* Post tags */
 .post-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-
   margin-top: 2px;
 }
 
 .post-tags .tag {
-  color: var(--brand-600);
-
+  color: var(--brand-400);
   font-size: 13px;
-
   font-weight: 500;
 }
 
 .post-title {
   display: block;
-
   font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.composer-input {
-  flex: 1;
-
-  min-height: 44px;
-
-  display: flex;
-  align-items: center;
-
-  padding: 0 14px;
-
-  border-radius: 12px;
-
-  background: var(--surface-soft);
-
-  color: var(--text-muted);
-}
-
-.composer-actions {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  margin-top: 14px;
-
-  padding-top: 12px;
-
-  border-top: 1px solid var(--border);
-}
-
-/* ─── Posts — X-style (avoid over-carding) ─── */
+/* ─── Posts — Solid cards (X-style) ─── */
 .post {
   background: var(--surface);
-
   border-top: 1px solid var(--border);
-
   padding: 18px 4px;
-
   transition: background var(--transition-fast);
 }
 
+.post:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
 .post:hover {
-  background: #fcfcfd;
+  background: var(--surface-hover);
 }
 
 .post-header {
   display: flex;
-
   gap: 11px;
 }
 
@@ -199,44 +184,36 @@
   display: flex;
   align-items: center;
   gap: 7px;
-
   font-weight: 700;
+  color: var(--text-primary);
+  font-size: 14px;
 }
 
 .post-handle {
   color: var(--text-muted);
-
   font-weight: 400;
 }
 
 .post-time {
   color: var(--text-muted);
-
   font-weight: 400;
 }
 
 .post-body {
   margin-left: 53px;
-
-  margin-top: 5px;
-
+  margin-top: 6px;
   color: var(--text-primary);
-
   font-size: 15px;
-
+  line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
 .post-media {
   margin-left: 53px;
-
   margin-top: 14px;
-
   overflow: hidden;
-
-  border-radius: 14px;
-
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
@@ -247,161 +224,160 @@
 
 .post-actions {
   margin-left: 53px;
-
   display: flex;
-
   justify-content: space-between;
-
   max-width: 500px;
-
   margin-top: 12px;
 }
 
 .post-action {
   display: inline-flex;
   align-items: center;
-
   gap: 6px;
-
   border: 0;
   background: transparent;
-
   color: var(--text-muted);
-
-  padding: 6px;
-
-  border-radius: 8px;
-
-  transition: background var(--transition-fast), color var(--transition-fast);
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+  /* Touch target */
+  min-height: 36px;
 }
 
 .post-action:hover {
-  background: var(--surface-soft);
-
-  color: var(--brand-600);
+  background: rgba(139, 92, 246, 0.10);
+  color: var(--brand-400);
 }
 
-/* ─── Right rail ─── */
+.post-action:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* ─── Right Rail — secondary glass panels ─── */
 .right-rail {
   display: flex;
-
   flex-direction: column;
-
   gap: 16px;
-
   min-width: 0;
 }
 
 .discovery-card {
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-
-  border-radius: var(--radius-lg);
-
+  /* Glass for secondary/discovery surfaces */
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
   padding: 18px;
+  box-shadow: var(--shadow-sm);
 }
 
 .discovery-title {
   margin: 0 0 14px;
-
-  font-size: 16px;
-
+  font-size: 15px;
   font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Gradient accent line above discovery card title */
+.discovery-card::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 3px;
+  background: var(--brand-gradient);
+  border-radius: var(--radius-full);
+  margin-bottom: 12px;
 }
 
 .trending-item {
   display: block;
-
-  padding: 11px 0;
-
+  padding: 10px 0;
   border-bottom: 1px solid var(--border);
+  transition: color var(--transition-fast);
+  text-decoration: none;
+  color: inherit;
 }
 
-.trending-item:last-child {
-  border-bottom: 0;
+.trending-item:last-child { border-bottom: 0; }
+
+.trending-item:hover .trending-topic {
+  color: var(--brand-400);
 }
 
 .trending-topic {
   font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+  transition: color var(--transition-fast);
 }
 
 .trending-meta {
   margin-top: 2px;
-
   font-size: 12px;
-
   color: var(--text-muted);
-}
-
-/* ─── Dark mode ─── */
-[data-theme='dark'] .post:hover,
-.dark-mode .post:hover {
-  background: var(--surface-hover);
-}
-
-/* ─── Mobile feed ─── */
-@media (max-width: 768px) {
-  .feed-header {
-    padding: 0 16px;
-  }
-
-  .feed-tabs {
-    overflow-x: auto;
-
-    scrollbar-width: none;
-  }
-
-  .feed-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .feed-tab {
-    flex: 0 0 auto;
-  }
-
-  .post {
-    padding: 16px;
-
-    border-top: 0;
-
-    border-bottom: 1px solid var(--border);
-  }
-
-  .post-body,
-  .post-media,
-  .post-actions {
-    margin-left: 0;
-  }
 }
 
 /* ─── Back to top ─── */
 .back-to-top-button {
   position: fixed;
-
   right: 24px;
-  bottom: 24px;
-
+  bottom: calc(var(--mobile-nav-height, 68px) + 16px);
   width: 44px;
   height: 44px;
-
   display: grid;
   place-items: center;
-
   border: 0;
   border-radius: 50%;
-
-  background: var(--brand-500);
-
-  color: var(--surface);
-
+  background: var(--brand-gradient);
+  color: #fff;
   font-size: 16px;
-
-  box-shadow: var(--shadow-md);
-
-  z-index: 150;
-
+  box-shadow: var(--shadow-md), var(--glow-brand-sm);
+  z-index: var(--z-fixed, 1030);
   cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
+.back-to-top-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--glow-brand-md);
+}
 
+.back-to-top-button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+@media (min-width: 769px) {
+  .back-to-top-button { bottom: 24px; }
+}
+
+/* ─── Mobile feed ─── */
+@media (max-width: 768px) {
+  .feed-header { padding: 0 16px; }
+
+  .feed-tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .feed-tabs::-webkit-scrollbar { display: none; }
+  .feed-tab { flex: 0 0 auto; }
+
+  .post {
+    padding: 16px;
+    border-top: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-body,
+  .post-media,
+  .post-actions { margin-left: 0; }
+}

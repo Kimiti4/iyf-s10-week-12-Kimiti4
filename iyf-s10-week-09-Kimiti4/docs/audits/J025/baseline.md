@@ -1,6 +1,6 @@
 # J-025 Performance Baseline
 
-**Date:** 2026-09-02T22:54:54.991Z
+**Date:** 2026-09-22T23:40:15.676Z
 **Baseline:** 3cfe995
 **Routes Measured:** 9
 
@@ -17,15 +17,15 @@
 
 | Route | TTFB | FCP | LCP | CLS | Load | Verdict |
 |---|---|---|---|---|---|---|
-| / | 9ms | 660ms | 660ms | 0 | 52ms | PASS |
-| /login | 4ms | 192ms | 592ms | 0 | 6ms | PASS |
-| /register | 15ms | 156ms | 284ms | 0 | 17ms | PASS |
-| /discover | 12ms | 192ms | 904ms | 0 | 5ms | PASS |
-| /alerts | 4ms | 188ms | 392ms | 0.025 | 69ms | PASS |
-| /profile | 2ms | 128ms | 740ms | 0 | 21ms | PASS |
-| /jams | 2ms | 208ms | 244ms | 0 | 12ms | PASS |
-| /reels | 2ms | 160ms | 160ms | 0 | 89ms | PASS |
-| /settings | 4ms | 488ms | 880ms | 0 | 55ms | PASS |
+| / | 24ms | 1468ms | 1468ms | 0.001 | 31ms | PASS |
+| /login | 5ms | 1344ms | 1980ms | 0.001 | 11ms | PASS |
+| /register | 2ms | 508ms | 840ms | 0.001 | 134ms | PASS |
+| /discover | 2ms | 520ms | 1496ms | 0.001 | 19ms | PASS |
+| /alerts | 2ms | 516ms | 636ms | 0.001 | 7ms | PASS |
+| /profile | 7ms | 528ms | 616ms | 0.001 | 10ms | PASS |
+| /jams | 2ms | 548ms | 668ms | 0.003 | 279ms | PASS |
+| /reels | 2ms | 572ms | 796ms | 0.001 | 26ms | PASS |
+| /settings | 2ms | 528ms | 656ms | 0.002 | 8ms | PASS |
 
 ## Summary
 

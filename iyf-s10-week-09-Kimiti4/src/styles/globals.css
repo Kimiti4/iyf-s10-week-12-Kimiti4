@@ -1,7 +1,7 @@
 /* ==========================================================================
-   JAMII LINK 2.0 - GLOBAL FOUNDATION
-   Loaded after tokens.css, before index.css. Provides the base reset and
-   body defaults consumed across the whole app.
+   JAMII LINK 2.0 — GLOBAL FOUNDATION
+   Loaded after tokens.css. Provides reset, body defaults, focus, utilities.
+   Inter is requested by tokens.css @import; fallback stack is always present.
    ========================================================================== */
 
 *,
@@ -17,12 +17,11 @@ html {
 body {
   margin: 0;
 
-  background: var(--bg, #f7f8fa);
-  color: var(--text-primary, #101828);
+  background: var(--bg, #080d1a);
+  color: var(--text-primary, #f1f5f9);
 
   font-family:
     Inter,
-    Outfit,
     ui-sans-serif,
     system-ui,
     -apple-system,
@@ -62,7 +61,31 @@ video {
   display: block;
 }
 
+/* ─── Focus visible — universal, high-contrast ─── */
+:focus-visible {
+  outline: 2px solid var(--focus-ring, #a78bfa);
+  outline-offset: var(--focus-ring-offset, 2px);
+  border-radius: 4px;
+}
+
+/* Selection highlight */
 ::selection {
-  background: var(--brand-100, #e0e7ff);
-  color: var(--brand-700, #3730a3);
+  background: rgba(139, 92, 246, 0.28);
+  color: var(--text-primary);
+}
+
+/* Custom scrollbar (webkit) */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong, rgba(139, 92, 246, 0.28));
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-500, #8b5cf6);
 }

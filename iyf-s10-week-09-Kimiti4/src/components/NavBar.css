@@ -1,20 +1,30 @@
 /* ==========================================================================
    TOPBAR — Global Navigation Bar
+   Glass surface: backdrop-filter blur.
+   IMPORTANT: z-index is explicit so dropdowns/modals remain on top.
    ========================================================================== */
 
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 1000;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  z-index: var(--z-sticky, 1020);
+
+  /* Glass surface */
+  background: var(--glass-bg, rgba(8, 13, 26, 0.80));
+  backdrop-filter: blur(var(--glass-blur, 12px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
+
+  border-bottom: 1px solid var(--glass-border, rgba(139, 92, 246, 0.18));
+
+  /* Subtle bottom shadow so content slides underneath clearly */
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), var(--shadow-sm);
 }
 
 .topbar__inner {
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 16px;
-  height: 56px;
+  height: var(--topbar-height, 60px);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -30,15 +40,25 @@
 
 .topbar__menu-btn {
   display: none;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
-  padding: 6px;
+  padding: 8px;
   cursor: pointer;
   border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  /* Touch target */
+  min-width: 44px;
+  min-height: 44px;
 }
-.topbar__menu-btn:hover { background: var(--surface-soft, #f2f4f7); }
+.topbar__menu-btn:hover {
+  background: var(--surface-soft);
+  color: var(--text-primary);
+}
 .topbar__menu-btn:focus-visible {
-  outline: 2px solid var(--brand-500);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
 }
 
@@ -51,12 +71,12 @@
 .hamburger span {
   display: block;
   height: 2px;
-  background: var(--text-primary);
+  background: currentColor;
   border-radius: 1px;
-  transition: transform 0.2s, opacity 0.2s;
+  transition: transform var(--transition-base), opacity var(--transition-base);
 }
 .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
 
 .topbar__logo {
@@ -64,38 +84,46 @@
   align-items: center;
   gap: 8px;
   text-decoration: none;
+  border-radius: var(--radius-sm);
 }
 .topbar__logo:focus-visible {
-  outline: 2px solid var(--brand-500);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 .topbar__logo-icon {
-  font-size: 24px;
+  font-size: 22px;
+  line-height: 1;
 }
 
 .topbar__logo-text {
   font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  /* Gradient text — vivid indigo → teal */
+  background: var(--brand-gradient-text,
+    linear-gradient(90deg, #a78bfa 0%, #2dd4bf 100%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+/* The accent span is kept for compatibility but visual effect now comes from .topbar__logo-text */
 .topbar__logo-accent {
-  color: var(--brand-500);
+  /* no fill needed — gradient from parent covers it */
 }
 
-/* ── Center ── */
+/* ── Center: Search ── */
 .topbar__center {
   flex: 1;
   max-width: 480px;
 }
 
-/* ── Right ── */
+/* ── Right: Actions ── */
 .topbar__right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -106,50 +134,69 @@
 }
 
 .topbar__btn {
-  padding: 6px 14px;
+  padding: 7px 16px;
   border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   text-decoration: none;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  /* Touch target */
+  min-height: 36px;
 }
 .topbar__btn:focus-visible {
-  outline: 2px solid var(--brand-500);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
 }
 
 .topbar__btn--ghost {
   color: var(--text-secondary);
-  background: none;
+  background: transparent;
+  border: 1px solid var(--border);
 }
 .topbar__btn--ghost:hover {
-  background: var(--surface-soft, #f2f4f7);
+  background: var(--surface-soft);
   color: var(--text-primary);
+  border-color: var(--border-strong);
 }
 
 .topbar__btn--primary {
-  background: var(--brand-500);
-  color: var(--surface);
+  background: var(--brand-gradient,
+    linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%));
+  color: #fff;
+  box-shadow: var(--glow-brand-sm);
 }
 .topbar__btn--primary:hover {
-  background: var(--brand-600);
+  filter: brightness(1.10);
+  box-shadow: var(--glow-brand-md);
 }
 
+/* Avatar */
 .topbar__avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-full);
-  background: var(--brand-500);
-  color: var(--surface);
+  background: var(--brand-gradient);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   text-decoration: none;
   overflow: hidden;
   flex-shrink: 0;
+  border: 2px solid var(--glass-border);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.topbar__avatar:hover {
+  border-color: var(--brand-400);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.20);
 }
 .topbar__avatar img {
   width: 100%;
@@ -157,55 +204,70 @@
   object-fit: cover;
 }
 .topbar__avatar:focus-visible {
-  outline: 2px solid var(--brand-500);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
-/* ── Mobile Menu ── */
+/* ── Mobile Menu Backdrop ── */
 .mobile-menu-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 999;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: calc(var(--z-sticky) - 1);
+  /* Ensures it is BELOW the navbar (z-sticky) and modal stack */
 }
 
+/* ── Mobile Dropdown Menu ── */
 .mobile-menu {
   position: absolute;
-  top: 56px;
+  top: var(--topbar-height, 60px);
   left: 0;
   right: 0;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+
+  /* Glass panel */
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur, 12px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
+  border-bottom: 1px solid var(--glass-border);
   box-shadow: var(--shadow-lg);
+
   padding: 8px;
-  z-index: 1000;
-  max-height: calc(100vh - 56px);
+  z-index: var(--z-sticky, 1020);
+  max-height: calc(100vh - var(--topbar-height, 60px));
   overflow-y: auto;
 }
 
 .mobile-menu__item {
-  display: block;
+  display: flex;
   width: 100%;
   padding: 12px 16px;
   text-align: left;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   text-decoration: none;
   background: none;
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background 0.12s;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  /* Touch target */
+  min-height: 44px;
+  align-items: center;
 }
 .mobile-menu__item:hover {
-  background: var(--surface-soft, #f2f4f7);
+  background: rgba(139, 92, 246, 0.10);
+  color: var(--text-primary);
 }
 .mobile-menu__item:focus-visible {
-  outline: 2px solid var(--brand-500);
+  outline: 2px solid var(--focus-ring);
   outline-offset: -2px;
 }
 .mobile-menu__item--danger {
+  color: var(--danger);
+}
+.mobile-menu__item--danger:hover {
+  background: var(--danger-soft);
   color: var(--danger);
 }
 
@@ -218,10 +280,12 @@
 
 @media (min-width: 769px) {
   .mobile-menu,
-  .mobile-menu-backdrop { display: none; }
+  .mobile-menu-backdrop { display: none !important; }
 }
 
 /* ── Reduced Motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .hamburger span { transition: none; }
+  .hamburger span,
+  .topbar__btn,
+  .topbar__avatar { transition: none; }
 }

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-02T22:54:54.991Z",
+  "timestamp": "2026-09-22T23:40:15.676Z",
   "baseline": "3cfe995",
   "budgets": {
     "LCP": {
@@ -38,14 +38,14 @@
       "route": "/",
       "url": "http://localhost:5174/",
       "metrics": {
-        "ttfb": 9,
-        "fcp": 660,
-        "lcp": 660,
-        "cls": 0,
-        "loadTime": 52,
-        "domContentLoaded": 198,
-        "totalJsTransfer": 60250,
-        "resourceCount": 63
+        "ttfb": 24,
+        "fcp": 1468,
+        "lcp": 1468,
+        "cls": 0.001,
+        "loadTime": 31,
+        "domContentLoaded": 986,
+        "totalJsTransfer": 64363,
+        "resourceCount": 98
       },
       "verdict": {
         "ttfb": "PASS",
@@ -59,14 +59,14 @@
       "route": "/login",
       "url": "http://localhost:5174/login",
       "metrics": {
-        "ttfb": 4,
-        "fcp": 192,
-        "lcp": 592,
-        "cls": 0,
-        "loadTime": 6,
-        "domContentLoaded": 74,
+        "ttfb": 5,
+        "fcp": 1344,
+        "lcp": 1980,
+        "cls": 0.001,
+        "loadTime": 11,
+        "domContentLoaded": 1163,
         "totalJsTransfer": 0,
-        "resourceCount": 9
+        "resourceCount": 12
       },
       "verdict": {
         "ttfb": "PASS",
@@ -80,14 +80,14 @@
       "route": "/register",
       "url": "http://localhost:5174/register",
       "metrics": {
-        "ttfb": 15,
-        "fcp": 156,
-        "lcp": 284,
-        "cls": 0,
-        "loadTime": 17,
-        "domContentLoaded": 88,
+        "ttfb": 2,
+        "fcp": 508,
+        "lcp": 840,
+        "cls": 0.001,
+        "loadTime": 134,
+        "domContentLoaded": 345,
         "totalJsTransfer": 0,
-        "resourceCount": 9
+        "resourceCount": 12
       },
       "verdict": {
         "ttfb": "PASS",
@@ -101,14 +101,14 @@
       "route": "/discover",
       "url": "http://localhost:5174/discover",
       "metrics": {
-        "ttfb": 12,
-        "fcp": 192,
-        "lcp": 904,
-        "cls": 0,
-        "loadTime": 5,
-        "domContentLoaded": 75,
+        "ttfb": 2,
+        "fcp": 520,
+        "lcp": 1496,
+        "cls": 0.001,
+        "loadTime": 19,
+        "domContentLoaded": 347,
         "totalJsTransfer": 0,
-        "resourceCount": 24
+        "resourceCount": 26
       },
       "verdict": {
         "ttfb": "PASS",
@@ -122,14 +122,14 @@
       "route": "/alerts",
       "url": "http://localhost:5174/alerts",
       "metrics": {
-        "ttfb": 4,
-        "fcp": 188,
-        "lcp": 392,
-        "cls": 0.025,
-        "loadTime": 69,
-        "domContentLoaded": 68,
+        "ttfb": 2,
+        "fcp": 516,
+        "lcp": 636,
+        "cls": 0.001,
+        "loadTime": 7,
+        "domContentLoaded": 358,
         "totalJsTransfer": 0,
-        "resourceCount": 13
+        "resourceCount": 16
       },
       "verdict": {
         "ttfb": "PASS",
@@ -143,14 +143,14 @@
       "route": "/profile",
       "url": "http://localhost:5174/profile",
       "metrics": {
-        "ttfb": 2,
-        "fcp": 128,
-        "lcp": 740,
-        "cls": 0,
-        "loadTime": 21,
-        "domContentLoaded": 55,
+        "ttfb": 7,
+        "fcp": 528,
+        "lcp": 616,
+        "cls": 0.001,
+        "loadTime": 10,
+        "domContentLoaded": 384,
         "totalJsTransfer": 0,
-        "resourceCount": 13
+        "resourceCount": 14
       },
       "verdict": {
         "ttfb": "PASS",
@@ -165,13 +165,13 @@
       "url": "http://localhost:5174/jams",
       "metrics": {
         "ttfb": 2,
-        "fcp": 208,
-        "lcp": 244,
-        "cls": 0,
-        "loadTime": 12,
-        "domContentLoaded": 106,
+        "fcp": 548,
+        "lcp": 668,
+        "cls": 0.003,
+        "loadTime": 279,
+        "domContentLoaded": 373,
         "totalJsTransfer": 0,
-        "resourceCount": 16
+        "resourceCount": 18
       },
       "verdict": {
         "ttfb": "PASS",
@@ -186,13 +186,13 @@
       "url": "http://localhost:5174/reels",
       "metrics": {
         "ttfb": 2,
-        "fcp": 160,
-        "lcp": 160,
-        "cls": 0,
-        "loadTime": 89,
-        "domContentLoaded": 75,
+        "fcp": 572,
+        "lcp": 796,
+        "cls": 0.001,
+        "loadTime": 26,
+        "domContentLoaded": 404,
         "totalJsTransfer": 0,
-        "resourceCount": 15
+        "resourceCount": 17
       },
       "verdict": {
         "ttfb": "PASS",
@@ -206,14 +206,14 @@
       "route": "/settings",
       "url": "http://localhost:5174/settings",
       "metrics": {
-        "ttfb": 4,
-        "fcp": 488,
-        "lcp": 880,
-        "cls": 0,
-        "loadTime": 55,
-        "domContentLoaded": 324,
+        "ttfb": 2,
+        "fcp": 528,
+        "lcp": 656,
+        "cls": 0.002,
+        "loadTime": 8,
+        "domContentLoaded": 354,
         "totalJsTransfer": 0,
-        "resourceCount": 10
+        "resourceCount": 12
       },
       "verdict": {
         "ttfb": "PASS",

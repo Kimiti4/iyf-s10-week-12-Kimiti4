@@ -1,7 +1,7 @@
 /* ==========================================================================
-   JAMII LINK 2.0 - APPLICATION SHELL  (desktop/tablet)
-   Phase 1: spec app-shell (topbar + sidebar + main + content + 3-col).
-   Layered additively over the existing shell; keeps current functionality.
+   JAMII LINK 2.0 — APPLICATION SHELL  (desktop / tablet)
+   Topbar + sidebar + main + content + 3-col social layout.
+   Glass is on topbar/sidebar; content area is transparent (tokens handle bg).
    ========================================================================== */
 
 /* ─── Shell wrapper ─── */
@@ -10,76 +10,59 @@
   background: var(--bg);
 }
 
-/* ─── Top bar ─── */
+/* ─── Top bar placeholder (sizing only; appearance in NavBar.css) ─── */
 .topbar {
   position: sticky;
   top: 0;
-
-  height: var(--topbar-height);
-
-  z-index: 100;
+  height: var(--topbar-height, 60px);
+  z-index: var(--z-sticky, 1020);
 }
 
 /* ─── Sidebar ─── */
 .app-sidebar {
   position: fixed;
-
-  top: var(--topbar-height);
+  top: var(--topbar-height, 60px);
   left: 0;
   bottom: 0;
+  width: var(--sidebar-width, 248px);
+  height: calc(100vh - var(--topbar-height, 60px));
 
-  width: var(--sidebar-width);
-
-  height: calc(100vh - var(--topbar-height));
-
-  background: var(--surface);
-
-  border-right: 1px solid var(--border);
+  /* Glass — matches Sidebar.css approach */
+  background: var(--glass-bg);
+  border-right: 1px solid var(--glass-border);
 
   padding: 20px 12px;
-
   overflow-y: auto;
-
   z-index: 90;
 }
 
-.app-sidebar::-webkit-scrollbar {
-  width: 4px;
-}
-
+.app-sidebar::-webkit-scrollbar { width: 3px; }
 .app-sidebar::-webkit-scrollbar-thumb {
   background: var(--border-strong);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 
 /* ─── Main ─── */
 .app-main {
-  margin-left: var(--sidebar-width);
-
-  padding-top: var(--topbar-height);
-
+  margin-left: var(--sidebar-width, 248px);
+  padding-top: var(--topbar-height, 60px);
   min-height: 100vh;
 }
 
 .app-content {
   width: 100%;
   max-width: 1280px;
-
   margin: 0 auto;
-
   padding: 24px;
 }
 
 /* ─── Three-column social layout ─── */
 .social-layout {
   display: grid;
-
   grid-template-columns:
-    minmax(0, var(--feed-width))
-    var(--right-rail-width);
-
+    minmax(0, var(--feed-width, 680px))
+    var(--right-rail-width, 300px);
   justify-content: center;
-
   gap: 32px;
 }
 
@@ -88,27 +71,21 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-
-  font-weight: 750;
+  font-weight: 800;
   font-size: 19px;
-
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 .brand-icon {
   width: 34px;
   height: 34px;
-
   display: grid;
   place-items: center;
-
   border-radius: 10px;
-
-  background: var(--brand-500);
-
-  color: var(--surface);
-
+  background: var(--brand-gradient);
+  color: #fff;
   font-size: 17px;
+  box-shadow: var(--glow-brand-sm);
 }
 
 .brand-name {
@@ -116,29 +93,28 @@
 }
 
 .brand-highlight {
-  color: var(--brand-500);
+  background: var(--brand-gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* ─── Tablet breakpoint: 821px–1100px ─── */
+/* ─── Tablet: 821px–1100px ─── */
 @media (max-width: 1100px) and (min-width: 821px) {
-  :root {
-    --sidebar-width: 220px;
-  }
+  :root { --sidebar-width: 220px; }
 
   .social-layout {
     grid-template-columns: minmax(0, 680px);
   }
 
-  .right-rail {
-    display: none;
-  }
+  .right-rail { display: none; }
 
-  .app-content {
-    max-width: 760px;
-  }
+  .app-content { max-width: 760px; }
 }
 
-/* ─── Mobile: ≤820px ───
-   Leave sidebar/mobile behavior to existing Sidebar.css.
-   Do NOT force a fixed width here.
-*/
+/* ─── Mobile: ≤820px ─── */
+@media (max-width: 820px) {
+  .app-main { margin-left: 0; }
+  .social-layout { grid-template-columns: 1fr; }
+  .right-rail { display: none; }
+}

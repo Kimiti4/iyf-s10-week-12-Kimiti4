@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-02T23:42:47.913Z",
+  "timestamp": "2026-09-22T23:36:02.886Z",
   "js": {
     "files": [
       {
@@ -15,143 +15,143 @@
         "size": 126493
       },
       {
-        "name": "index-DoLhG2wm.js",
-        "size": 124924
+        "name": "index-tEmrN9mB.js",
+        "size": 123464
       },
       {
         "name": "socket-io-BkL6vOXg.js",
         "size": 41523
       },
       {
-        "name": "EnhancedRegisterPage-CR7MUp79.js",
-        "size": 17942
+        "name": "EnhancedRegisterPage-PpcJg-J1.js",
+        "size": 17978
       },
       {
-        "name": "JamDetailPage-kA-uEke3.js",
+        "name": "AlertFeedPage-C7n18_On.js",
+        "size": 17413
+      },
+      {
+        "name": "JamDetailPage-CUjvMfAB.js",
         "size": 15766
       },
       {
-        "name": "AlertFeedPage-Com7ztfW.js",
-        "size": 15476
-      },
-      {
-        "name": "PostCard-BXQbhU1n.js",
+        "name": "PostCard-5TybfqWt.js",
         "size": 13807
       },
       {
-        "name": "CommunityEvents-Bd8jrLfb.js",
+        "name": "CommunityEvents-BD7Bn1SF.js",
         "size": 13573
       },
       {
-        "name": "UnifiedFeed-B93Vqdhy.js",
+        "name": "UnifiedFeed-CLq74XB-.js",
         "size": 13012
       },
       {
-        "name": "UserProfilePage-IdyWdQ4I.js",
-        "size": 12496
+        "name": "UserProfilePage-DTBU2E2J.js",
+        "size": 12894
       },
       {
-        "name": "AdminDashboard-Bv_KSKuF.js",
-        "size": 12464
+        "name": "AdminDashboard-C-5JTrFk.js",
+        "size": 12300
       },
       {
-        "name": "JamCreationPage-CC2uQDS6.js",
-        "size": 11053
+        "name": "JamCreationPage-C3L-jnUO.js",
+        "size": 10782
       },
       {
         "name": "EnhancedEmergencyAlerts-BzaVRzXO.js",
         "size": 10019
       },
       {
-        "name": "ReputationSystem-C2TghDd8.js",
+        "name": "ReputationSystem-TwzI2WBm.js",
         "size": 9820
       },
       {
-        "name": "MarketplacePage-Bly6IH-5.js",
+        "name": "MarketplacePage-B9uFhWMz.js",
         "size": 9070
       },
       {
-        "name": "DiscoveryPage-DlHDwVoX.js",
+        "name": "DiscoveryPage-9DlFj5NW.js",
         "size": 8797
       },
       {
-        "name": "CreatorStudioPage-7ZirbBSU.js",
+        "name": "CreatorStudioPage-tDBkGlQI.js",
         "size": 8689
       },
       {
-        "name": "ReelDetailPage-Bet_3rHF.js",
+        "name": "ReelDetailPage-lgfOfHgB.js",
         "size": 7424
       },
       {
-        "name": "ReelsPage-F3c2SP3K.js",
+        "name": "ReelsPage-CGjrrzQ2.js",
         "size": 5912
       },
       {
-        "name": "ActionBar-BhJKiNlQ.js",
+        "name": "ActionBar-BfNlOUZw.js",
         "size": 5688
       },
       {
-        "name": "SettingsPage-kfFxdP9P.js",
+        "name": "SettingsPage-CjqlUZPA.js",
         "size": 5397
       },
       {
-        "name": "PostPage-BmLCZwZp.js",
-        "size": 5304
+        "name": "TiannaraAssistant-KxTsDChA.js",
+        "size": 5335
       },
       {
-        "name": "FounderDashboard-CYbTk5NK.js",
+        "name": "PostPage-Cc0FS8Ge.js",
+        "size": 5307
+      },
+      {
+        "name": "ChatPage-BvCvIvyc.js",
+        "size": 4949
+      },
+      {
+        "name": "FounderDashboard-IZfgUhzl.js",
         "size": 4824
       },
       {
-        "name": "EnhancedLoginPage-zyXEbW-Y.js",
-        "size": 4769
+        "name": "EnhancedLoginPage-2g2uMyM2.js",
+        "size": 4789
       },
       {
-        "name": "ChatPage-HxqMMM4Z.js",
-        "size": 4507
-      },
-      {
-        "name": "CommunityGovernance-OIMkRy_Y.js",
+        "name": "CommunityGovernance-CiOGEXCg.js",
         "size": 4459
       },
       {
-        "name": "CollaborativeQuests-CWIuQ9e2.js",
+        "name": "CollaborativeQuests-BZ3gWLlC.js",
         "size": 4449
       },
       {
-        "name": "OrganizationPage-1baRyPg5.js",
+        "name": "OrganizationPage-9qXp3CLn.js",
         "size": 4008
       },
       {
-        "name": "TiannaraAssistant-CKRHVodE.js",
-        "size": 3961
+        "name": "postApi-DRzPiPmB.js",
+        "size": 3978
       },
       {
-        "name": "postApi-CjQ8nNJ6.js",
-        "size": 3781
-      },
-      {
-        "name": "NotificationsPage-CapWkJWh.js",
+        "name": "NotificationsPage-DaP5FWqM.js",
         "size": 3698
       },
       {
-        "name": "ActivityHistory-Jn0eUF4K.js",
-        "size": 3337
+        "name": "ActivityHistory-Diw57OjS.js",
+        "size": 3383
       },
       {
-        "name": "DraftsPage-Chzewi3v.js",
-        "size": 3234
+        "name": "DraftsPage-FtrMQwEH.js",
+        "size": 3265
       },
       {
-        "name": "JamCard-BuAqTV4J.js",
+        "name": "JamCard-BnTH7hz7.js",
         "size": 3097
       },
       {
-        "name": "JamFeedPage-WeUBVBgh.js",
+        "name": "JamFeedPage-C-ZHmt07.js",
         "size": 2700
       },
       {
-        "name": "usePostActions-07N3nMMO.js",
+        "name": "usePostActions-CLlbwu8f.js",
         "size": 2587
       },
       {
@@ -175,28 +175,36 @@
         "size": 2360
       },
       {
-        "name": "reelApi-rVWYA3dx.js",
+        "name": "reelApi-CnIYoswA.js",
         "size": 1959
       },
       {
-        "name": "jamApi-CGKu1v7J.js",
+        "name": "jamApi-BXTGVtYI.js",
         "size": 1751
       },
       {
-        "name": "FollowingPage-Cg2XnBD2.js",
+        "name": "FollowingPage-CmdFV9fK.js",
         "size": 1719
       },
       {
-        "name": "AvatarIcon-B0Y6y-VG.js",
+        "name": "validation-BWA8nYUm.js",
+        "size": 1473
+      },
+      {
+        "name": "AvatarIcon-BKB808wi.js",
         "size": 1406
       },
       {
-        "name": "AnalyticsCard-Cgyg7qf2.js",
+        "name": "AnalyticsCard-C5LWRgeF.js",
         "size": 1327
       },
       {
-        "name": "analyticsApi-BdwKRLKu.js",
+        "name": "analyticsApi-CviEUmWo.js",
         "size": 1252
+      },
+      {
+        "name": "socketClient-C7L4a4DK.js",
+        "size": 798
       },
       {
         "name": "jam-Cm5cCEEo.js",
@@ -223,115 +231,115 @@
         "size": 145
       }
     ],
-    "total": 1710305,
-    "count": 55,
+    "total": 1715165,
+    "count": 57,
     "largest": 975754
   },
   "css": {
     "files": [
       {
-        "name": "index-yy0G-AHP.css",
-        "size": 49853
+        "name": "index-DbWIE-4_.css",
+        "size": 66772
       },
       {
-        "name": "jam-DS8Cn_RK.css",
-        "size": 16119
+        "name": "jam-H6CN6hj0.css",
+        "size": 16124
       },
       {
-        "name": "AlertFeedPage-Pyk9tqa-.css",
-        "size": 13235
+        "name": "AlertFeedPage-Dsk_ackY.css",
+        "size": 14706
       },
       {
-        "name": "MarketplacePage-CpshmVBj.css",
-        "size": 10029
+        "name": "MarketplacePage-Dl10P71o.css",
+        "size": 10272
       },
       {
-        "name": "ReputationSystem-BYqzqJVj.css",
-        "size": 9674
+        "name": "ReputationSystem-CflhCx6c.css",
+        "size": 9804
       },
       {
-        "name": "FounderDashboard-Du5EdFHS.css",
-        "size": 9637
+        "name": "FounderDashboard-CAtIWM5i.css",
+        "size": 9649
       },
       {
-        "name": "AdminDashboard-3Bz16Th4.css",
-        "size": 8762
+        "name": "AdminDashboard-BtdWqyP-.css",
+        "size": 8772
       },
       {
         "name": "CommunityEvents-D5pYrx65.css",
         "size": 8663
       },
       {
-        "name": "posts-Eil_TNX1.css",
-        "size": 8657
+        "name": "posts-lu51Gh4U.css",
+        "size": 8661
       },
       {
-        "name": "CommunityGovernance-DZoWXUpX.css",
-        "size": 7825
+        "name": "CommunityGovernance-Bm4Ll8g-.css",
+        "size": 7840
       },
       {
-        "name": "UserProfilePage-UPu3ce7i.css",
-        "size": 7638
+        "name": "UserProfilePage-DkCgfJs5.css",
+        "size": 7650
       },
       {
-        "name": "ReelDetailPage-BQzf4-J-.css",
-        "size": 7623
+        "name": "ReelDetailPage-CRX6hlFy.css",
+        "size": 7627
       },
       {
-        "name": "SettingsPage-Dy0RxnqE.css",
-        "size": 6985
+        "name": "SettingsPage-2DGgpw5n.css",
+        "size": 6993
       },
       {
-        "name": "ChatPage-DTm7PCzV.css",
-        "size": 6012
+        "name": "ChatPage-B-q47duj.css",
+        "size": 6016
       },
       {
-        "name": "CreatorStudioPage-BdBVyubE.css",
-        "size": 5916
+        "name": "CreatorStudioPage-fCYQ7Zcs.css",
+        "size": 5925
       },
       {
-        "name": "CollaborativeQuests-BrpArREa.css",
-        "size": 5793
+        "name": "CollaborativeQuests-C2kpCgEH.css",
+        "size": 5808
       },
       {
         "name": "EnhancedRegisterPage-Bl8mqE-i.css",
         "size": 5245
       },
       {
-        "name": "DiscoveryPage-wrAcaGT3.css",
-        "size": 5117
+        "name": "DiscoveryPage-DxCaV4e1.css",
+        "size": 5126
       },
       {
-        "name": "ActivityHistory-Ckwm3g4W.css",
-        "size": 5058
+        "name": "ActivityHistory-CPxuzGFY.css",
+        "size": 5074
       },
       {
-        "name": "ReelsPage-BOtsx6Ko.css",
-        "size": 4915
+        "name": "ReelsPage-DJ0Gc3oi.css",
+        "size": 4920
       },
       {
-        "name": "OrganizationPage-utAKo3Sl.css",
-        "size": 4650
+        "name": "OrganizationPage-DKeXMmjc.css",
+        "size": 4662
       },
       {
-        "name": "JamDetailPage-CZjtr9ca.css",
-        "size": 4532
+        "name": "JamDetailPage-DLPniE26.css",
+        "size": 4542
       },
       {
-        "name": "NotificationsPage-BkecDtl4.css",
-        "size": 4465
+        "name": "NotificationsPage-CQH0zNGS.css",
+        "size": 4477
       },
       {
         "name": "EnhancedLoginPage-0Q9utWNi.css",
         "size": 4180
       },
       {
-        "name": "TiannaraAssistant-BrAvOHTJ.css",
-        "size": 3852
+        "name": "TiannaraAssistant-CFAgFis-.css",
+        "size": 3865
       },
       {
-        "name": "DraftsPage-kkzSgbAV.css",
-        "size": 2916
+        "name": "DraftsPage-BeJOBpZ1.css",
+        "size": 2952
       },
       {
         "name": "EnhancedEmergencyAlerts-BHCZg7gS.css",
@@ -358,9 +366,9 @@
         "size": 445
       }
     ],
-    "total": 236282,
+    "total": 255256,
     "count": 32,
-    "largest": 49853
+    "largest": 66772
   },
-  "total": 1946587
+  "total": 1970421
 }

@@ -44,8 +44,9 @@ test.describe('Smoke: App Launch', () => {
     await page.goto('/');
     await page.waitForTimeout(1000);
 
-    // 2. Feed loads - navigation bar visible
-    await expect(page.locator('nav, .enhanced-navbar, [class*="nav"]').first()).toBeVisible();
+    // 2. Feed loads - app shell navigation visible (role-based selector;
+    //    generous timeout so cold preview mounts don't race the assert)
+    await expect(page.getByRole('navigation').first()).toBeVisible({ timeout: 15000 });
 
     // 3. Navigation works - go to different routes
     await page.goto('/discover');
@@ -60,13 +61,15 @@ test.describe('Smoke: App Launch', () => {
     await page.waitForTimeout(300);
     expect(page.url()).toContain('/reels');
 
-    // 4. One interaction succeeds - click a nav link back to feed
-    const homeLink = page.getByRole('link', { name: /home|feed|jamii/i }).first();
-    if (await homeLink.isVisible()) {
-      await homeLink.scrollIntoViewIfNeeded();
-      await homeLink.click({ force: true });
-      await page.waitForTimeout(500);
-    }
+    // 4. One interaction succeeds - click the top navbar home link.
+    //    Scoped to the Primary navbar: the sidebar logo can sit off-canvas
+    //    (translateX(-100%)) below 1024px, so it is not a safe click target.
+    const homeLink = page
+      .getByRole('navigation', { name: 'Primary' })
+      .getByRole('link', { name: /jamii/i });
+    await expect(homeLink).toBeVisible();
+    await homeLink.click();
+    await page.waitForTimeout(500);
 
     // Final: Back on a valid page
     expect(page.url()).toMatch(/\//);
