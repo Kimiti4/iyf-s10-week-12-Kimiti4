@@ -94,15 +94,97 @@ exports.getMatches = asyncHandler(async (req, res) => {
 /**
  * Complete an exchange with a review
  *
- * R3 [P1-6]: explicitly unavailable. The previous implementation returned
- * fake success with no persistence. Per the MOCK DATA RULE no synthetic
- * success is manufactured; exchange completion stays 501 until a real
- * persistence model exists (R6 owns storage).
+ * P5-6: real persistence now that skill_matches is landed.
+ *   - invalid/nonexistent match      -> 404
+ *   - non-participant                -> 403
+ *   - already completed              -> 409
+ *   - quality_rating outside 1..5    -> 400
+ *   - valid completion               -> 200, marks status='completed',
+ *     stores quality_rating, and credits BOTH participants via
+ *     impact_metrics (reference_id = match_id, deduped by UQ index).
  */
 exports.completeExchange = asyncHandler(async (req, res) => {
-  return res.status(501).json({
-    success: false,
-    error: 'Exchange completion is not available',
-    code: 'EXCHANGE_NOT_IMPLEMENTED'
+  const userId = req.user.id;
+  const { match_id } = req.params;
+  const { quality_rating } = req.body || {};
+
+  // R4 adversarial: malformed (non-UUID) identifiers must be 404, never 500.
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!UUID_RE.test(match_id)) {
+    return res.status(404).json({
+      success: false,
+      error: 'Match not found',
+      code: 'NOT_FOUND'
+    });
+  }
+
+  const rating = Number(quality_rating);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return res.status(400).json({
+      success: false,
+      error: 'quality_rating must be an integer between 1 and 5',
+      code: 'VALIDATION_ERROR'
+    });
+  }
+
+  const matchResult = await query(`
+    SELECT id, user1_id, user2_id, skill1, skill2, status
+    FROM skill_matches
+    WHERE id = $1
+  `, [match_id]);
+
+  if (matchResult.rows.length === 0) {
+    return res.status(404).json({
+      success: false,
+      error: 'Match not found',
+      code: 'NOT_FOUND'
+    });
+  }
+
+  const match = matchResult.rows[0];
+
+  if (match.user1_id !== userId && match.user2_id !== userId) {
+    return res.status(403).json({
+      success: false,
+      error: 'You are not a participant in this match',
+      code: 'FORBIDDEN'
+    });
+  }
+
+  if (match.status === 'completed') {
+    return res.status(409).json({
+      success: false,
+      error: 'Exchange already completed',
+      code: 'ALREADY_COMPLETED'
+    });
+  }
+
+  await query(`
+    UPDATE skill_matches
+    SET status = 'completed', quality_rating = $2, completed_at = NOW()
+    WHERE id = $1
+  `, [match_id, rating]);
+
+  // Dual impact credit: both participants earn the same exchange event,
+  // keyed by match_id so the UQ index (user_id, event_type, reference_id)
+  // prevents double-crediting on repeated calls.
+  for (const participantId of [match.user1_id, match.user2_id]) {
+    await query(`
+      INSERT INTO impact_metrics (user_id, event_type, impact_value, reference_id, description)
+      VALUES ($1, 'exchange_completed', 10, $2, 'Completed a skill exchange')
+      ON CONFLICT DO NOTHING
+    `, [participantId, match_id]);
+  }
+
+  res.json({
+    success: true,
+    data: {
+      match_id: match.id,
+      status: 'completed',
+      quality_rating: rating,
+      your_skill: match.user1_id === userId ? match.skill1 : match.skill2,
+      their_skill: match.user1_id === userId ? match.skill2 : match.skill1,
+      completed_at: new Date().toISOString()
+    }
   });
 });

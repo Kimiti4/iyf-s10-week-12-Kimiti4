@@ -19,6 +19,8 @@
     "test:social": "node tests/social.contract.test.js",
     "db:migrate": "node scripts/migrate.js",
     "db:migrate:002": "node scripts/migrations/002_add_alert_constraints.js",
+    "db:migrate:005": "node scripts/migrations/005_novel_features.js",
+    "db:migrate:006": "node scripts/migrations/006_impact_skills_enforcement.js",
     "db:migrate:004": "node scripts/migrations/004_geographic_and_fts.js",
     "db:migrate:all": "node scripts/migrate.js"
   },
@@ -41,6 +43,7 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^8.0.10",
     "otplib": "^13.4.1",
+    "pdfkit": "^0.20.2",
     "pg": "^8.20.0",
     "qrcode": "^1.5.4",
     "socket.io": "^4.8.3"

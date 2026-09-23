@@ -190,7 +190,7 @@ async function tests() {
     ['POST', '/api/skills/complete/whatever', { quality_rating: 5 }],
     ['GET', '/api/reputation/leaderboard/all', null],
   ];
-  const expectStatus = [501, 501, 501, 501, 200];
+  const expectStatus = [501, 501, 501, 404, 200];
   for (let i = 0; i < pins.length; i++) {
     const [method, p, body] = pins[i];
     const r = await req(method, p, body, userAToken);

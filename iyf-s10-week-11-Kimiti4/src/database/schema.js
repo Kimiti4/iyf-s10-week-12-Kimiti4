@@ -72,6 +72,11 @@ const createTables = async () => {
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
+    await query(`CREATE UNIQUE INDEX IF NOT EXISTS uq_impact_metrics_event
+                 ON impact_metrics (user_id, event_type, reference_id)
+                 WHERE reference_id IS NOT NULL`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_impact_metrics_created
+                 ON impact_metrics (user_id, created_at DESC)`);
 
     await query(`
       CREATE TABLE IF NOT EXISTS user_skills (
@@ -96,10 +101,18 @@ const createTables = async () => {
         status VARCHAR(20) DEFAULT 'pending',
         quality_rating INTEGER,
         testimonial TEXT,
+        match_score NUMERIC(4,2),
+        matching_skills INT DEFAULT 0,
+        requested_skills INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT NOW(),
         completed_at TIMESTAMP
       )
     `);
+    await query(`CREATE UNIQUE INDEX IF NOT EXISTS uq_skill_matches_pending_pair
+                 ON skill_matches (user1_id, user2_id)
+                 WHERE status = 'pending'`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_skill_matches_user2
+                 ON skill_matches (user2_id)`);
 
     // 2. Organizations Table
     await query(`

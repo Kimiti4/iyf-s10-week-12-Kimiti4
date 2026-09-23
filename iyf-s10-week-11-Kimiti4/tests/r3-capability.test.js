@@ -216,7 +216,7 @@ async function tests() {
   const prof = await req('GET', '/api/skills/profile', null, userAToken);
   assert(prof.status === 200, 'GET /skills/profile -> 200 (mounted, real CRUD)');
   const ce = await req('POST', '/api/skills/complete/whatever', { quality_rating: 5 }, userAToken);
-  assert(ce.status === 501, 'POST /skills/complete/:id -> 501 (no fake success)');
+  assert(ce.status === 404, 'POST /skills/complete/whatever -> 404 (real route, invalid match id)');
 
   // ===== P1-7 reputation =====
   console.log('\nP1-7: reputation real shapes, stubs 501');

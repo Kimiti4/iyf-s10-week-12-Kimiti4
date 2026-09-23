@@ -150,12 +150,16 @@ exports.submitFeedback = async (req, res) => {
   });
 };
 
+const crypto = require('crypto');
+const { generatePassportPDF } = require('../utils/pdfGenerator');
+
 /**
  * Export Reputation Passport
  */
 exports.exportPassport = async (req, res) => {
   try {
     const userId = req.user.id;
+    const format = req.query.format || 'json';
     const user = await UserRepository.findById(userId);
     
     if (!user) {
@@ -182,24 +186,46 @@ exports.exportPassport = async (req, res) => {
     ];
 
     const badges = [];
-    if (activity[0].count > 0) badges.push({ title: 'First Post', description: 'Created your first post', earned: user.createdAt });
-    if (activity[1].count >= 10) badges.push({ title: 'Helper', description: 'Helped 10 community members', earned: user.createdAt });
+    if (activity[0].count > 0) badges.push({ title: 'First Post', earned: user.createdAt });
+    if (activity[1].count >= 10) badges.push({ title: 'Helper', earned: user.createdAt });
 
-    const passport = {
-      creator_id: user.id,
-      name: user.username,
-      verified_since: user.createdAt,
-      metrics: {
+    // Build Canonical Payload
+    const canonicalPayload = {
+      schema_version: "1.0",
+      passport_id: `jamii_${crypto.randomBytes(8).toString('hex')}`,
+      user_id: user.id,
+      issued_at: new Date().toISOString(),
+      identity: {
+        name: user.username,
+        verified_since: user.createdAt
+      },
+      reputation: {
         total_score: score,
         level: level,
         rank: rank
       },
-      badges,
-      works: activity,
-      export_date: new Date().toISOString()
-      // R3 [P1-7]: the previous mock `signature` field is removed per the
-      // MOCK DATA RULE. No replacement signature is fabricated.
+      impact: {
+        activity
+      },
+      skills: [],
+      achievements: {
+        badges
+      }
     };
+
+    // Deterministic serialization (sort keys)
+    const canonicalString = JSON.stringify(canonicalPayload, Object.keys(canonicalPayload).sort());
+    const digest = crypto.createHash('sha256').update(canonicalString).digest('hex');
+
+    const passport = {
+      ...canonicalPayload,
+      digest_algorithm: 'SHA-256',
+      digest
+    };
+
+    if (format === 'pdf') {
+      return generatePassportPDF(passport, res);
+    }
 
     res.json({
       success: true,
