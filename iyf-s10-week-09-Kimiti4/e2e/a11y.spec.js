@@ -57,6 +57,9 @@ test.describe('Accessibility Compliance', () => {
 
   test('feed is accessible and keyboard-navigable', async ({ page }, testInfo) => {
     await page.goto('/');
+    // Wait for the lazily-loaded feed shell so axe/Tab target real content,
+    // not the Suspense spinner (flaky under parallel full-suite load).
+    await expect(page.getByRole('navigation').first()).toBeVisible();
     await checkAccessibility(page, testInfo);
     await page.keyboard.press('Tab');
     await expect(page.locator('a:focus, button:focus').first()).toBeVisible();
@@ -107,6 +110,9 @@ test.describe('Accessibility Compliance', () => {
 
   test('login page is accessible', async ({ page }, testInfo) => {
     await page.goto('/login');
+    // Wait for the lazily-loaded form before axe runs; otherwise axe scans
+    // the Suspense spinner and the label assertion sees an empty DOM.
+    await expect(page.locator('button.btn-login')).toBeVisible();
     await checkAccessibility(page, testInfo);
     // Labels should be present on the email/password fields
     await expect(page.locator('label')).not.toHaveCount(0);

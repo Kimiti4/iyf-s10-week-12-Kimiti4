@@ -21,6 +21,12 @@ export default defineConfig({
     baseURL: 'http://localhost:5174',
     trace: 'on-first-retry',
     video: 'on-first-retry',
+    navigationTimeout: 30000,
+  },
+  expect: {
+    // Lazy route chunks can take >5s to mount when many workers hit the
+    // preview server at once; keep assertions patient under full-suite load.
+    timeout: 15000,
   },
   webServer: {
     command: 'npm run build && npm run preview -- --port 5174 --strictPort',
