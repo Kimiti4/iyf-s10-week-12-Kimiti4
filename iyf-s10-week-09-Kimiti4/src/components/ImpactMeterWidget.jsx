@@ -50,8 +50,8 @@ export default function ImpactMeterWidget({ userId }) {
           <strong>{data.contribution_breakdown.help_provided}</strong>
         </div>
         <div className="breakdown-item">
-          <span>💰 Exchange Value</span>
-          <strong>{data.contribution_breakdown.exchange_value}</strong>
+          <span>🔁 Exchanges Completed</span>
+          <strong>{data.contribution_breakdown.exchange_completed ?? 0}</strong>
         </div>
         <div className="breakdown-item">
           <span>⏱️ Time Saved</span>
@@ -59,15 +59,10 @@ export default function ImpactMeterWidget({ userId }) {
         </div>
       </div>
 
-      {data.badges?.length > 0 && (
-        <div className="impact-badges">
-          <h4>Impact Badges</h4>
-          <div className="badges-list">
-            {data.badges.map(badge => (
-              <span key={badge} className="impact-badge">{badge}</span>
-            ))}
-          </div>
-        </div>
+      {data.period && (
+        <p className="impact-period">
+          Period: {new Date(data.period.start).toLocaleDateString()} – {new Date(data.period.end).toLocaleDateString()}
+        </p>
       )}
     </motion.div>
   );

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-22T23:40:15.676Z",
+  "timestamp": "2026-09-23T21:43:34.121Z",
   "baseline": "3cfe995",
   "budgets": {
     "LCP": {
@@ -38,33 +38,33 @@
       "route": "/",
       "url": "http://localhost:5174/",
       "metrics": {
-        "ttfb": 24,
-        "fcp": 1468,
-        "lcp": 1468,
+        "ttfb": 14,
+        "fcp": 2020,
+        "lcp": 2020,
         "cls": 0.001,
         "loadTime": 31,
-        "domContentLoaded": 986,
-        "totalJsTransfer": 64363,
-        "resourceCount": 98
+        "domContentLoaded": 1307,
+        "totalJsTransfer": 64398,
+        "resourceCount": 83
       },
       "verdict": {
         "ttfb": "PASS",
-        "fcp": "PASS",
+        "fcp": "WARN",
         "lcp": "PASS",
         "cls": "PASS"
       },
-      "overall": "PASS"
+      "overall": "WARN"
     },
     {
       "route": "/login",
       "url": "http://localhost:5174/login",
       "metrics": {
-        "ttfb": 5,
-        "fcp": 1344,
-        "lcp": 1980,
+        "ttfb": 18,
+        "fcp": 628,
+        "lcp": 1264,
         "cls": 0.001,
-        "loadTime": 11,
-        "domContentLoaded": 1163,
+        "loadTime": 10,
+        "domContentLoaded": 482,
         "totalJsTransfer": 0,
         "resourceCount": 12
       },
@@ -81,11 +81,11 @@
       "url": "http://localhost:5174/register",
       "metrics": {
         "ttfb": 2,
-        "fcp": 508,
-        "lcp": 840,
+        "fcp": 516,
+        "lcp": 640,
         "cls": 0.001,
-        "loadTime": 134,
-        "domContentLoaded": 345,
+        "loadTime": 207,
+        "domContentLoaded": 368,
         "totalJsTransfer": 0,
         "resourceCount": 12
       },
@@ -102,11 +102,11 @@
       "url": "http://localhost:5174/discover",
       "metrics": {
         "ttfb": 2,
-        "fcp": 520,
-        "lcp": 1496,
+        "fcp": 684,
+        "lcp": 1656,
         "cls": 0.001,
-        "loadTime": 19,
-        "domContentLoaded": 347,
+        "loadTime": 5,
+        "domContentLoaded": 524,
         "totalJsTransfer": 0,
         "resourceCount": 26
       },
@@ -123,11 +123,11 @@
       "url": "http://localhost:5174/alerts",
       "metrics": {
         "ttfb": 2,
-        "fcp": 516,
-        "lcp": 636,
-        "cls": 0.001,
-        "loadTime": 7,
-        "domContentLoaded": 358,
+        "fcp": 540,
+        "lcp": 620,
+        "cls": 0.051,
+        "loadTime": 6,
+        "domContentLoaded": 395,
         "totalJsTransfer": 0,
         "resourceCount": 16
       },
@@ -143,12 +143,12 @@
       "route": "/profile",
       "url": "http://localhost:5174/profile",
       "metrics": {
-        "ttfb": 7,
-        "fcp": 528,
-        "lcp": 616,
+        "ttfb": 2,
+        "fcp": 748,
+        "lcp": 856,
         "cls": 0.001,
-        "loadTime": 10,
-        "domContentLoaded": 384,
+        "loadTime": 9,
+        "domContentLoaded": 585,
         "totalJsTransfer": 0,
         "resourceCount": 14
       },
@@ -164,12 +164,12 @@
       "route": "/jams",
       "url": "http://localhost:5174/jams",
       "metrics": {
-        "ttfb": 2,
-        "fcp": 548,
-        "lcp": 668,
+        "ttfb": 3,
+        "fcp": 452,
+        "lcp": 568,
         "cls": 0.003,
-        "loadTime": 279,
-        "domContentLoaded": 373,
+        "loadTime": 4,
+        "domContentLoaded": 319,
         "totalJsTransfer": 0,
         "resourceCount": 18
       },
@@ -185,12 +185,12 @@
       "route": "/reels",
       "url": "http://localhost:5174/reels",
       "metrics": {
-        "ttfb": 2,
-        "fcp": 572,
-        "lcp": 796,
+        "ttfb": 1,
+        "fcp": 440,
+        "lcp": 784,
         "cls": 0.001,
-        "loadTime": 26,
-        "domContentLoaded": 404,
+        "loadTime": 4,
+        "domContentLoaded": 315,
         "totalJsTransfer": 0,
         "resourceCount": 17
       },
@@ -207,11 +207,11 @@
       "url": "http://localhost:5174/settings",
       "metrics": {
         "ttfb": 2,
-        "fcp": 528,
-        "lcp": 656,
-        "cls": 0.002,
-        "loadTime": 8,
-        "domContentLoaded": 354,
+        "fcp": 512,
+        "lcp": 640,
+        "cls": 0.003,
+        "loadTime": 9,
+        "domContentLoaded": 351,
         "totalJsTransfer": 0,
         "resourceCount": 12
       },
@@ -225,8 +225,8 @@
     }
   ],
   "summary": {
-    "passed": 9,
-    "warned": 0,
+    "passed": 8,
+    "warned": 1,
     "failed": 0,
     "errors": 0,
     "total": 9

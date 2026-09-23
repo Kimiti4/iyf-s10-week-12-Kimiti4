@@ -10,7 +10,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 5000, // Return error after 5 seconds if cannot connect
+  connectionTimeoutMillis: 15000, // Supabase pooler can exceed 5s cold; fail after 15s
 });
 
 // Test connection on startup

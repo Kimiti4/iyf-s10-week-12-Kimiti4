@@ -312,7 +312,7 @@ export const commentsAPI = {
 // ===== REPUTATION API =====
 export const reputationAPI = {
     getProfile: (userId) => request(`/reputation/${userId}`),
-    exportPassport: () => request('/reputation/export')
+    exportPassport: (format = 'json') => request(`/reputation/export?format=${encodeURIComponent(format)}`)
 };
 
 // ===== ORGANIZATIONS API =====

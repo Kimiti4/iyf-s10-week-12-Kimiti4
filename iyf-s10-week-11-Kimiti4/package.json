@@ -17,6 +17,7 @@
     "test:messages": "node tests/messages.contract.test.js",
     "test:jams": "node tests/jams.contract.test.js",
     "test:social": "node tests/social.contract.test.js",
+    "test:impact": "node tests/impact.contract.test.js",
     "db:migrate": "node scripts/migrate.js",
     "db:migrate:002": "node scripts/migrations/002_add_alert_constraints.js",
     "db:migrate:005": "node scripts/migrations/005_novel_features.js",

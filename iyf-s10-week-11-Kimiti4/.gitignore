@@ -51,6 +51,7 @@ src/seeds/
 !src/services/
 !src/services/*.js
 !src/utils/
+!src/utils/*.js
 !src/database/
 !src/database/*.js
 !src/database/repositories/

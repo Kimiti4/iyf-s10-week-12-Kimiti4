@@ -56,7 +56,7 @@ const ReputationSystem = () => {
   // Export Creator Passport
   const exportPassport = async (format = 'json') => {
     try {
-      const res = await api.reputation.exportPassport();
+      const res = await api.reputation.exportPassport(format);
       const passport = res.data;
 
       if (format === 'json') {
