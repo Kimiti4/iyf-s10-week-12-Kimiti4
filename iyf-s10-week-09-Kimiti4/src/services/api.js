@@ -84,12 +84,18 @@ const request = async (endpoint, options = {}, _retried = false) => {
             throw new Error('Resource not found.');
         }
         
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || data.message || 'Request failed');
+        const contentType = response.headers.get('content-type') || '';
+        let data = null;
+        if (contentType.includes('application/json')) {
+            try { data = await response.json(); } catch { data = null; }
+        } else {
+            try { const text = await response.text(); data = text ? { message: text.slice(0, 300) } : null; } catch { data = null; }
         }
-        
+        if (!response.ok) {
+            const message = data?.error || data?.message || `Request failed (${response.status})`;
+            throw new Error(message);
+        }
+        if (data === null) throw new Error(`API returned an invalid or empty response (${response.status})`);
         return data;
     } catch (error) {
         logger.apiError(endpoint, error);
