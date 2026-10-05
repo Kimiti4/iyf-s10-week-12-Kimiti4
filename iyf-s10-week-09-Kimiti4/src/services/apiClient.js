@@ -20,7 +20,7 @@ const configuredApiUrl = import.meta.env.VITE_API_URL;
 // absent. Requests fail explicitly below, while mocked E2E requests can still
 // render and exercise the frontend. Production deployments must provide
 // VITE_API_URL for real API traffic.
-const API_URL = (configuredApiUrl || '').replace(/\/+$/, '');
+const API_URL = (configuredApiUrl || (import.meta.env.PROD ? '' : '/api')).replace(/\/+$/, '');
 
 const getAuthHeaders = () => {
   const token = getAccessToken();
