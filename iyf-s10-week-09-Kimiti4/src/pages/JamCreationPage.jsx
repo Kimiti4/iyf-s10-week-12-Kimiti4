@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import JamCreationWizard from '../components/jam/JamCreationWizard';
-import { createJam } from '../services/jamApi';
+import { jamsAPI } from '../services/jamApi';
 import '../components/jam/jam.css';
 
 const IDLE = 'idle';
@@ -20,7 +20,7 @@ export default function JamCreationPage() {
     setStatus(LOADING);
     setErrorMessage('');
     try {
-      const result = await createJam(jamData);
+      const result = await jamsAPI.create(jamData);
       const jamId = result?.data?.id || result?.data?._id || result?.id || result?._id;
       if (!jamId) throw new Error('Jam was created but the server returned no Jam ID.');
       setStatus(SUCCESS);
