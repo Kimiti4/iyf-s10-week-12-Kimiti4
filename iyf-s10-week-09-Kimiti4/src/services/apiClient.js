@@ -19,7 +19,7 @@ const configuredApiUrl = import.meta.env.VITE_API_URL;
 if (import.meta.env.PROD && !configuredApiUrl) {
   throw new Error('Frontend API is not configured. Set VITE_API_URL before deploying.');
 }
-const API_URL = (configuredApiUrl || 'http://localhost:3000/api').replace(/\\/+$/, '');
+const API_URL = (configuredApiUrl || 'http://localhost:3000/api').replace(/\/+$/, '');
 
 const getAuthHeaders = () => {
   const token = getAccessToken();
