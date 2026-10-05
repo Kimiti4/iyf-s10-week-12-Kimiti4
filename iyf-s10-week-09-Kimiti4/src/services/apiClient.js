@@ -56,7 +56,7 @@ function failAuth() {
 }
 
 export const request = async (endpoint, options = {}, _retried = false) => {
-  if (!API_URL) {
+  if (!API_URL && import.meta.env.PROD) {
     throw new Error('Frontend API is not configured. Set VITE_API_URL before making API requests.');
   }
   const url = `${API_URL}${endpoint}`;
