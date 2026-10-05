@@ -22,7 +22,10 @@ export function initializeSocket(backendUrl) {
     return socket;
   }
 
-  const url = backendUrl || import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+  const url = backendUrl || import.meta.env.VITE_BACKEND_URL || '';
+  if (!url) {
+    return null;
+  }
 
   socket = io(url, {
     autoConnect: true,
