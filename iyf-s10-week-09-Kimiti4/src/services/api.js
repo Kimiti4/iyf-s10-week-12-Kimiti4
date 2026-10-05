@@ -37,6 +37,7 @@ async function tryRefresh() {
 
 // Generic request function with error handling
 const request = async (endpoint, options = {}, _retried = false) => {
+    if (!API_URL) throw new Error('Frontend API is not configured. Set VITE_API_URL before making API requests.');
     const url = `${API_URL}${endpoint}`;
 
     const config = {
@@ -250,6 +251,7 @@ export const postsAPI = {
      * @param {File} imageFile - Image file to upload
      */
     uploadImage: async (postId, imageFile) => {
+        if (!API_URL) throw new Error('Frontend API is not configured. Set VITE_API_URL before uploading images.');
         const formData = new FormData();
         formData.append('image', imageFile);
 
