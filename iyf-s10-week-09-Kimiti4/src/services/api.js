@@ -9,7 +9,7 @@ import { fetchWithTelemetry } from '../utils/telemetry';
 import { fetchWithRetry } from '../utils/apiRetry';
 import { getAccessToken, setAccessToken, clearAccessToken } from '../utils/authToken';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 
 // Helper for auth headers (R5: memory-only access token)
 const getAuthHeaders = () => {
