@@ -83,6 +83,12 @@ async function seedUnauthenticated(context) {
 function installCatchAll(page) {
   return page.route('**/api/**', (route) => {
     const url = route.request().url();
+    // Auth routes are registered at context level by seedAuth/seedUnauthenticated.
+    // Page-level catch-all routes take precedence, so fall through here instead
+    // of replacing the auth fixture with the generic {data: []} response.
+    if (/\/api\/auth\/(refresh|me)(?:[/?]|$)/.test(url)) {
+      return route.fallback();
+    }
     if (/\/(categories|suggested-users|trending|for-you|search)/.test(url)) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
     }
