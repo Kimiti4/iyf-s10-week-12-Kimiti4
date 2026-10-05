@@ -1,318 +1,193 @@
-/**
- * 🔹 Full-Screen Reels Page - Instagram/TikTok Style
- * Vertical scrolling with one reel at a time
- */
-
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft, FaPlay, FaPause, FaHeart, FaComment, FaShare, FaMusic, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { FaArrowLeft, FaHeart, FaComment, FaShare, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { reelsAPI } from '../../services/reelApi';
 import './ReelsPage.css';
 
-// Extended mock reels data for full experience
-const MOCK_REELS = [
-    {
-        id: 'reel-1',
-        author: {
-            username: 'NairobiVibes',
-            avatar: '/reel-avatar-1.png',
-            verified: true
-        },
-        description: 'Sunset views from KICC 🌅 #Nairobi #Kenya #Sunset',
-        likes: 12400,
-        comments: 342,
-        shares: 89,
-        music: 'Original Sound - NairobiVibes',
-        thumbnail: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=600',
-        duration: 15
-    },
-    {
-        id: 'reel-2',
-        author: {
-            username: 'ChefMamaKE',
-            avatar: '/reel-avatar-2.png',
-            verified: false
-        },
-        description: 'Quick ugali recipe in 60 seconds! 🍲 Perfect every time! #Cooking #KenyanFood #Recipe',
-        likes: 8900,
-        comments: 234,
-        shares: 156,
-        music: 'Trending Audio - Chef Beats',
-        thumbnail: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=600',
-        duration: 30
-    },
-    {
-        id: 'reel-3',
-        author: {
-            username: 'FitnessKenya',
-            avatar: '/reel-avatar-3.png',
-            verified: true
-        },
-        description: 'Morning workout routine 💪 Stay fit, stay healthy! #Fitness #Health #Workout',
-        likes: 15600,
-        comments: 567,
-        shares: 234,
-        music: 'Workout Mix 2026',
-        thumbnail: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600',
-        duration: 20
-    },
-    {
-        id: 'reel-4',
-        author: {
-            username: 'MaasaiCulture',
-            avatar: '/reel-avatar-4.png',
-            verified: true
-        },
-        description: 'Traditional Maasai dance 🇰🇪 Preserving our heritage #Culture #Heritage #Kenya',
-        likes: 23400,
-        comments: 890,
-        shares: 445,
-        music: 'Traditional Maasai Chants',
-        thumbnail: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=600',
-        duration: 25
-    },
-    {
-        id: 'reel-5',
-        author: {
-            username: 'TechNairobi',
-            avatar: '/reel-avatar-5.png',
-            verified: false
-        },
-        description: 'Coding setup tour 💻 My developer workspace #Tech #Coding #Developer',
-        likes: 6700,
-        comments: 189,
-        shares: 92,
-        music: 'Lo-fi Coding Beats',
-        thumbnail: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600',
-        duration: 18
-    },
-    {
-        id: 'reel-6',
-        author: {
-            username: 'WildlifeKE',
-            avatar: '/reel-avatar-6.png',
-            verified: true
-        },
-        description: 'Elephants at Amboseli 🐘 Nature at its finest #Wildlife #Safari #Kenya',
-        likes: 34500,
-        comments: 1234,
-        shares: 678,
-        music: 'Nature Sounds - Ambient',
-        thumbnail: 'https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=600',
-        duration: 22
-    }
-];
-
 export default function ReelsPage() {
-    const navigate = useNavigate();
-    const [currentReelIndex, setCurrentReelIndex] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(true);
-    const [isMuted, setIsMuted] = useState(false);
-    const containerRef = useRef(null);
+  const navigate = useNavigate();
+  const [reels, setReels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [muted, setMuted] = useState(false);
+  const [busyId, setBusyId] = useState(null);
 
-    const currentReel = MOCK_REELS[currentReelIndex];
+  const loadReels = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const result = await reelsAPI.getAll({ limit: 20 });
+      setReels(result.reels || []);
+    } catch (err) {
+      setReels([]);
+      setError(err?.message || 'Reels are currently unavailable.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Handle scroll to detect which reel is in view
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
+  useEffect(() => {
+    loadReels();
+  }, []);
 
-        const handleScroll = () => {
-            const scrollTop = container.scrollTop;
-            const reelHeight = container.clientHeight;
-            const newIndex = Math.round(scrollTop / reelHeight);
-            
-            if (newIndex !== currentReelIndex && newIndex >= 0 && newIndex < MOCK_REELS.length) {
-                setCurrentReelIndex(newIndex);
-                setIsPlaying(true);
-            }
-        };
+  const toggleLike = async (reel) => {
+    setBusyId(reel.id);
+    try {
+      const result = reel.isLiked
+        ? await reelsAPI.unlike(reel.id)
+        : await reelsAPI.like(reel.id);
+      setReels((items) => items.map((item) => item.id === reel.id
+        ? { ...item, ...result }
+        : item));
+    } catch (err) {
+      setError(err?.message || 'Unable to update the like.');
+    } finally {
+      setBusyId(null);
+    }
+  };
 
-        container.addEventListener('scroll', handleScroll);
-        return () => container.removeEventListener('scroll', handleScroll);
-    }, [currentReelIndex]);
-
-    const formatNumber = (num) => {
-        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-        return num.toString();
-    };
-
-    const handleNext = () => {
-        if (currentReelIndex < MOCK_REELS.length - 1) {
-            setCurrentReelIndex(currentReelIndex + 1);
-            setIsPlaying(true);
-        }
-    };
-
-    const handlePrevious = () => {
-        if (currentReelIndex > 0) {
-            setCurrentReelIndex(currentReelIndex - 1);
-            setIsPlaying(true);
-        }
-    };
-
+  if (loading) {
     return (
-        <main className="reels-page" role="main" aria-label="Reels">
-            {/* Header */}
-            <header className="reels-page-header">
-                <motion.button 
-                    className="back-button"
-                    onClick={() => navigate('/')}
-                    whileTap={{ scale: 0.9 }}
-                >
-                    <FaArrowLeft />
-                    <span>Feed</span>
-                </motion.button>
-                <h1>Reels</h1>
-                <div className="header-spacer"></div>
-            </header>
-
-            {/* Reels Container */}
-            <div 
-                className="reels-fullscreen-container"
-                ref={containerRef}
-            >
-                <AnimatePresence mode="wait">
-                    {MOCK_REELS.map((reel, index) => (
-                        <motion.div
-                            key={reel.id}
-                            className={`reel-fullscreen-item ${index === currentReelIndex ? 'active' : ''}`}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: index === currentReelIndex ? 1 : 0.5 }}
-                            exit={{ opacity: 0 }}
-                        >
-                            {/* Video Background */}
-                            <div className="reel-video-background">
-                                <img 
-                                    src={reel.thumbnail} 
-                                    alt={reel.description}
-                                    className="reel-fullscreen-thumbnail"
-                                />
-                                
-                                {/* Gradient Overlays */}
-                                <div className="gradient-overlay-top"></div>
-                                <div className="gradient-overlay-bottom"></div>
-
-                                {/* Play/Pause Indicator */}
-                                {!isPlaying && index === currentReelIndex && (
-                                    <motion.div 
-                                        className="play-pause-indicator"
-                                        initial={{ scale: 0, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        exit={{ scale: 0, opacity: 0 }}
-                                    >
-                                        <FaPlay />
-                                    </motion.div>
-                                )}
-
-                                {/* Click zones for play/pause */}
-                                <div 
-                                    className="click-zone-left"
-                                    onClick={handlePrevious}
-                                />
-                                <div 
-                                    className="click-zone-center"
-                                    onClick={() => setIsPlaying(!isPlaying)}
-                                />
-                                <div 
-                                    className="click-zone-right"
-                                    onClick={handleNext}
-                                />
-                            </div>
-
-                            {/* Right Side Actions */}
-                            <div className="reel-actions-vertical">
-                                <motion.div 
-                                    className="action-item"
-                                    whileTap={{ scale: 0.9 }}
-                                >
-                                    <div className="action-icon-wrapper like-wrapper">
-                                        <FaHeart />
-                                    </div>
-                                    <span className="action-count">{formatNumber(reel.likes)}</span>
-                                </motion.div>
-
-                                <motion.div 
-                                    className="action-item"
-                                    whileTap={{ scale: 0.9 }}
-                                >
-                                    <div className="action-icon-wrapper comment-wrapper">
-                                        <FaComment />
-                                    </div>
-                                    <span className="action-count">{formatNumber(reel.comments)}</span>
-                                </motion.div>
-
-                                <motion.div 
-                                    className="action-item"
-                                    whileTap={{ scale: 0.9 }}
-                                >
-                                    <div className="action-icon-wrapper share-wrapper">
-                                        <FaShare />
-                                    </div>
-                                    <span className="action-count">{formatNumber(reel.shares)}</span>
-                                </motion.div>
-
-                                <motion.div 
-                                    className="action-item"
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={() => setIsMuted(!isMuted)}
-                                >
-                                    <div className="action-icon-wrapper sound-wrapper">
-                                        {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
-                                    </div>
-                                    <span className="action-count">{isMuted ? 'Muted' : 'Sound'}</span>
-                                </motion.div>
-                            </div>
-
-                            {/* Bottom Info */}
-                            <div className="reel-info-bottom">
-                                <div className="reel-author-info">
-                                    <img 
-                                        src={reel.avatar} 
-                                        alt={reel.author.username} 
-                                        className="author-avatar-large" 
-                                    />
-                                    <div className="author-details">
-                                        <div className="author-name-row">
-                                            <span className="author-name">@{reel.author.username}</span>
-                                            {reel.verified && (
-                                                <span className="verified-badge">✓</span>
-                                            )}
-                                        </div>
-                                        <button className="follow-button">Follow</button>
-                                    </div>
-                                </div>
-                                
-                                <p className="reel-description-full">{reel.description}</p>
-                                
-                                <div className="reel-music-info">
-                                    <FaMusic className="music-icon-spinning" />
-                                    <span className="music-marquee">
-                                        {reel.music}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Progress Bar */}
-                            <div className="progress-bar-container">
-                                <div 
-                                    className="progress-bar-fill"
-                                    style={{ 
-                                        width: isPlaying && index === currentReelIndex ? '100%' : '0%',
-                                        transition: isPlaying ? `width ${reel.duration}s linear` : 'none'
-                                    }}
-                                />
-                            </div>
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
-            </div>
-
-            {/* Scroll Indicator */}
-            <div className="reel-counter">
-                {currentReelIndex + 1} / {MOCK_REELS.length}
-            </div>
-        </main>
+      <main className="reels-page" role="main" aria-label="Reels">
+        <div className="reels-loading" role="status" aria-live="polite">
+          <div className="loading-spinner" aria-hidden="true" />
+          <p>Loading reels…</p>
+        </div>
+      </main>
     );
+  }
+
+  if (error) {
+    return (
+      <main className="reels-page" role="main" aria-label="Reels">
+        <header className="reels-page-header">
+          <button type="button" className="back-button" onClick={() => navigate('/')}>
+            <FaArrowLeft aria-hidden="true" /><span>Feed</span>
+          </button>
+          <h1>Reels</h1>
+        </header>
+        <div className="reels-error" role="alert">
+          <h2>Reels are unavailable</h2>
+          <p>{error}</p>
+          <button type="button" onClick={loadReels}>Retry</button>
+        </div>
+      </main>
+    );
+  }
+
+  if (reels.length === 0) {
+    return (
+      <main className="reels-page" role="main" aria-label="Reels">
+        <header className="reels-page-header">
+          <button type="button" className="back-button" onClick={() => navigate('/')}>
+            <FaArrowLeft aria-hidden="true" /><span>Feed</span>
+          </button>
+          <h1>Reels</h1>
+        </header>
+        <div className="reels-empty">
+          <h2>No reels yet</h2>
+          <p>Published reels from the community will appear here.</p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="reels-page" role="main" aria-label="Reels">
+      <header className="reels-page-header">
+        <button type="button" className="back-button" onClick={() => navigate('/')}>
+          <FaArrowLeft aria-hidden="true" /><span>Feed</span>
+        </button>
+        <h1>Reels</h1>
+        <button
+          type="button"
+          className="sound-toggle"
+          aria-label={muted ? 'Unmute reels' : 'Mute reels'}
+          aria-pressed={muted}
+          onClick={() => setMuted((value) => !value)}
+        >
+          {muted ? <FaVolumeMute /> : <FaVolumeUp />}
+        </button>
+      </header>
+
+      <section className="reels-fullscreen-container" aria-label="Community reels">
+        {reels.map((reel) => (
+          <article key={reel.id} className="reel-fullscreen-item active">
+            <div className="reel-video-background">
+              {reel.videoUrl ? (
+                <video
+                  className="reel-fullscreen-video"
+                  src={reel.videoUrl}
+                  poster={reel.posterUrl || undefined}
+                  controls
+                  playsInline
+                  muted={muted}
+                  preload="metadata"
+                  onError={() => setError('This reel could not be played.')}
+                />
+              ) : reel.posterUrl ? (
+                <img src={reel.posterUrl} alt="" className="reel-fullscreen-thumbnail" />
+              ) : (
+                <div className="reel-video-unavailable">Video unavailable</div>
+              )}
+            </div>
+
+            <div className="reel-actions-vertical">
+              <button
+                type="button"
+                className="action-item"
+                aria-label={reel.isLiked ? 'Unlike reel' : 'Like reel'}
+                aria-pressed={reel.isLiked}
+                disabled={busyId === reel.id}
+                onClick={() => toggleLike(reel)}
+              >
+                <span className="action-icon-wrapper like-wrapper"><FaHeart /></span>
+                <span className="action-count">{reel.likeCount}</span>
+              </button>
+              <button
+                type="button"
+                className="action-item"
+                aria-label="Open comments"
+                onClick={() => navigate('/reels/' + reel.id)}
+              >
+                <span className="action-icon-wrapper comment-wrapper"><FaComment /></span>
+                <span className="action-count">{reel.commentCount}</span>
+              </button>
+              <button
+                type="button"
+                className="action-item"
+                aria-label="Open reel"
+                onClick={() => navigate('/reels/' + reel.id)}
+              >
+                <span className="action-icon-wrapper share-wrapper"><FaShare /></span>
+                <span className="action-count">{reel.shareCount}</span>
+              </button>
+            </div>
+
+            <div className="reel-info-bottom">
+              <div className="reel-author-info">
+                {reel.author.avatar ? (
+                  <img src={reel.author.avatar} alt="" className="author-avatar-large" />
+                ) : (
+                  <div className="author-avatar-large" aria-hidden="true">
+                    {reel.author.username?.charAt(0)?.toUpperCase() || '?'}
+                  </div>
+                )}
+                <div className="author-details">
+                  <span className="author-name">@{reel.author.username}</span>
+                  {reel.author.isVerified && <span className="verified-badge" aria-label="Verified">✓</span>}
+                </div>
+              </div>
+              <p className="reel-description-full">{reel.caption}</p>
+              {reel.jamId && (
+                <button type="button" className="follow-button" onClick={() => navigate('/jams/' + reel.jamId)}>
+                  {reel.jamCTA || 'View Jam'}
+                </button>
+              )}
+            </div>
+          </article>
+        ))}
+      </section>
+    </main>
+  );
 }
