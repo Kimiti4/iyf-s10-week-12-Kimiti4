@@ -15,7 +15,11 @@
 
 import { getAccessToken, setAccessToken, clearAccessToken } from '../utils/authToken';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const configuredApiUrl = import.meta.env.VITE_API_URL;
+if (import.meta.env.PROD && !configuredApiUrl) {
+  throw new Error('Frontend API is not configured. Set VITE_API_URL before deploying.');
+}
+const API_URL = (configuredApiUrl || 'http://localhost:3000/api').replace(/\\/+$/, '');
 
 const getAuthHeaders = () => {
   const token = getAccessToken();
@@ -96,7 +100,14 @@ export const request = async (endpoint, options = {}, _retried = false) => {
   }
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : { success: response.ok };
+  let data = { success: response.ok };
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(response.ok ? 'Server returned an invalid response.' : `Request failed (${response.status}).`);
+    }
+  }
 
   if (!response.ok) {
     throw new Error(data.error || data.message || 'Request failed');
