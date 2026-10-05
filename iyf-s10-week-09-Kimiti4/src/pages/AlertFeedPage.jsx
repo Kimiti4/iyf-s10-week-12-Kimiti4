@@ -38,6 +38,7 @@ const CATEGORIES = [
 export default function AlertFeedPage() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [severityFilter, setSeverityFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -57,6 +58,7 @@ export default function AlertFeedPage() {
   const fetchAlerts = useCallback(async (pageNum = 1) => {
     try {
       setLoading(true);
+      setLoadError('');
       const params = { page: pageNum, limit: 20 };
       if (severityFilter !== 'all') params.severity = severityFilter;
       if (categoryFilter !== 'all') params.category = categoryFilter;
@@ -67,7 +69,9 @@ export default function AlertFeedPage() {
       setPage(response.page || 1);
       setTotalPages(response.pages || 1);
       setTotal(response.total || 0);
-    } catch {
+    } catch (error) {
+      const message = error?.message || 'Unable to reach the alerts service';
+      setLoadError(message);
       toastRef.current.error('Failed to load alerts');
     } finally {
       setLoading(false);
@@ -210,6 +214,13 @@ export default function AlertFeedPage() {
           <div className="loading-state" role="status">
             <div className="loading-spinner" aria-hidden="true" />
             <p>Loading alerts...</p>
+          </div>
+        ) : loadError ? (
+          <div className="empty-state" role="alert">
+            <div className="empty-state__icon" aria-hidden="true">⚠️</div>
+            <p>Unable to load alerts.</p>
+            <p className="empty-hint">{loadError}</p>
+            <button className="btn-create-alert" onClick={() => fetchAlerts(page)}>Retry</button>
           </div>
         ) : alerts.length === 0 ? (
           <div className="empty-state">
