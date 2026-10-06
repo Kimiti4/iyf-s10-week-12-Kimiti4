@@ -527,6 +527,25 @@ const createTables = async () => {
     await query(`CREATE INDEX IF NOT EXISTS idx_stories_user
                  ON stories (user_id, created_at DESC)`);
 
+
+    // Beta feedback: persisted product feedback for support, QA and launch decisions.
+    await query(`
+      CREATE TABLE IF NOT EXISTS feedback (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        name VARCHAR(120),
+        email VARCHAR(255),
+        type VARCHAR(20) NOT NULL CHECK (type IN ('bug', 'feature', 'general')),
+        priority VARCHAR(20) NOT NULL DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
+        message TEXT NOT NULL CHECK (char_length(message) BETWEEN 1 AND 5000),
+        status VARCHAR(20) NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'reviewing', 'resolved', 'closed')),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at DESC)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_feedback_status ON feedback(status)`);
+
     // Create indexes for performance
     console.log(' Creating indexes...');
     await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
