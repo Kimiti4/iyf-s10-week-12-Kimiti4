@@ -7,10 +7,8 @@ import { ToastProvider } from './components/Toast'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import FeedbackForm from './components/FeedbackForm'
-import TrendingChip from './components/TrendingChip'
 import JamiiModeToggle from './components/JamiiModeToggle'
 import PullToRefreshIndicator from './components/PullToRefresh'
-import ConstellationBackground from './enhanced/components/ConstellationBackground'
 import { usePullToRefresh } from './hooks/usePullToRefresh'
 import { useSwipeGestures } from './hooks/useSwipeGestures'
 import './index.css' // Unified whimsical design system
@@ -378,9 +376,6 @@ function App() {
           <SidebarProvider>
             <ToastProvider>
             <div className="App app-shell">
-              {/* 🔹 Constellation Background */}
-              <ConstellationBackground />
-              
               {/* Pull to Refresh Indicator */}
               <PullToRefreshIndicator isRefreshing={isRefreshing} progress={progress} />
               
@@ -399,9 +394,6 @@ function App() {
               <div className="jamii-mode-widget">
                 <JamiiModeToggle />
               </div>
-              
-              {/* 🔥 Trending Floating Chip */}
-              <TrendingChip topic="#JamiiLink" count={42} />
               
               <footer className="footer">
                 <div className="container">
