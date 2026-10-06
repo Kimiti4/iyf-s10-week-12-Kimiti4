@@ -83,6 +83,7 @@ exports.getLeaderboard = async (req, res) => {
     const result = await query(`
       SELECT id, username, reputation_score, avatar_icon
       FROM users
+      WHERE is_active = TRUE AND deleted_at IS NULL
       ORDER BY reputation_score DESC
       LIMIT $1
     `, [limit]);
