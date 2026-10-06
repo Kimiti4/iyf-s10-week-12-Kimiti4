@@ -56,7 +56,7 @@ export default function RegisterPage() {
         state: { message: '🎉 Welcome to JamiiLink! Please login to start exploring.' } 
       })
     } catch (err) {
-      setError('Registration failed - please try again! 😢')
+      setError(err?.message || 'Registration failed. Please try again.')
     } finally {
       setLoading(false)
     }
