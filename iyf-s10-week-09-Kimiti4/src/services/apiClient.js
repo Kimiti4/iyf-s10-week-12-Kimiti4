@@ -15,7 +15,12 @@
 
 import { getAccessToken, setAccessToken, clearAccessToken } from '../utils/authToken';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const configuredApiUrl = import.meta.env.VITE_API_URL;
+// Do not crash the entire SPA at module import when local/CI configuration is
+// absent. Requests fail explicitly below, while mocked E2E requests can still
+// render and exercise the frontend. Production deployments must provide
+// VITE_API_URL for real API traffic.
+const API_URL = (configuredApiUrl || (import.meta.env.PROD ? '' : '/api')).replace(/\/+$/, '');
 
 const getAuthHeaders = () => {
   const token = getAccessToken();
@@ -51,6 +56,9 @@ function failAuth() {
 }
 
 export const request = async (endpoint, options = {}, _retried = false) => {
+  if (!API_URL && import.meta.env.PROD) {
+    throw new Error('Frontend API is not configured. Set VITE_API_URL before making API requests.');
+  }
   const url = `${API_URL}${endpoint}`;
   const config = {
     ...options,
@@ -96,7 +104,14 @@ export const request = async (endpoint, options = {}, _retried = false) => {
   }
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : { success: response.ok };
+  let data = { success: response.ok };
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(response.ok ? 'Server returned an invalid response.' : `Request failed (${response.status}).`);
+    }
+  }
 
   if (!response.ok) {
     throw new Error(data.error || data.message || 'Request failed');

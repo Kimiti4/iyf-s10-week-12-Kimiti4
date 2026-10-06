@@ -25,125 +25,15 @@ import {
   FaList
 } from 'react-icons/fa';
 import logger from '../utils/logger';
+import { request } from '../services/apiClient';
 import { useToast } from './Toast';
 import './CommunityEvents.css';
-
-// Mock data for development
-const getMockEvents = () => [
-  {
-    _id: '1',
-    title: 'Community Tech Workshop',
-    description: 'Learn the latest web development technologies in this hands-on workshop. Perfect for beginners and intermediate developers.',
-    date: '2026-05-15',
-    time: '2:00 PM - 5:00 PM',
-    location: 'Nairobi Innovation Hub, Westlands',
-    category: 'workshop',
-    status: 'confirmed',
-    image: '',
-    organizer: 'Tech Community KE',
-    hosts: ['John Kamau', 'Sarah Wanjiku'],
-    performers: ['David Ochieng - React Expert', 'Mary Akinyi - UX Designer'],
-    guests: ['Prof. James Mwangi - Tech Policy'],
-    attendees: ['user1', 'user2', 'user3', 'user4', 'user5'],
-    maxAttendees: 50,
-    ticketPrice: 'Free'
-  },
-  {
-    _id: '2',
-    title: 'Youth Empowerment Conference',
-    description: 'Annual conference bringing together young leaders, entrepreneurs, and change-makers across East Africa.',
-    date: '2026-05-22',
-    time: '9:00 AM - 6:00 PM',
-    location: 'KICC, Nairobi CBD',
-    category: 'conference',
-    status: 'confirmed',
-    image: '',
-    organizer: 'Youth Leadership Foundation',
-    hosts: ['Grace Muthoni', 'Peter Odhiambo'],
-    performers: ['DJ Savara - Opening Act', 'Spoken Word Poets Collective'],
-    guests: ['Hon. Cabinet Secretary - Youth Affairs', 'UN Representative'],
-    attendees: ['user1', 'user2', 'user3', 'user4', 'user5', 'user6', 'user7', 'user8'],
-    maxAttendees: 500,
-    ticketPrice: 500
-  },
-  {
-    _id: '3',
-    title: 'Music & Arts Festival',
-    description: 'Celebrate local talent with live music, art exhibitions, food stalls, and cultural performances.',
-    date: '2026-06-01',
-    time: '12:00 PM - 10:00 PM',
-    location: 'Uhuru Park, Nairobi',
-    category: 'concert',
-    status: 'pending',
-    image: '',
-    organizer: 'Nairobi Arts Council',
-    hosts: ['Cultural Committee'],
-    performers: ['Sauti Sol', 'Nadia Mukami', 'Khaligraph Jones', 'Local Dance Troupes'],
-    guests: ['County Governor', 'Minister of Culture'],
-    attendees: ['user1', 'user2', 'user3'],
-    maxAttendees: 5000,
-    ticketPrice: 200
-  },
-  {
-    _id: '4',
-    title: 'Community Cleanup Drive',
-    description: 'Join us for a monthly community cleanup. Help keep our neighborhoods clean and beautiful!',
-    date: '2026-05-10',
-    time: '7:00 AM - 11:00 AM',
-    location: 'Kibera Community Center',
-    category: 'volunteer',
-    status: 'confirmed',
-    image: '',
-    organizer: 'Green Kenya Initiative',
-    hosts: ['Volunteer Coordinators'],
-    performers: [],
-    guests: [],
-    attendees: ['user1', 'user2', 'user3', 'user4', 'user5', 'user6', 'user7', 'user8', 'user9', 'user10', 'user11', 'user12'],
-    maxAttendees: 100,
-    ticketPrice: 'Free'
-  },
-  {
-    _id: '5',
-    title: 'Digital Skills Training',
-    description: 'Free training on digital literacy, online safety, and basic computer skills for community members.',
-    date: '2026-05-18',
-    time: '10:00 AM - 2:00 PM',
-    location: 'Community Library, Eastlands',
-    category: 'training',
-    status: 'confirmed',
-    image: '',
-    organizer: 'Digital Inclusion Project',
-    hosts: ['Trainer Team'],
-    performers: [],
-    guests: ['Library Director'],
-    attendees: ['user1', 'user2', 'user3', 'user4'],
-    maxAttendees: 30,
-    ticketPrice: 'Free'
-  },
-  {
-    _id: '6',
-    title: 'Friday Night Social Meetup',
-    description: 'Relax and network with fellow community members. Drinks, snacks, and good conversation!',
-    date: '2026-05-09',
-    time: '6:00 PM - 10:00 PM',
-    location: 'Java House, Sarit Centre',
-    category: 'social',
-    status: 'confirmed',
-    image: '',
-    organizer: 'JamiiLink Social Club',
-    hosts: ['Community Managers'],
-    performers: [],
-    guests: [],
-    attendees: ['user1', 'user2', 'user3', 'user4', 'user5', 'user6', 'user7'],
-    maxAttendees: 25,
-    ticketPrice: 'Pay Your Own'
-  }
-];
 
 export default function CommunityEvents({ currentUser }) {
   const toast = useToast();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [filter, setFilter] = useState('all');
@@ -152,21 +42,15 @@ export default function CommunityEvents({ currentUser }) {
   const [viewMode, setViewMode] = useState('grid');
 
   const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    setError('');
     try {
-      setLoading(true);
-      const res = await fetch('/api/events');
-      
-      if (!res.ok) {
-        logger.warn('Events API not available, using mock data for development');
-        setEvents(getMockEvents());
-        return;
-      }
-      
-      const data = await res.json();
-      setEvents(data.events || []);
-    } catch (error) {
-      logger.warn('Error fetching events, using mock data:', error.message);
-      setEvents(getMockEvents());
+      const data = await request('/events');
+      setEvents(Array.isArray(data?.events) ? data.events : []);
+    } catch (err) {
+      logger.warn('Unable to load events', err);
+      setEvents([]);
+      setError(err?.message || 'Events are currently unavailable.');
     } finally {
       setLoading(false);
     }
@@ -219,10 +103,23 @@ export default function CommunityEvents({ currentUser }) {
 
   if (loading) {
     return (
-      <div className="events-loading">
-        <div className="loading-spinner"></div>
+      <div className="events-loading" role="status" aria-live="polite">
+        <div className="loading-spinner" aria-hidden="true"></div>
         <p>Loading events...</p>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="community-events" role="main" aria-label="Community events">
+        <div className="no-events" role="alert">
+          <div className="no-events-icon">📅</div>
+          <h2>Events are unavailable</h2>
+          <p>{error}</p>
+          <button type="button" onClick={fetchEvents}>Retry</button>
+        </div>
+      </main>
     );
   }
 

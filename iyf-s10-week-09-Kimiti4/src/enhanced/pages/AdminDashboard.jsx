@@ -7,7 +7,7 @@ import { useToast } from '../../components/Toast';
 import { getAccessToken } from '../../utils/authToken'; // R5: memory-only token
 import './AdminDashboard.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 
 export default function AdminDashboard() {
   const navigate = useNavigate();

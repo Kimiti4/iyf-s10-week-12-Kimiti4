@@ -27,17 +27,17 @@ const FOUNDER_USER = {
   bio: 'E2E founder user',
 };
 
-async function seedAuth(context, user = DEFAULT_USER) {
+async function seedAuth(context, user = DEFAULT_USER, page = null) {
   const token = `e2e-token-${user.id}`;
   await context.addInitScript(({ token, user }) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
   }, { token, user });
 
-  // R5 session contract: AuthContext restores via POST /api/auth/refresh
-  // (HttpOnly cookie flow) and ignores any localStorage token. Mock the
-  // refresh round-trip so the harness authenticates under the R5 model.
-  await context.route('**/api/auth/refresh', (route) =>
+  // Page-scoped auth mocks always take precedence over the generic context
+  // catch-all installed by journeys.
+  const routeTarget = page || context;
+  await routeTarget.route('**/api/auth/refresh', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -45,7 +45,7 @@ async function seedAuth(context, user = DEFAULT_USER) {
     })
   );
 
-  await context.route('**/api/auth/me', (route) =>
+  await routeTarget.route('**/api/auth/me', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -54,13 +54,14 @@ async function seedAuth(context, user = DEFAULT_USER) {
   );
 }
 
-async function seedUnauthenticated(context) {
+async function seedUnauthenticated(context, page = null) {
   await context.addInitScript(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   });
 
-  await context.route('**/api/auth/refresh', (route) =>
+  const routeTarget = page || context;
+  await routeTarget.route('**/api/auth/refresh', (route) =>
     route.fulfill({
       status: 401,
       contentType: 'application/json',
@@ -68,7 +69,7 @@ async function seedUnauthenticated(context) {
     })
   );
 
-  await context.route('**/api/auth/me', (route) =>
+  await routeTarget.route('**/api/auth/me', (route) =>
     route.fulfill({
       status: 401,
       contentType: 'application/json',
@@ -77,16 +78,27 @@ async function seedUnauthenticated(context) {
   );
 }
 
-/** Install a per-page catch-all for unmocked API routes.
- *  Must be called AFTER test-specific page.route() calls so page routes
- *  take priority.  Prevents CORS failures from the real Railway backend. */
+/** Install a context-level catch-all for unmocked API routes.
+ * Page-specific journey mocks and auth mocks take precedence. */
 function installCatchAll(page) {
-  return page.route('**/api/**', (route) => {
+  return page.context().route('**/api/**', async (route) => {
     const url = route.request().url();
-    if (/\/(categories|suggested-users|trending|for-you|search)/.test(url)) {
-      return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+
+    if (/\/api\/auth\/(refresh|me)(?:[/?]|$)/.test(url)) {
+      await route.fallback();
+      return;
     }
-    route.fulfill({
+
+    if (/\/(categories|suggested-users|trending|for-you|search)/.test(url)) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: '[]'
+      });
+      return;
+    }
+
+    await route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ success: true, data: [] }),
@@ -102,22 +114,22 @@ function installSocketMock(page) {
 
 const test = base.extend({
   authenticatedPage: async ({ page, context }, use) => {
-    await seedAuth(context, DEFAULT_USER);
+    await seedAuth(context, DEFAULT_USER, page);
     await use(page);
   },
 
   adminPage: async ({ page, context }, use) => {
-    await seedAuth(context, ADMIN_USER);
+    await seedAuth(context, ADMIN_USER, page);
     await use(page);
   },
 
   founderPage: async ({ page, context }, use) => {
-    await seedAuth(context, FOUNDER_USER);
+    await seedAuth(context, FOUNDER_USER, page);
     await use(page);
   },
 
   unauthenticatedPage: async ({ page, context }, use) => {
-    await seedUnauthenticated(context);
+    await seedUnauthenticated(context, page);
     await use(page);
   },
 });

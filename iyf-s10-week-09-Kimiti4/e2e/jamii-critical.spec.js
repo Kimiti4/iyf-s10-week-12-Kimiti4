@@ -49,7 +49,9 @@ test.describe('JamiiLink Critical Path', () => {
       })
     );
     await page.goto('/');
-    await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
+    // Sidebar and topbar both expose the landmark name "Main navigation";
+    // take the first match instead of failing strict mode.
+    await expect(page.getByRole('navigation', { name: 'Main navigation' }).first()).toBeVisible();
   });
 
   test('auth pages render without crashing', async ({ page }) => {

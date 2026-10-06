@@ -60,11 +60,15 @@ export default function EnhancedLoginPage() {
         }
     };
     
-    const getBackendBase = () => (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/+api\/?$/, '');
+    const getBackendBase = () => (import.meta.env.VITE_API_URL || '').replace(/\/+api\/?$/, '');
 
     const handleSocialLogin = (provider) => {
         if (provider === 'Google') {
             const backendUrl = getBackendBase();
+            if (!backendUrl) {
+                setNotice('Google login is not configured for this deployment. Please use email login.');
+                return;
+            }
             window.location.href = `${backendUrl}/api/auth/google`;
         } else {
             setNotice(`${provider} login is coming soon. Meanwhile, sign up with email or Google.`);

@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { queueOfflinePost, isOnline } from '../utils/offlinePost'
+import { postsAPI } from '../services/api'
 import { useOrganization } from '../context/OrganizationContext'
 import { useToast } from '../components/Toast'
 import { validatePost, sanitizeInput } from '../utils/validation'
@@ -78,34 +79,22 @@ export default function CreatePostPage() {
     }
 
     try {
-      if (isOnline()) {
-        // Try online submission
-        const response = await fetch('/api/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sanitizedData)
-        })
-        
-        if (response.ok) {
-          toast.success('Post published successfully! 🎉')
-          if (currentOrg) navigate(`/org/${currentOrg.slug}`)
-          else navigate('/posts')
-        } else {
-          throw new Error('Failed to create post')
-        }
-      } else {
-        // Queue for offline submission
+      if (!isOnline()) {
         await queueOfflinePost(sanitizedData)
-        setPendingQueue(pendingQueue + 1)
+        setPendingQueue((count) => count + 1)
         toast.success(`Post saved! 📭 It will send when you're back online.`)
         navigate(-1)
+      } else {
+        // Only the shared API client may address the backend. It also applies
+        // the R5 session/refresh contract and preserves the backend error.
+        await postsAPI.create(sanitizedData)
+        toast.success('Post published successfully! 🎉')
+        if (currentOrg) navigate(`/org/${currentOrg.slug}`)
+        else navigate('/')
       }
     } catch (err) {
-      // Fallback to offline queue on error
-      await queueOfflinePost(sanitizedData)
-      setPendingQueue(pendingQueue + 1)
-      toast.success(`Saved for later! 📭 Will send when online.`)
-      navigate(-1)
+      // Do not turn validation/auth/server failures into fake offline success.
+      setError(err?.message || 'Failed to publish the post.')
     } finally {
       setLoading(false)
     }

@@ -30,7 +30,7 @@ const NavBar = memo(function NavBar() {
         <div className="mobile-menu-backdrop" onClick={() => setMobileMenuOpen(false)} aria-hidden="true" />
       )}
 
-      <nav className="topbar" role="navigation" aria-label="Primary">
+      <nav className="topbar" role="navigation" aria-label="Main navigation">
         <div className="topbar__inner">
           {/* Left */}
           <div className="topbar__left">

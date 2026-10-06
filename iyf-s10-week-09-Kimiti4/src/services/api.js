@@ -9,7 +9,10 @@ import { fetchWithTelemetry } from '../utils/telemetry';
 import { fetchWithRetry } from '../utils/apiRetry';
 import { getAccessToken, setAccessToken, clearAccessToken } from '../utils/authToken';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const configuredApiUrl = import.meta.env.VITE_API_URL;
+// Keep local/CI requests under /api so Playwright can intercept the same contract
+// used by the application. Production still requires an explicit backend URL.
+const API_URL = (configuredApiUrl || (import.meta.env.PROD ? '' : '/api')).replace(/\/+$/, '');
 
 // Helper for auth headers (R5: memory-only access token)
 const getAuthHeaders = () => {
@@ -37,6 +40,7 @@ async function tryRefresh() {
 
 // Generic request function with error handling
 const request = async (endpoint, options = {}, _retried = false) => {
+    if (!API_URL && import.meta.env.PROD) throw new Error('Frontend API is not configured. Set VITE_API_URL before making API requests.');
     const url = `${API_URL}${endpoint}`;
 
     const config = {
@@ -83,12 +87,18 @@ const request = async (endpoint, options = {}, _retried = false) => {
             throw new Error('Resource not found.');
         }
         
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || data.message || 'Request failed');
+        const contentType = response.headers.get('content-type') || '';
+        let data = null;
+        if (contentType.includes('application/json')) {
+            try { data = await response.json(); } catch { data = null; }
+        } else {
+            try { const text = await response.text(); data = text ? { message: text.slice(0, 300) } : null; } catch { data = null; }
         }
-        
+        if (!response.ok) {
+            const message = data?.error || data?.message || `Request failed (${response.status})`;
+            throw new Error(message);
+        }
+        if (data === null) throw new Error(`API returned an invalid or empty response (${response.status})`);
         return data;
     } catch (error) {
         logger.apiError(endpoint, error);
@@ -250,6 +260,7 @@ export const postsAPI = {
      * @param {File} imageFile - Image file to upload
      */
     uploadImage: async (postId, imageFile) => {
+        if (!API_URL) throw new Error('Frontend API is not configured. Set VITE_API_URL before uploading images.');
         const formData = new FormData();
         formData.append('image', imageFile);
 

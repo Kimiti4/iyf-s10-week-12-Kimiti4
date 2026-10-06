@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { colors } from '../styles/designSystem'
+import { organizationsAPI } from '../services/api'
 import './OrganizationPage.css'
 
 export default function OrganizationPage() {
@@ -13,31 +13,28 @@ export default function OrganizationPage() {
   const navigate = useNavigate()
   const [organization, setOrganization] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [joining, setJoining] = useState(false)
 
   useEffect(() => {
-    const mockOrg = {
-      slug,
-      name: 'Tech Hub Nairobi',
-      description: 'A vibrant community of tech enthusiasts, developers, and innovators in Nairobi!',
-      type: 'community',
-      stats: {
-        memberCount: 1250,
-        postCount: 845,
-        eventCount: 23
-      },
-      verified: true,
-      verificationLevel: 'platinum',
-      contact: {
-        email: 'hello@techhub.co.ke'
-      },
-      members: ['You', 'Jane', 'John', 'Sarah']
-    }
-    
-    setTimeout(() => {
-      setOrganization(mockOrg)
-      setLoading(false)
-    }, 800)
-  }, [slug])
+    let active = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const result = await organizationsAPI.getBySlug(slug);
+        if (active) setOrganization(result?.data || result?.organization || null);
+      } catch (err) {
+        if (active) {
+          setOrganization(null);
+          setError(err?.message || 'Unable to load this organization.');
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, [slug]);
 
   if (loading) {
     return (
@@ -54,13 +51,9 @@ export default function OrganizationPage() {
 
   if (!organization) {
     return (
-      <motion.div 
-        className="error-state"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
-        <h2>Organization Not Found 🏚️</h2>
-        <p>Looks like this community doesn't exist yet.</p>
+      <motion.div className="error-state" role="alert" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <h2>{error ? 'Unable to load organization' : 'Organization Not Found 🏚️'}</h2>
+        <p>{error || "Looks like this community doesn't exist yet."}</p>
         <Link to="/" className="btn-secondary">← Back to Feed</Link>
       </motion.div>
     )
@@ -104,12 +97,25 @@ export default function OrganizationPage() {
           </div>
         </div>
         
-        <motion.button 
+        <motion.button
           className="btn-join-org"
+          disabled={joining}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={async () => {
+            if (!organization.id && !organization._id) return;
+            try {
+              setJoining(true);
+              await organizationsAPI.join(organization.id || organization._id);
+              setError('');
+            } catch (err) {
+              setError(err?.message || 'Unable to join this organization.');
+            } finally {
+              setJoining(false);
+            }
+          }}
         >
-          {organization.members.includes('You') ? '✓ Member' : 'Join Community 🚀'}
+          {joining ? 'Joining…' : 'Join Community 🚀'}
         </motion.button>
       </motion.header>
 
@@ -138,7 +144,7 @@ export default function OrganizationPage() {
             <motion.button 
               className="btn-create-post"
               whileHover={{ scale: 1.05 }}
-              onClick={() => navigate('/create-post')}
+              onClick={() => navigate('/')}
             >
               ✨ Create Post
             </motion.button>
@@ -148,7 +154,7 @@ export default function OrganizationPage() {
             <div className="empty-illustration">📭</div>
             <h3>No posts yet!</h3>
             <p>Be the first to spark a conversation 🎉</p>
-            <Link to="/create-post" className="btn-primary">
+            <Link to="/" className="btn-primary">
               Create First Post ✍️
             </Link>
           </div>

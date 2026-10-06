@@ -33,7 +33,7 @@ test.describe('JN-07: Safety → Report → Block → Feedback', () => {
 
     // Level A: Feed loads
     await page.goto('/');
-    await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Main navigation' }).first()).toBeVisible();
 
     // Level B: Report interaction - find report/more button on a post
     const moreBtn = page.getByRole('button', { name: /more|options|menu|report/i }).first();

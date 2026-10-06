@@ -40,7 +40,7 @@ test.describe('JN-04: Create → Share → Repost → Remix', () => {
 
     // Level A: Feed loads
     await page.goto('/');
-    await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Main navigation' }).first()).toBeVisible();
 
     // Level B: Create interaction - find compose area
     const composeBtn = page.getByRole('button', { name: /create|new post|compose/i }).first();
