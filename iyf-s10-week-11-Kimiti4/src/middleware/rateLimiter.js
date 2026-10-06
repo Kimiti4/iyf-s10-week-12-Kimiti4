@@ -57,6 +57,15 @@ const alertLimiter = rateLimit({
  * 5 requests per 15 minutes per IP for send-verification + verify-code.
  * Per-contact attempt counters in the controller still apply (defense in depth).
  */
+const feedbackLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: 'Too many feedback submissions. Please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isTestEnv()
+});
+
 const verificationLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -70,5 +79,6 @@ module.exports = {
   generalLimiter,
   authLimiter,
   alertLimiter,
-  verificationLimiter
+  verificationLimiter,
+  feedbackLimiter
 };
