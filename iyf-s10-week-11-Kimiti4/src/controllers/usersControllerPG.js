@@ -208,7 +208,7 @@ const updateUserRole = asyncHandler(async (req, res) => {
     UPDATE users
     SET role = $1, updated_at = NOW()
     WHERE id = $2
-    RETURNING *
+    RETURNING id, username, email, role, is_founder, is_banned, created_at, updated_at
   `, [role, userId]);
 
   const user = result.rows[0];
