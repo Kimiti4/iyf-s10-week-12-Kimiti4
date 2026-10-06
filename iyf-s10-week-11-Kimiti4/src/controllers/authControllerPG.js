@@ -121,14 +121,18 @@ function readRefreshCookie(req) {
  * navigations, tests) pass through to the session checks.
  */
 function allowedOrigins() {
-  return [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:3000',
+  const production = [
     'https://jamii-link.ke.vercel.app',
     'https://jamii-link.vercel.app',
     process.env.FRONTEND_URL
   ].filter(Boolean);
+  if (process.env.NODE_ENV === 'production') return production;
+  return [
+    ...production,
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:3000'
+  ];
 }
 
 function checkSameOrigin(req, res) {
