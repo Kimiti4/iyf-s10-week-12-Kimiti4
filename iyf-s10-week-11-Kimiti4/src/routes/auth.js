@@ -14,6 +14,8 @@ const { protect } = require('../middleware/authPG'); // PostgreSQL version
 // Public routes
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+router.post('/password-reset/request', authController.requestPasswordReset);
+router.post('/password-reset/confirm', authController.resetPassword;
 router.post('/logout', authController.logout);
 // R5 [P0-7]: rotating refresh sessions (HttpOnly cookie transport).
 router.post('/refresh', authController.refresh);
