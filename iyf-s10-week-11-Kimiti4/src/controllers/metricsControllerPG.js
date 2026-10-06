@@ -57,6 +57,14 @@ const getTrendingContent = asyncHandler(async (req, res) => {
 
 // GET /api/metrics/users/:userId/activity - User activity stats
 // R1 [P0-3]: requester must be self OR admin / founder / moderator.
+const assertUserMetricsAccess = (req, targetUserId) => {
+  const role = req.user?.role;
+  const privileged = ['admin', 'founder', 'moderator'].includes(role);
+  if (!privileged && String(req.user?.id) !== String(targetUserId)) {
+    throw new ApiError('Forbidden', 403);
+  }
+};
+
 const getUserMetrics = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
