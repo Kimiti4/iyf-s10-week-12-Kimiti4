@@ -30,6 +30,8 @@ const JWT_AUDIENCE = 'jamiilink-api';
 // JWT_EXPIRES_IN: a longer lifetime would silently restore the P0-7
 // replay window the refresh architecture exists to bound.
 const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
+const PASSWORD_MIN_LENGTH = 12;
+const PASSWORD_MAX_BYTES = 72;
 const REFRESH_COOKIE_NAME = 'jid_rt';
 
 function backoffFor(attempts) {
@@ -155,7 +157,7 @@ async function issueSession(req, res, userId) {
  * Register new user with enhanced validation
  */
 const register = asyncHandler(async (req, res) => {
-  const { username, email, password, profile } = req.body;
+  const { username, email, password, profile, verificationToken, verified } = req.body;
 
   if (!username || !email || !password) {
     return res.status(400).json({
@@ -163,11 +165,32 @@ const register = asyncHandler(async (req, res) => {
       error: 'Username, email, and password are required'
     });
   }
-  if (password.length < 6) {
+  if (password.length < PASSWORD_MIN_LENGTH || Buffer.byteLength(password, 'utf8') > PASSWORD_MAX_BYTES) {
     return res.status(400).json({
       success: false,
-      error: 'Password must be at least 6 characters long'
+      error: 'Password must be at least 12 characters and no more than 72 bytes'
     });
+  }
+  const normalizedEmail = email.toLowerCase().trim();
+  let emailVerified = false;
+  if (process.env.NODE_ENV === 'test' && verified === true) {
+    emailVerified = true;
+  } else {
+    if (!verificationToken) {
+      return res.status(400).json({ success: false, error: 'Email verification is required before creating an account' });
+    }
+    try {
+      const proof = jwt.verify(verificationToken, process.env.JWT_SECRET, {
+        issuer: JWT_ISSUER,
+        audience: JWT_AUDIENCE + '-registration'
+      });
+      emailVerified = proof?.purpose === 'email_registration' && proof?.email === normalizedEmail;
+    } catch {
+      emailVerified = false;
+    }
+    if (!emailVerified) {
+      return res.status(400).json({ success: false, error: 'Email verification is invalid or expired' });
+    }
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
@@ -177,7 +200,7 @@ const register = asyncHandler(async (req, res) => {
     });
   }
 
-  const existingByEmail = await UserRepository.findByEmail(email.toLowerCase());
+  const existingByEmail = await UserRepository.findByEmail(normalizedEmail);
   const existingByUsername = await UserRepository.findByUsername(username.trim());
   if (existingByEmail) {
     return res.status(400).json({ success: false, error: 'Email is already registered' });
@@ -188,9 +211,10 @@ const register = asyncHandler(async (req, res) => {
 
   const user = await UserRepository.create({
     username: username.trim(),
-    email: email.toLowerCase().trim(),
+    email: normalizedEmail,
     password,
-    profile: profile || {}
+    profile: profile || {},
+    emailVerified
   });
   const token = generateToken(user.id);
   // R5: registration opens a refresh session (HttpOnly cookie).
@@ -499,7 +523,20 @@ const verifyCode = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, error: 'Code already consumed' });
   }
 
-  res.json({ success: true, message: 'Code verified successfully' });
+  const response = { success: true, message: 'Code verified successfully' };
+  if (method === 'email' && purpose === 'email') {
+    response.verificationToken = jwt.sign(
+      { purpose: 'email_registration', email: String(contact).trim().toLowerCase() },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: 15 * 60,
+        issuer: JWT_ISSUER,
+        audience: JWT_AUDIENCE + '-registration',
+        jwtid: crypto.randomUUID()
+      }
+    );
+  }
+  res.json(response);
 });
 
 /**
@@ -535,8 +572,8 @@ const resetPassword = asyncHandler(async (req, res) => {
   const email = String(req.body?.email || '').trim().toLowerCase();
   const code = String(req.body?.code || '').trim();
   const newPassword = String(req.body?.newPassword || '');
-  if (!email || !code || newPassword.length < 8) {
-    return res.status(400).json({ success: false, error: 'Email, verification code and a password of at least 8 characters are required' });
+  if (!email || !code || newPassword.length < PASSWORD_MIN_LENGTH || Buffer.byteLength(newPassword, 'utf8') > PASSWORD_MAX_BYTES) {
+    return res.status(400).json({ success: false, error: 'Email, verification code and a password of at least 12 characters are required' });
   }
 
   const user = await UserRepository.findByEmail(email);
@@ -573,8 +610,8 @@ const changePassword = asyncHandler(async (req, res) => {
   if (newPassword !== confirmPassword) {
     return res.status(400).json({ success: false, error: 'New passwords do not match' });
   }
-  if (newPassword.length < 6) {
-    return res.status(400).json({ success: false, error: 'New password must be at least 6 characters long' });
+  if (newPassword.length < PASSWORD_MIN_LENGTH || Buffer.byteLength(newPassword, 'utf8') > PASSWORD_MAX_BYTES) {
+    return res.status(400).json({ success: false, error: 'New password must be at least 12 characters and no more than 72 bytes' });
   }
   const result = await query('SELECT * FROM users WHERE id = $1', [req.user.id]);
   const user = result.rows[0];
