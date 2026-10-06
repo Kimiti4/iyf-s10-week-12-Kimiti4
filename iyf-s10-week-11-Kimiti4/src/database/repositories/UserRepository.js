@@ -76,7 +76,7 @@ class UserRepository {
    */
   async findByUsername(username) {
     const result = await query(`
-      SELECT * FROM users WHERE username = $1 AND is_active = TRUE
+      SELECT id, username, email, password, email_verified, email_verified_at, role, is_founder, bio, location_county, location_settlement, location_ward, skills, avatar_url, avatar_icon, verification_is_verified, verification_verified_at, verification_type, verification_badge_level, verification_badge_color, verification_notes, verification_expires_at, reputation_score, reputation_level, current_organization_id, created_at, updated_at FROM users WHERE username = $1 AND is_active = TRUE
     `, [username]);
 
     if (!result.rows[0]) return null;
@@ -88,7 +88,7 @@ class UserRepository {
    */
   async findById(id) {
     const result = await query(`
-      SELECT * FROM users WHERE id = $1 AND is_active = TRUE
+      SELECT id, username, email, password, email_verified, email_verified_at, role, is_founder, bio, location_county, location_settlement, location_ward, skills, avatar_url, avatar_icon, verification_is_verified, verification_verified_at, verification_type, verification_badge_level, verification_badge_color, verification_notes, verification_expires_at, reputation_score, reputation_level, current_organization_id, created_at, updated_at FROM users WHERE id = $1 AND is_active = TRUE
     `, [id]);
 
     if (!result.rows[0]) return null;
