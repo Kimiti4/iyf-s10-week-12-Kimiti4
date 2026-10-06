@@ -90,7 +90,6 @@ class UsersRepository {
         verification_badge_color,
         verification_notes,
         mfa_enabled,
-        mfa_recovery_codes,
         login_streak,
         last_login_at,
         reputation_score,
@@ -161,7 +160,9 @@ class UsersRepository {
       UPDATE users
       SET ${setClauses.join(', ')}
       WHERE id = $${paramIndex}
-      RETURNING *
+      RETURNING id, username, bio, location_county, location_settlement, location_ward,
+        skills, avatar_url, avatar_icon, verification_is_verified,
+        verification_badge_level, verification_badge_color, updated_at
     `, params);
 
     return result.rows[0] || null;
