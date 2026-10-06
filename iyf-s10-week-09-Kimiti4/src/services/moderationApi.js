@@ -25,7 +25,7 @@ export const moderationAPI = {
       body: JSON.stringify({
         targetType: payload.targetType === 'profile' ? 'user' : payload.targetType,
         targetId: payload.targetId,
-        reason: payload.reason,
+        reason: ({ sexual_content: 'sexual', copyright: 'other', impersonation: 'other' })[payload.reason] || payload.reason,
         details: payload.description,
       }),
     });
