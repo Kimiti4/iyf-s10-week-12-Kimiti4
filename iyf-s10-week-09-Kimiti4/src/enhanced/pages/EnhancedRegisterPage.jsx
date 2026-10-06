@@ -70,7 +70,7 @@ export default function EnhancedRegisterPage() {
         setError('');
         setLoading(true);
         try {
-            await api.auth.verifyCode({
+            const response = await api.auth.verifyCode({
                 method: 'email',
                 contact: formData.email.trim().toLowerCase(),
                 code: verificationCode,
@@ -78,12 +78,13 @@ export default function EnhancedRegisterPage() {
             });
             if (!response.verificationToken) throw new Error('Email verification could not be completed securely.');
             setVerificationToken(response.verificationToken);
+            const verifiedEmailToken = response.verificationToken;
             await register({
                 username: sanitizeInput(formData.name.trim()),
                 email: formData.email.trim().toLowerCase(),
                 password: formData.password,
                 profile: { location: formData.location.trim() },
-                verificationToken
+                verificationToken: verifiedEmailToken
             });
             navigate('/', { replace: true });
         } catch (err) {
