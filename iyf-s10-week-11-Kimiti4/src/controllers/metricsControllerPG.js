@@ -68,16 +68,7 @@ const assertUserMetricsAccess = (req, targetUserId) => {
 const getUserMetrics = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
-  // Route-level protect guarantees req.user; defensive check.
-  if (!req.user) {
-    throw new ApiError('Authentication required', 401);
-  }
-
-  const isSelf = userId === req.user.id;
-  const isPrivileged = ['admin', 'founder', 'moderator'].includes(req.user.role);
-  if (!isSelf && !isPrivileged) {
-    throw new ApiError('You can only read your own activity', 403);
-  }
+  assertUserMetricsAccess(req, userId);
 
   const user = await UserRepository.findById(userId);
   if (!user) {
