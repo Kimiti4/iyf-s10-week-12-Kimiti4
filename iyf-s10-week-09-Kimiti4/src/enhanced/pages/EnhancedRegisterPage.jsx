@@ -11,6 +11,7 @@ export default function EnhancedRegisterPage() {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', location: '' });
     const [verificationCode, setVerificationCode] = useState('');
+    const [verificationToken, setVerificationToken] = useState('');
     const [codeSent, setCodeSent] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [formErrors, setFormErrors] = useState({});
@@ -75,12 +76,14 @@ export default function EnhancedRegisterPage() {
                 code: verificationCode,
                 purpose: 'email'
             });
+            if (!response.verificationToken) throw new Error('Email verification could not be completed securely.');
+            setVerificationToken(response.verificationToken);
             await register({
                 username: sanitizeInput(formData.name.trim()),
                 email: formData.email.trim().toLowerCase(),
                 password: formData.password,
                 profile: { location: formData.location.trim() },
-                verified: true
+                verificationToken
             });
             navigate('/', { replace: true });
         } catch (err) {
@@ -113,7 +116,7 @@ export default function EnhancedRegisterPage() {
                         <label className="auth-field"><span>Full name</span><input type="text" value={formData.name} onChange={(e) => update('name', e.target.value)} placeholder="Your name" required autoComplete="name" aria-label="Full name" /></label>
                         <label className="auth-field"><span>Email address</span><input type="email" value={formData.email} onChange={(e) => update('email', e.target.value)} placeholder="you@example.com" required autoComplete="email" aria-label="Email address" /></label>
                         <label className="auth-field"><span>Location <em>optional</em></span><input type="text" value={formData.location} onChange={(e) => update('location', e.target.value)} placeholder="Nairobi, Kenya" autoComplete="address-level2" aria-label="Location" /></label>
-                        <label className="auth-field"><span>Password</span><div className="input-group password-group"><input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => update('password', e.target.value)} placeholder="At least 8 characters" required minLength="8" autoComplete="new-password" aria-label="Password" /><button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? <FaEyeSlash /> : <FaEye />}</button></div></label>
+                        <label className="auth-field"><span>Password</span><div className="input-group password-group"><input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => update('password', e.target.value)} placeholder="At least 12 characters" required minLength="12" maxLength="72" autoComplete="new-password" aria-label="Password" /><button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? <FaEyeSlash /> : <FaEye />}</button></div></label>
                         <label className="auth-field"><span>Confirm password</span><input type="password" value={formData.confirmPassword} onChange={(e) => update('confirmPassword', e.target.value)} placeholder="Repeat your password" required autoComplete="new-password" aria-label="Confirm password" /></label>
                         <button type="submit" className="btn-register">Continue</button>
                     </form>
