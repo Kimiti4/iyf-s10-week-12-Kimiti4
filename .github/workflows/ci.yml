@@ -121,3 +121,4 @@ jobs:
           working-directory: iyf-s10-week-09-Kimiti4
           vercel-args: '--prod'
           vercel-project-name: 'jamii-link'
+# Node 24 migration and auth remediation verification trigger.
