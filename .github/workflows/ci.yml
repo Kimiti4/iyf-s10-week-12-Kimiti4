@@ -136,16 +136,16 @@ jobs:
             echo "FAIL: production site did not serve a configured bundle in time"
             exit 1
           fi
-          echo "Checking backend health at $API_ORIGIN/api/health..."
+          echo "Checking backend production readiness at $API_ORIGIN/api/health/ready..."
           for attempt in 1 2 3 4; do
-            health=$(curl -fsS --max-time 60 "$API_ORIGIN/api/health" 2>/dev/null || true)
-            if grep -q '"db":true' <<<"$health"; then
-              echo "OK: backend healthy $health"
+            health=$(curl -fsS --max-time 60 "$API_ORIGIN/api/health/ready" 2>/dev/null || true)
+            if grep -q '"status":"ready"' <<<"$health"; then
+              echo "OK: backend production-ready $health"
               exit 0
             fi
             echo "backend not ready (attempt $attempt/4): ${health:-no response}"
             sleep 10
           done
-          echo "FAIL: backend health check"
+          echo "FAIL: backend production readiness check (DB/auth secret/HTTPS frontend origin/SMTP must all be configured)"
           exit 1
 # Node 24 and authentication remediation verification.
