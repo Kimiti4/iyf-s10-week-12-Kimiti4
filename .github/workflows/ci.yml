@@ -9,17 +9,17 @@ jobs:
   lint-and-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: iyf-s10-week-09-Kimiti4/package-lock.json
       - run: npm ci
         working-directory: iyf-s10-week-09-Kimiti4
       - run: npm run build
         working-directory: iyf-s10-week-09-Kimiti4
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: build-output
           path: iyf-s10-week-09-Kimiti4/dist/
@@ -30,15 +30,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: iyf-s10-week-09-Kimiti4/package-lock.json
       - run: npm ci
         working-directory: iyf-s10-week-09-Kimiti4
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
@@ -55,7 +55,7 @@ jobs:
           VITE_API_URL: /api
       - run: npx playwright test e2e/ --reporter=html
         working-directory: iyf-s10-week-09-Kimiti4
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report
@@ -67,10 +67,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: iyf-s10-week-09-Kimiti4/package-lock.json
       - run: npm ci
@@ -83,7 +83,7 @@ jobs:
           VITE_API_URL: http://localhost:4173/api
       - run: npx lhci autorun
         working-directory: iyf-s10-week-09-Kimiti4
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: lighthouse-reports
@@ -95,7 +95,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: echo "✅ All checks passed. Ready for Vercel preview deploy."
 
   deploy-production:
@@ -103,17 +103,17 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: iyf-s10-week-09-Kimiti4/package-lock.json
       - run: npm ci
         working-directory: iyf-s10-week-09-Kimiti4
       - run: npm run build
         working-directory: iyf-s10-week-09-Kimiti4
-      - uses: amondnet/vercel-action@v25
+      - uses: amondnet/vercel-action@v42
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
