@@ -460,7 +460,13 @@ export const usersAPI = {
     /**
      * Get verified/badged users
      */
-    getVerifiedUsers: () => request('/users/verified')
+    getVerifiedUsers: () => request('/users/verified'),
+
+    /** Delete the authenticated user's account after password confirmation. */
+    deleteMyAccount: (currentPassword) => request('/users/me', {
+        method: 'DELETE',
+        body: JSON.stringify({ currentPassword })
+    })
 };
 
 // ===== UTILITY FUNCTIONS =====
