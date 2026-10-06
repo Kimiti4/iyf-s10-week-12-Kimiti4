@@ -28,7 +28,7 @@ export default function LoginPage() {
       await login({ email, password })
       navigate(from, { replace: true })
     } catch (err) {
-      setError('Wrong credentials - try our demo account! 🎯')
+      setError(err?.message || 'Login failed. Please check your email and password.')
     } finally {
       setLoading(false)
     }
