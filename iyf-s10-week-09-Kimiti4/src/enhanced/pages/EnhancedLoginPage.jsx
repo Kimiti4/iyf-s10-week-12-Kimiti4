@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaCheckCircle, FaEye, FaEyeSlash, FaLock, FaShieldAlt } from 'react-icons/fa';
+import { FaArrowLeft, FaCheckCircle, FaEye, FaEyeSlash, FaShieldAlt } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { validateLogin, sanitizeInput } from '../../utils/validation';
 import { authAPI } from '../../services/api';
