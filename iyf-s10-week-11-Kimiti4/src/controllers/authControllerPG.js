@@ -503,6 +503,66 @@ const verifyCode = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Request a password reset code.
+ * Always returns the same public response so account existence is not disclosed.
+ */
+const requestPasswordReset = asyncHandler(async (req, res) => {
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  const generic = { success: true, message: 'If an account exists for that email, a reset code will be sent.' };
+  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return res.status(200).json(generic);
+
+  const user = await UserRepository.findByEmail(email);
+  if (!user) return res.status(200).json(generic);
+
+  const rawCode = generateNumericCode();
+  await VerificationCodeRepository.create({ userId: user.id, purpose: 'password_reset', contact: email, rawCode, ttlSeconds: CODE_TTL_SECONDS });
+  const delivery = await emailService.send({
+    to: email,
+    subject: 'Reset your JamiiLink password',
+    text: `Your JamiiLink password reset code is: ${rawCode}. It expires in ${CODE_TTL_SECONDS / 60} minutes.`,
+    html: `<p>Your JamiiLink password reset code is: <strong>${rawCode}</strong></p><p>It expires in ${CODE_TTL_SECONDS / 60} minutes.</p>`
+  });
+  if (delivery.status === 'failed') {
+    return res.status(503).json({ success: false, error: 'Password reset email could not be delivered. Please try again later.' });
+  }
+  res.status(200).json(generic);
+});
+
+/**
+ * Reset password with a durable, single-use verification code.
+ */
+const resetPassword = asyncHandler(async (req, res) => {
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  const code = String(req.body?.code || '').trim();
+  const newPassword = String(req.body?.newPassword || '');
+  if (!email || !code || newPassword.length < 8) {
+    return res.status(400).json({ success: false, error: 'Email, verification code and a password of at least 8 characters are required' });
+  }
+
+  const user = await UserRepository.findByEmail(email);
+  const active = await VerificationCodeRepository.findActive({ contact: email, purpose: 'password_reset' });
+  if (!user || !active) return res.status(400).json({ success: false, error: 'Invalid or expired reset code' });
+
+  const bcrypt = require('bcryptjs');
+  const row = await query('SELECT code_hash FROM verification_codes WHERE id = $1', [active.id]);
+  const valid = row.rows[0] && await bcrypt.compare(code, row.rows[0].code_hash);
+  if (!valid) {
+    const attempts = await VerificationCodeRepository.incrementAttempts(active.id);
+    if (attempts === null) return res.status(400).json({ success: false, error: 'Reset code expired' });
+    if (attempts >= CODE_MAX_ATTEMPTS) await VerificationCodeRepository.forceConsume(active.id);
+    return res.status(400).json({ success: false, error: 'Invalid or expired reset code' });
+  }
+
+  const consumed = await VerificationCodeRepository.consume(active.id);
+  if (!consumed) return res.status(400).json({ success: false, error: 'Reset code has already been used' });
+
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
+  await query('UPDATE users SET password = $1, updated_at = NOW(), mfa_failed_attempts = 0, mfa_locked_until = NULL WHERE id = $2', [hashedPassword, user.id]);
+  await SessionRepository.revokeAllForUser(user.id);
+  res.json({ success: true, message: 'Password reset successfully. Please log in again.' });
+});
+
+/**
  * Change password
  */
 const changePassword = asyncHandler(async (req, res) => {
