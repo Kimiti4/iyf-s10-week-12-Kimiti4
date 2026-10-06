@@ -20,11 +20,16 @@ export const moderationAPI = {
    * @returns {Promise<NormalizedReport>}
    */
   async report(payload) {
-    const data = await request('/moderation/reports', {
+    const data = await request('/reports', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        targetType: payload.targetType === 'profile' ? 'user' : payload.targetType,
+        targetId: payload.targetId,
+        reason: payload.reason,
+        details: payload.description,
+      }),
     });
-    return normalizeReport(data.report || data);
+    return normalizeReport(data.data || data.report || data);
   },
 
   /**
