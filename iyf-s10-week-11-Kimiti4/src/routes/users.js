@@ -25,6 +25,7 @@ router.post('/unban/:userId', protect, restrictTo('admin', 'founder'), usersCont
 // Authenticated routes
 router.get('/me', protect, usersController.getMyProfile);
 router.put('/profile', protect, usersController.updateProfile);
+router.delete('/me', protect, usersController.deleteMyAccount);
 router.get('/stats/:id?', protect, usersController.getUserStats);
 router.get('/likes/me', protect, usersController.getLikedPosts);
 router.get('/:userId/follow', protect, usersController.getFollowState);
