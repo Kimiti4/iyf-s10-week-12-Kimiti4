@@ -4,6 +4,9 @@
  */
 const { UserRepository, UsersRepository } = require('../database');
 const { query } = require('../config/postgres');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const SessionRepository = require('../database/repositories/SessionRepository');
 const asyncHandler = require('../utils/asyncHandler');
 const { ApiError } = require('../middleware/errorHandler');
 
@@ -75,6 +78,33 @@ const getUserById = asyncHandler(async (req, res) => {
   }
 
   res.json({ success: true, data: projectUserForViewer(user, req.user) });
+});
+
+
+// DELETE current account
+const deleteMyAccount = asyncHandler(async (req, res) => {
+  const { currentPassword } = req.body || {};
+  if (typeof currentPassword !== 'string' || currentPassword.length === 0) {
+    throw new ApiError('Current password is required to delete your account', 400);
+  }
+
+  // Replace the credential with an unreachable random hash so the account
+  // cannot authenticate again even if an old access token is presented.
+  const deletedPasswordHash = await bcrypt.hash(crypto.randomBytes(32).toString('hex'), 12);
+  const result = await UserRepository.deleteAccount(req.user.id, currentPassword, deletedPasswordHash);
+
+  if (result.reason === 'not_found') {
+    throw new ApiError('Account not found', 404);
+  }
+  if (result.reason === 'invalid_password') {
+    throw new ApiError('Current password is incorrect', 401);
+  }
+
+  await SessionRepository.revokeAllForUser(req.user.id);
+  res.json({
+    success: true,
+    message: 'Your account has been deleted and your active sessions revoked.'
+  });
 });
 
 // GET current user profile
@@ -268,6 +298,7 @@ module.exports = {
   getAllUsers,
   getUserById,
   getMyProfile,
+  deleteMyAccount,
   updateProfile,
   getUserStats,
   banUser,
