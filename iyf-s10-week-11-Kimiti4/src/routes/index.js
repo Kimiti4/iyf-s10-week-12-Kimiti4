@@ -19,6 +19,7 @@ const reputationRoutes = require('./reputation');
 const distributionRoutes = require('./distribution');
 const messagesRoutes = require('./messages');
 const jamsRoutes = require('./jams');
+const feedbackRoutes = require('./feedback');
 const { query } = require('../config/postgres');
 
 // Health check
@@ -90,5 +91,8 @@ router.use('/uploads', require('./uploads'));
 
 // Jams (flagship creator-led content primitive)
 router.use('/jams', jamsRoutes);
+
+// Public beta feedback, rate-limited and persisted server-side.
+router.use('/feedback', feedbackRoutes);
 
 module.exports = router;
