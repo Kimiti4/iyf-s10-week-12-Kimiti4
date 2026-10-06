@@ -86,8 +86,27 @@ function installCatchAll(page) {
     // Auth routes are registered at context level by seedAuth/seedUnauthenticated.
     // Page-level catch-all routes take precedence, so fall through here instead
     // of replacing the auth fixture with the generic {data: []} response.
-    if (/\/api\/auth\/(refresh|me)(?:[/?]|$)/.test(url)) {
-      return route.fallback();
+    if (/\/api\/auth\/refresh(?:[/?]|$)/.test(url)) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, token: 'e2e-catchall-token', tokenType: 'Bearer' }),
+      });
+    }
+    if (/\/api\/auth\/me(?:[/?]|$)/.test(url)) {
+      return page.evaluate(() => {
+        try {
+          return JSON.parse(localStorage.getItem('user') || 'null');
+        } catch {
+          return null;
+        }
+      }).then((user) => route.fulfill({
+        status: user ? 200 : 401,
+        contentType: 'application/json',
+        body: JSON.stringify(user
+          ? { success: true, user }
+          : { success: false, error: 'Not authenticated' }),
+      }));
     }
     if (/\/(categories|suggested-users|trending|for-you|search)/.test(url)) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
