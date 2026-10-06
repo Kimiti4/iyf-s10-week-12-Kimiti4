@@ -15,7 +15,6 @@ import './index.css' // Unified whimsical design system
 import Sidebar from './components/Sidebar'
 import NavBar from './components/NavBar'
 import MobileBottomNav from './components/MobileBottomNav'
-import RegisterPage from './pages/RegisterPage'
 const EnhancedLoginPage = lazy(() => import('./enhanced/pages/EnhancedLoginPage'))
 const EnhancedRegisterPage = lazy(() => import('./enhanced/pages/EnhancedRegisterPage'))
 const ReelsPage = lazy(() => import('./enhanced/pages/ReelsPage'))
@@ -84,7 +83,11 @@ function AppRoutes() {
           <EnhancedLoginPage />
         </Suspense>
       } />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/register" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <EnhancedRegisterPage />
+        </Suspense>
+      } />
       <Route path="/reels" element={
         <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
           <ReelsPage />
