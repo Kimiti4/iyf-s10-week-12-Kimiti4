@@ -96,7 +96,7 @@ export default function EnhancedRegisterPage() {
                 <div className="register-header">
                     <div className="auth-brand-mark" aria-hidden="true">J</div>
                     <p className="auth-eyebrow">JAMIILINK</p>
-                    <h1>Create your account</h1>
+                    <h1>Join JamiiLink</h1>
                     <p className="subtitle">Join a community built around useful local connection.</p>
                     <div className="progress-steps" aria-label={`Step ${step} of 2`}>
                         <div className={`step ${step >= 1 ? 'active' : ''}`}><div className="step-number">1</div><span>Your details</span></div>
