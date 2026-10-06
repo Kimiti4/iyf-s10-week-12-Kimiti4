@@ -64,7 +64,7 @@ class UserRepository {
    */
   async findByEmail(email) {
     const result = await query(`
-      SELECT * FROM users WHERE email = $1
+      SELECT * FROM users WHERE email = $1 AND is_active = TRUE
     `, [email.toLowerCase()]);
 
     if (!result.rows[0]) return null;
@@ -76,7 +76,7 @@ class UserRepository {
    */
   async findByUsername(username) {
     const result = await query(`
-      SELECT * FROM users WHERE username = $1
+      SELECT * FROM users WHERE username = $1 AND is_active = TRUE
     `, [username]);
 
     if (!result.rows[0]) return null;
@@ -88,11 +88,40 @@ class UserRepository {
    */
   async findById(id) {
     const result = await query(`
-      SELECT * FROM users WHERE id = $1
+      SELECT * FROM users WHERE id = $1 AND is_active = TRUE
     `, [id]);
 
     if (!result.rows[0]) return null;
     return this.formatUser(result.rows[0]);
+  }
+
+  /**
+   * Soft-delete the account and remove direct personal profile data.
+   * Content ownership remains referentially stable, while authentication
+   * and profile access are disabled immediately.
+   */
+  async deleteAccount(id, currentPassword, deletedPasswordHash) {
+    const result = await query(\
+      'SELECT id, password FROM users WHERE id = $1 AND is_active = TRUE', [id]
+    );
+    const row = result.rows[0];
+    if (!row) return { ok: false, reason: 'not_found' };
+    const valid = await bcrypt.compare(currentPassword, row.password);
+    if (!valid) return { ok: false, reason: 'invalid_password' };
+    const anonymizedEmail = 'deleted+' + id + '@invalid.jamiilink.local';
+    const anonymizedUsername = 'deleted_' + String(id).replace(/-/g, '').slice(0, 20);
+    await query(\
+      \`UPDATE users
+       SET username = $1, email = $2, password = $3,
+           bio = NULL, location_county = NULL, location_settlement = NULL,
+           location_ward = NULL, skills = NULL, avatar_url = NULL,
+           avatar_icon = NULL, email_verified = FALSE,
+           email_verified_at = NULL, is_active = FALSE, deleted_at = NOW(),
+           updated_at = NOW()
+       WHERE id = $4\`,
+      [anonymizedUsername, anonymizedEmail, deletedPasswordHash, id]
+    );
+    return { ok: true };
   }
 
   /**
