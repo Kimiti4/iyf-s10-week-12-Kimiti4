@@ -18,6 +18,8 @@ const createTables = async () => {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         username VARCHAR(30) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
+        email_verified BOOLEAN DEFAULT FALSE,
+        email_verified_at TIMESTAMP,
         password VARCHAR(255) NOT NULL,
         role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'admin', 'moderator', 'founder')),
         is_founder BOOLEAN DEFAULT FALSE,
@@ -548,6 +550,9 @@ const createTables = async () => {
 
     // Create indexes for performance
     console.log(' Creating indexes...');
+    await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE`);
+    await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP`);
+
     await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)`);
     
