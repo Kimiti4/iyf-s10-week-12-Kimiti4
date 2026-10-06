@@ -17,7 +17,8 @@ class UserRepository {
       role = 'user',
       isFounder = false,
       profile = {},
-      verification = {}
+      verification = {},
+      emailVerified = false
     } = userData;
 
     // Hash password
@@ -29,9 +30,10 @@ class UserRepository {
         username, email, password, role, is_founder,
         bio, location_county, location_settlement, location_ward,
         skills, avatar_url, avatar_icon,
+        email_verified, email_verified_at,
         verification_is_verified, verification_badge_level,
         verification_badge_color, verification_notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
       RETURNING *
     `, [
       username,
@@ -46,6 +48,8 @@ class UserRepository {
       profile.skills ? `{${profile.skills.join(',')}}` : null,
       profile.avatar || null,
       profile.avatarIcon || '🦁',
+      emailVerified,
+      emailVerified ? new Date() : null,
       verification.isVerified || false,
       verification.badgeLevel || 'bronze',
       verification.badgeColor || '#CD7F32',
