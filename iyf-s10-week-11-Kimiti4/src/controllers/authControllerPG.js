@@ -600,5 +600,5 @@ const changePassword = asyncHandler(async (req, res) => {
 
 module.exports = {
   register, login, logout, refresh, getMe, updateProfile, changePassword,
-  sendVerification, verifyCode
+  sendVerification, verifyCode, requestPasswordReset, resetPassword
 };
