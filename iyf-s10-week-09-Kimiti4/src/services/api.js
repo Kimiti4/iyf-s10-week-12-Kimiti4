@@ -466,6 +466,11 @@ export const usersAPI = {
     deleteMyAccount: (currentPassword) => request('/users/me', {
         method: 'DELETE',
         body: JSON.stringify({ currentPassword })
+    }),
+
+    report: (data) => request('/reports', {
+        method: 'POST',
+        body: JSON.stringify(data)
     })
 };
 
