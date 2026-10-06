@@ -21,6 +21,7 @@ const messagesRoutes = require('./messages');
 const jamsRoutes = require('./jams');
 const feedbackRoutes = require('./feedback');
 const { query } = require('../config/postgres');
+const emailService = require('../services/emailService');
 
 // Health check
 router.get('/health', (req, res) => {
@@ -35,6 +36,29 @@ router.get('/health', (req, res) => {
       categories: ['mtaani', 'skill', 'farm', 'gig', 'alert']
     }))
     .catch(() => res.status(503).json({ status: 'degraded', db: false }));
+});
+
+
+// Deployment readiness: exposes only boolean capability/configuration state.
+// Never returns secrets or credential values.
+router.get('/health/ready', async (req, res) => {
+  try {
+    await query('SELECT 1');
+    const smtpConfigured = emailService._internal.smtpConfigured();
+    const jwtConfigured = typeof process.env.JWT_SECRET === 'string' && process.env.JWT_SECRET.length >= 32;
+    const frontendConfigured = typeof process.env.FRONTEND_URL === 'string' && process.env.FRONTEND_URL.startsWith('https://');
+    const ready = smtpConfigured && jwtConfigured && frontendConfigured;
+    res.status(ready ? 200 : 503).json({
+      status: ready ? 'ready' : 'not_ready',
+      db: true,
+      email: smtpConfigured,
+      authSecret: jwtConfigured,
+      frontendOrigin: frontendConfigured,
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch {
+    res.status(503).json({ status: 'not_ready', db: false, email: false, authSecret: false, frontendOrigin: false });
+  }
 });
 
 // Market prices endpoint (FarmLink price transparency)
