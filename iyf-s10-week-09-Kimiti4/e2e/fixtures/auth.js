@@ -81,37 +81,28 @@ async function seedUnauthenticated(context) {
  *  Must be called AFTER test-specific page.route() calls so page routes
  *  take priority.  Prevents CORS failures from the real Railway backend. */
 function installCatchAll(page) {
-  return page.route('**/api/**', (route) => {
+  // Keep the generic fallback at the browser-context level. Page-specific
+  // mocks registered by individual journeys must take precedence.
+  return page.context().route('**/api/**', async (route) => {
     const url = route.request().url();
-    // Auth routes are registered at context level by seedAuth/seedUnauthenticated.
-    // Page-level catch-all routes take precedence, so fall through here instead
-    // of replacing the auth fixture with the generic {data: []} response.
-    if (/\/api\/auth\/refresh(?:[/?]|$)/.test(url)) {
-      return route.fulfill({
+
+    // Let the seeded authentication handlers registered on the context handle
+    // these requests. Context routes are evaluated newest-first.
+    if (/\/api\/auth\/(refresh|me)(?:[/?]|$)/.test(url)) {
+      await route.fallback();
+      return;
+    }
+
+    if (/\/(categories|suggested-users|trending|for-you|search)/.test(url)) {
+      await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ success: true, token: 'e2e-catchall-token', tokenType: 'Bearer' }),
+        body: '[]'
       });
+      return;
     }
-    if (/\/api\/auth\/me(?:[/?]|$)/.test(url)) {
-      return page.evaluate(() => {
-        try {
-          return JSON.parse(localStorage.getItem('user') || 'null');
-        } catch {
-          return null;
-        }
-      }).then((user) => route.fulfill({
-        status: user ? 200 : 401,
-        contentType: 'application/json',
-        body: JSON.stringify(user
-          ? { success: true, user }
-          : { success: false, error: 'Not authenticated' }),
-      }));
-    }
-    if (/\/(categories|suggested-users|trending|for-you|search)/.test(url)) {
-      return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
-    }
-    route.fulfill({
+
+    await route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ success: true, data: [] }),
