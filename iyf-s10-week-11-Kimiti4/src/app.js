@@ -24,14 +24,19 @@ app.use(securityHeaders);
 // CORS configuration for full-stack deployment
 const corsOptions = {
     origin: function (origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:5173',  // Vite dev server
-            'http://localhost:5174',  // Vite dev server (port 5174)
-            'http://localhost:3000',  // Local
-            'https://jamii-link.ke.vercel.app',  // Production frontend (Vercel)
-            'https://jamii-link.vercel.app',  // Production frontend (Vercel)
-            process.env.FRONTEND_URL  // Additional production frontend URL
+        const productionOrigins = [
+            'https://jamii-link.ke.vercel.app',
+            'https://jamii-link.vercel.app',
+            process.env.FRONTEND_URL
         ].filter(Boolean);
+        const developmentOrigins = [
+            'http://localhost:5173',
+            'http://localhost:5174',
+            'http://localhost:3000'
+        ];
+        const allowedOrigins = process.env.NODE_ENV === 'production'
+            ? productionOrigins
+            : [...productionOrigins, ...developmentOrigins];
         
         // Allow requests with no origin (mobile apps, curl, etc.)
         if (!origin || allowedOrigins.includes(origin)) {
@@ -82,7 +87,7 @@ app.get('/health', async (req, res) => {
   try {
     const { query } = require('./config/postgres');
     await query('SELECT 1');
-    res.json({ status: 'ok', db: true, timestamp: new Date().toISOString(), environment: process.env.NODE_ENV || 'development' });
+    res.json({ status: 'ok', db: true, timestamp: new Date().toISOString() });
   } catch {
     res.status(503).json({ status: 'degraded', db: false });
   }
