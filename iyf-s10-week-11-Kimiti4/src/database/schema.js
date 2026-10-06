@@ -548,6 +548,25 @@ const createTables = async () => {
       )
     `);
     await query(`CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at DESC)`);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS content_reports (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        reporter_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        target_type VARCHAR(30) NOT NULL CHECK (target_type IN ('post', 'comment', 'user')),
+        target_id UUID NOT NULL,
+        reason VARCHAR(40) NOT NULL CHECK (reason IN ('spam', 'harassment', 'hate', 'scam', 'sexual', 'violence', 'misinformation', 'other')),
+        details VARCHAR(2000),
+        status VARCHAR(20) NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'reviewing', 'resolved', 'dismissed')),
+        reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        review_note VARCHAR(2000),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_content_reports_status_created ON content_reports(status, created_at DESC)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_content_reports_target ON content_reports(target_type, target_id)`);
+
     await query(`CREATE INDEX IF NOT EXISTS idx_feedback_status ON feedback(status)`);
 
     // Create indexes for performance
