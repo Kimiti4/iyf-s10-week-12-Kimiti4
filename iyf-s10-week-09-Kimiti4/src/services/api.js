@@ -175,6 +175,14 @@ export const authAPI = {
     })
 };
 
+// ===== BETA FEEDBACK API =====
+export const feedbackAPI = {
+    submit: (feedback) => request('/feedback', {
+        method: 'POST',
+        body: JSON.stringify(feedback)
+    })
+};
+
 // ===== POSTS API =====
 export const postsAPI = {
     /**
