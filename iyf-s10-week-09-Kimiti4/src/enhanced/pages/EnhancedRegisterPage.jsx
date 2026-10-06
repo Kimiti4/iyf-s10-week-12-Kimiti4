@@ -1,399 +1,141 @@
-/**
- * 🔹 Enhanced Social Media Registration Page
- * Features: Email/Phone verification, animations, dark mode
- */
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
-import { FaEnvelope, FaPhone, FaLock, FaUser, FaMapMarkerAlt, FaEye, FaEyeSlash, FaCheckCircle, FaQrcode } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { FaArrowLeft, FaCheckCircle, FaEye, FaEyeSlash, FaLock, FaMailBulk } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { validateRegistration, sanitizeInput } from '../../utils/validation';
-import ConstellationBackground from '../components/ConstellationBackground';
 import api from '../../services/api';
 import './EnhancedRegisterPage.css';
 
 export default function EnhancedRegisterPage() {
-    const [step, setStep] = useState(1); // 1: Basic Info, 2: Verification
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        password: '',
-        confirmPassword: '',
-        location: ''
-    });
-    const [formErrors, setFormErrors] = useState({});
-    const [verificationMethod, setVerificationMethod] = useState('email');
+    const [step, setStep] = useState(1);
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', location: '' });
     const [verificationCode, setVerificationCode] = useState('');
     const [codeSent, setCodeSent] = useState(false);
-    const [totpSecret, setTotpSecret] = useState('');
-    const [qrCodeUrl, setQrCodeUrl] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [formErrors, setFormErrors] = useState({});
     const [error, setError] = useState('');
+    const [notice, setNotice] = useState('');
     const [loading, setLoading] = useState(false);
-    
     const { register } = useAuth();
     const navigate = useNavigate();
-    
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-        
-        if (formErrors[name]) {
-            setFormErrors({
-                ...formErrors,
-                [name]: ''
-            });
-        }
-    };
-    
-    const handleNextStep = (e) => {
+
+    const update = (name, value) => setFormData((current) => ({ ...current, [name]: value }));
+
+    const continueToVerification = (e) => {
         e.preventDefault();
         setError('');
-        setFormErrors({});
-        
-        const sanitizedData = {
-            ...formData,
-            name: sanitizeInput(formData.name),
+        setNotice('');
+        const data = {
+            username: sanitizeInput(formData.name.trim()),
             email: formData.email.trim().toLowerCase(),
-            location: sanitizeInput(formData.location)
+            password: formData.password,
+            confirmPassword: formData.confirmPassword
         };
-        
-        const validation = validateRegistration({
-            username: sanitizedData.name,
-            email: sanitizedData.email,
-            password: sanitizedData.password,
-            confirmPassword: sanitizedData.confirmPassword
-        });
-        
+        const validation = validateRegistration(data);
         if (!validation.valid) {
             setFormErrors(validation.errors);
-            setError('Please fix the errors below');
+            setError('Please correct the highlighted fields.');
             return;
         }
-        
+        setFormErrors({});
         setStep(2);
     };
 
-    const sendVerificationCode = async () => {
+    const sendCode = async () => {
         setError('');
+        setNotice('');
         setLoading(true);
-        
         try {
-            const contact = verificationMethod === 'phone' ? formData.phone : formData.email;
-            const response = await api.auth.sendVerification({ method: verificationMethod, contact });
-            
-            if (verificationMethod === 'totp' && response.data?.secret) {
-                setTotpSecret(response.data.secret);
-                setQrCodeUrl(response.data.qrCode);
+            const response = await api.auth.sendVerification({
+                method: 'email',
+                contact: formData.email.trim().toLowerCase(),
+                purpose: 'email'
+            });
+            if (response.deliveryStatus !== 'delivered' && response.deliveryStatus !== 'noop') {
+                throw new Error(response.reason || 'Email verification is not currently available.');
             }
-            
             setCodeSent(true);
+            setNotice('Verification code sent. Check your email; the code expires in 10 minutes.');
         } catch (err) {
-            setError(err.message || 'Failed to send verification code. Please try again.');
+            setError(err?.message || 'We could not send the verification email.');
         } finally {
             setLoading(false);
         }
     };
-    
-    const verifyCodeAndRegister = async () => {
+
+    const verifyAndRegister = async (e) => {
+        e.preventDefault();
         setError('');
         setLoading(true);
-        
         try {
-            // 1. Verify Code
-            const contact = verificationMethod === 'phone' ? formData.phone : formData.email;
             await api.auth.verifyCode({
-                method: verificationMethod,
-                contact,
+                method: 'email',
+                contact: formData.email.trim().toLowerCase(),
                 code: verificationCode,
-                secret: totpSecret
+                purpose: 'email'
             });
-            
-            // 2. Actually Register User
-            await register({ 
-                username: formData.name, 
+            await register({
+                username: sanitizeInput(formData.name.trim()),
                 email: formData.email.trim().toLowerCase(),
-                phone: formData.phone,
-                password: formData.password, 
-                profile: { location: formData.location },
+                password: formData.password,
+                profile: { location: formData.location.trim() },
                 verified: true
             });
-            
-            confetti({
-                particleCount: 150,
-                spread: 100,
-                origin: { y: 0.6 }
-            });
-            
-            setTimeout(() => {
-                navigate('/login', { 
-                    state: { message: '🎉 Registration successful! Your account is verified. Please login.' } 
-                });
-            }, 1500);
-            
+            navigate('/', { replace: true });
         } catch (err) {
-            setError(err.message || 'Invalid verification code or registration failed');
+            setError(err?.message || 'Verification failed. Please check the code and try again.');
         } finally {
             setLoading(false);
         }
     };
-    
+
     return (
-        <div className="enhanced-register-page">
-            <ConstellationBackground />
-            
-            <motion.div 
-                className="enhanced-register-container"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <motion.div className="register-header">
-                    <h1>✨ Join JamiiLink</h1>
-                    <p className="subtitle">Create your account and start connecting</p>
-                    
-                    <div className="progress-steps">
-                        <div className={`step ${step >= 1 ? 'active' : ''}`}>
-                            <div className="step-number">1</div>
-                            <span>Basic Info</span>
-                        </div>
-                        <div className="step-line"></div>
-                        <div className={`step ${step >= 2 ? 'active' : ''}`}>
-                            <div className="step-number">2</div>
-                            <span>Verify</span>
-                        </div>
+        <main className="enhanced-register-page" aria-label="Create account">
+            <motion.div className="enhanced-register-container" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+                <div className="register-header">
+                    <div className="auth-brand-mark" aria-hidden="true">J</div>
+                    <p className="auth-eyebrow">JAMIILINK</p>
+                    <h1>Create your account</h1>
+                    <p className="subtitle">Join a community built around useful local connection.</p>
+                    <div className="progress-steps" aria-label={`Step ${step} of 2`}>
+                        <div className={`step ${step >= 1 ? 'active' : ''}`}><div className="step-number">1</div><span>Your details</span></div>
+                        <div className="step-line" />
+                        <div className={`step ${step >= 2 ? 'active' : ''}`}><div className="step-number">2</div><span>Verify email</span></div>
                     </div>
-                </motion.div>
-                
-                <AnimatePresence>
-                    {error && (
-                        <motion.div 
-                            className="error-message"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                        >
-                            {error}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                
-                {step === 1 && (
-                    <motion.form
-                        onSubmit={handleNextStep}
-                        className="enhanced-register-form"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
-                        <div className="input-group">
-                            <FaUser className="input-icon" aria-hidden="true" />
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                placeholder="Full Name"
-                                required
-                                className={formErrors.username ? 'input-error' : ''}
-                                aria-label="Full name"
-                            />
-                            {formErrors.username && <span className="field-error">{formErrors.username}</span>}
-                        </div>
-                        
-                        <div className="input-group">
-                            <FaEnvelope className="input-icon" aria-hidden="true" />
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="Email Address"
-                                required
-                                className={formErrors.email ? 'input-error' : ''}
-                                aria-label="Email address"
-                            />
-                            {formErrors.email && <span className="field-error">{formErrors.email}</span>}
-                        </div>
-                        
-                        <div className="input-group">
-                            <FaPhone className="input-icon" aria-hidden="true" />
-                            <input
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                placeholder="Phone Number (+254...)"
-                                aria-label="Phone number"
-                            />
-                        </div>
-                        
-                        <div className="input-group">
-                            <FaMapMarkerAlt className="input-icon" aria-hidden="true" />
-                            <input
-                                type="text"
-                                name="location"
-                                value={formData.location}
-                                onChange={handleChange}
-                                placeholder="Location (Optional)"
-                                aria-label="Location"
-                            />
-                        </div>
-                        
-                        <div className="input-group password-group">
-                            <FaLock className="input-icon" aria-hidden="true" />
-                            <input
-                                type={showPassword ? 'text' : 'password'}
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder="Password (min 8 characters)"
-                                required
-                                minLength="8"
-                                className={formErrors.password ? 'input-error' : ''}
-                                aria-label="Password"
-                            />
-                            <button
-                                type="button"
-                                className="toggle-password"
-                                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
-                            {formErrors.password && <span className="field-error">{formErrors.password}</span>}
-                        </div>
-                        
-                        <div className="input-group">
-                            <FaLock className="input-icon" aria-hidden="true" />
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                placeholder="Confirm Password"
-                                required
-                                className={formErrors.confirmPassword ? 'input-error' : ''}
-                                aria-label="Confirm password"
-                            />
-                            {formErrors.confirmPassword && <span className="field-error">{formErrors.confirmPassword}</span>}
-                        </div>
-                        
-                        <motion.button 
-                            type="submit" 
-                            className="btn-register"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                        >
-                            Next: Verification
-                        </motion.button>
-                    </motion.form>
-                )}
-                
-                {step === 2 && (
-                    <motion.div
-                        className="verification-section"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                    >
-                        <div className="verification-header">
-                            <FaCheckCircle className="verified-icon" />
-                            <h2>Verify Your Account</h2>
-                            <p>Choose a method to secure your account</p>
-                        </div>
-                        
-                        {!codeSent ? (
-                            <div className="verification-method">
-                                <div className="method-buttons">
-                                    <button
-                                        type="button"
-                                        className={`method-btn ${verificationMethod === 'email' ? 'active' : ''}`}
-                                        onClick={() => setVerificationMethod('email')}
-                                    >
-                                        <FaEnvelope /> Email
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={`method-btn ${verificationMethod === 'phone' ? 'active' : ''}`}
-                                        onClick={() => setVerificationMethod('phone')}
-                                    >
-                                        <FaPhone /> Messaging
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={`method-btn ${verificationMethod === 'totp' ? 'active' : ''}`}
-                                        onClick={() => setVerificationMethod('totp')}
-                                    >
-                                        <FaQrcode /> Authenticator
-                                    </button>
-                                </div>
-                                <motion.button
-                                    className="btn-send-code"
-                                    onClick={sendVerificationCode}
-                                    disabled={loading}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                >
-                                    {loading ? 'Processing...' : (verificationMethod === 'totp' ? 'Generate QR Code' : 'Send Code')}
-                                </motion.button>
-                            </div>
-                        ) : (
-                            <div className="code-input-section">
-                                {verificationMethod === 'totp' && qrCodeUrl && (
-                                    <div className="totp-setup">
-                                        <p>Scan this QR code with Google Authenticator or Authy:</p>
-                                        <img src={qrCodeUrl} alt="TOTP QR Code" className="qr-code" />
-                                    </div>
-                                )}
-                                
-                                {verificationMethod !== 'totp' && (
-                                    <p>Enter the 6-digit code sent to your {verificationMethod}</p>
-                                )}
-                                
-                                <input
-                                    type="text"
-                                    value={verificationCode}
-                                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                    placeholder="Enter 6-digit code"
-                                    maxLength="6"
-                                    className="code-input"
-                                    aria-label="Verification code"
-                                />
-                                <motion.button
-                                    className="btn-verify"
-                                    onClick={verifyCodeAndRegister}
-                                    disabled={loading || verificationCode.length !== 6}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                >
-                                    {loading ? 'Verifying & Registering...' : 'Verify & Create Account'}
-                                </motion.button>
-                                <button
-                                    type="button"
-                                    className="resend-link"
-                                    onClick={() => {
-                                        setCodeSent(false);
-                                        setVerificationCode('');
-                                        setQrCodeUrl('');
-                                    }}
-                                >
-                                    Change method / Resend
-                                </button>
-                            </div>
-                        )}
-                    </motion.div>
-                )}
-                
-                <div className="register-footer">
-                    <p>Already have an account? <Link to="/login">Login here</Link></p>
                 </div>
+
+                {error && <div className="error-message" role="alert">{error}</div>}
+                {notice && <div className="form-notice" role="status">{notice}</div>}
+
+                {step === 1 ? (
+                    <form onSubmit={continueToVerification} className="enhanced-register-form">
+                        <label className="auth-field"><span>Full name</span><input type="text" value={formData.name} onChange={(e) => update('name', e.target.value)} placeholder="Your name" required autoComplete="name" aria-label="Full name" /></label>
+                        <label className="auth-field"><span>Email address</span><input type="email" value={formData.email} onChange={(e) => update('email', e.target.value)} placeholder="you@example.com" required autoComplete="email" aria-label="Email address" /></label>
+                        <label className="auth-field"><span>Location <em>optional</em></span><input type="text" value={formData.location} onChange={(e) => update('location', e.target.value)} placeholder="Nairobi, Kenya" autoComplete="address-level2" aria-label="Location" /></label>
+                        <label className="auth-field"><span>Password</span><div className="input-group password-group"><input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => update('password', e.target.value)} placeholder="At least 8 characters" required minLength="8" autoComplete="new-password" aria-label="Password" /><button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? <FaEyeSlash /> : <FaEye />}</button></div></label>
+                        <label className="auth-field"><span>Confirm password</span><input type="password" value={formData.confirmPassword} onChange={(e) => update('confirmPassword', e.target.value)} placeholder="Repeat your password" required autoComplete="new-password" aria-label="Confirm password" /></label>
+                        <button type="submit" className="btn-register">Continue</button>
+                    </form>
+                ) : (
+                    <form onSubmit={verifyAndRegister} className="enhanced-register-form">
+                        <div className="verification-header"><FaMailBulk className="verified-icon" /><h2>Verify your email</h2><p>We use email verification to reduce fake accounts and protect the community.</p></div>
+                        {!codeSent ? (
+                            <button type="button" className="btn-send-code" onClick={sendCode} disabled={loading}>{loading ? 'Sending…' : 'Send verification code'}</button>
+                        ) : (
+                            <>
+                                <label className="auth-field"><span>6-digit verification code</span><input inputMode="numeric" pattern="[0-9]{6}" maxLength="6" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" required aria-label="Verification code" /></label>
+                                <button type="submit" className="btn-register" disabled={loading || verificationCode.length !== 6}>{loading ? 'Creating account…' : 'Verify and create account'}</button>
+                                <button type="button" className="auth-back-link" onClick={sendCode} disabled={loading}>Resend code</button>
+                            </>
+                        )}
+                        <button type="button" className="auth-back-link" onClick={() => setStep(1)}><FaArrowLeft /> Change details</button>
+                    </form>
+                )}
+
+                <div className="auth-trust"><FaCheckCircle aria-hidden="true" /><span>Your password is never sent by email.</span></div>
+                <div className="register-footer"><p>Already have an account? <Link to="/login">Sign in</Link></p></div>
             </motion.div>
-        </div>
+        </main>
     );
 }
