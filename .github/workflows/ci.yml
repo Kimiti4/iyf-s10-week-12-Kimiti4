@@ -99,25 +99,52 @@ jobs:
       - run: echo "✅ All checks passed. Ready for Vercel preview deploy."
 
   deploy-production:
+    # Vercel's Git integration deploys main to production (the VERCEL_* secrets
+    # are not configured), so instead of a redundant CLI deploy this job verifies
+    # the live site after tests pass: SPA up, entry bundle served, production API
+    # base baked into the bundle (catches a missing VITE_API_URL), and the
+    # Render backend healthy.
     needs: [e2e, lighthouse-ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: iyf-s10-week-09-Kimiti4/package-lock.json
-      - run: npm ci
-        working-directory: iyf-s10-week-09-Kimiti4
-      - run: npm run build
-        working-directory: iyf-s10-week-09-Kimiti4
-      - uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: iyf-s10-week-09-Kimiti4
-          vercel-args: '--prod'
-          vercel-project-name: 'jamii-link'
+      - name: Verify production deployment
+        env:
+          PROD_URL: https://jamii-link.vercel.app
+          API_ORIGIN: https://jami-link.onrender.com
+        run: |
+          set -uo pipefail
+          echo "Checking $PROD_URL (Vercel deploys main automatically)..."
+          ready=0
+          for attempt in $(seq 1 12); do
+            echo "--- SPA attempt $attempt/12 ---"
+            html=$(curl -fsS --max-time 20 "$PROD_URL/" 2>/dev/null || true)
+            asset=$(grep -oE '/assets/index-[A-Za-z0-9_-]+\.js' <<<"$html" | head -n1 || true)
+            bundle=""
+            if [ -n "$asset" ]; then
+              bundle=$(curl -fsS --max-time 30 "$PROD_URL$asset" 2>/dev/null || true)
+            fi
+            if grep -q 'id="root"' <<<"$html" && grep -q 'jami-link.onrender.com' <<<"$bundle"; then
+              echo "OK: SPA serving and live API base baked into $asset"
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo "FAIL: production site did not serve a configured bundle in time"
+            exit 1
+          fi
+          echo "Checking backend health at $API_ORIGIN/api/health..."
+          for attempt in 1 2 3 4; do
+            health=$(curl -fsS --max-time 60 "$API_ORIGIN/api/health" 2>/dev/null || true)
+            if grep -q '"db":true' <<<"$health"; then
+              echo "OK: backend healthy $health"
+              exit 0
+            fi
+            echo "backend not ready (attempt $attempt/4): ${health:-no response}"
+            sleep 10
+          done
+          echo "FAIL: backend health check"
+          exit 1
