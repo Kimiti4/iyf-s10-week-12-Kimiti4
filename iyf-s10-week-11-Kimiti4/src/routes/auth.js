@@ -10,7 +10,7 @@ const router = express.Router();
 const authController = require('../controllers/authControllerPG'); // PostgreSQL version
 const { enrollTotp, verifyTotp } = require('../controllers/mfaControllerPG');
 const { protect } = require('../middleware/authPG'); // PostgreSQL version
-const { authLimiter, passwordResetLimiter, verificationLimiter } = require('../middleware/rateLimiter');
+const { authLimiter, passwordResetLimiter, verificationLimiter, refreshLimiter } = require('../middleware/rateLimiter');
 
 // Public routes
 router.post('/register', authLimiter, authController.register);
@@ -19,7 +19,7 @@ router.post('/password-reset/request', passwordResetLimiter, authController.requ
 router.post('/password-reset/confirm', passwordResetLimiter, authController.resetPassword);
 router.post('/logout', authController.logout);
 // R5 [P0-7]: rotating refresh sessions (HttpOnly cookie transport).
-router.post('/refresh', authController.refresh);
+router.post('/refresh', refreshLimiter, authController.refresh);
 
 // Verification routes
 router.post('/send-verification', verificationLimiter, authController.sendVerification);
