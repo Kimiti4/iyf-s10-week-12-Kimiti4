@@ -52,9 +52,6 @@ export function initializeSocket(backendUrl) {
  * Get current socket instance
  */
 export function getSocket() {
-  if (!socket) {
-    throw new Error('Socket not initialized. Call initializeSocket() first.');
-  }
   return socket;
 }
 
@@ -64,7 +61,9 @@ export function getSocket() {
  */
 export function joinRoom(roomId) {
   const sock = getSocket();
+  if (!sock) return false;
   sock.emit('join-room', roomId);
+  return true;
 }
 
 /**
@@ -73,7 +72,9 @@ export function joinRoom(roomId) {
  */
 export function leaveRoom(roomId) {
   const sock = getSocket();
+  if (!sock) return false;
   sock.emit('leave-room', roomId);
+  return true;
 }
 
 /**
@@ -82,6 +83,7 @@ export function leaveRoom(roomId) {
  */
 export function onNewAlert(callback) {
   const sock = getSocket();
+  if (!sock) return () => {};
   sock.on('new-alert', callback);
   
   // Return cleanup function
@@ -96,6 +98,7 @@ export function onNewAlert(callback) {
  */
 export function onAlertUpdate(callback) {
   const sock = getSocket();
+  if (!sock) return () => {};
   sock.on('alert-updated', callback);
   
   return () => {
@@ -109,6 +112,7 @@ export function onAlertUpdate(callback) {
  */
 export function onAlertDelete(callback) {
   const sock = getSocket();
+  if (!sock) return () => {};
   sock.on('alert-deleted', callback);
   
   return () => {
@@ -122,6 +126,7 @@ export function onAlertDelete(callback) {
  */
 export function onVerificationChange(callback) {
   const sock = getSocket();
+  if (!sock) return () => {};
   sock.on('verification-changed', callback);
   
   return () => {
