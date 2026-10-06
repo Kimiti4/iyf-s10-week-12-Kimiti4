@@ -20,6 +20,7 @@ const distributionRoutes = require('./distribution');
 const messagesRoutes = require('./messages');
 const jamsRoutes = require('./jams');
 const feedbackRoutes = require('./feedback');
+const contentReportsRoutes = require('./contentReports');
 const { query } = require('../config/postgres');
 const emailService = require('../services/emailService');
 
@@ -118,5 +119,6 @@ router.use('/jams', jamsRoutes);
 
 // Public beta feedback, rate-limited and persisted server-side.
 router.use('/feedback', feedbackRoutes);
+router.use('/reports', contentReportsRoutes);
 
 module.exports = router;
