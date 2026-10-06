@@ -126,6 +126,9 @@ export const authAPI = {
         body: JSON.stringify(credentials)
     }),
     
+    requestPasswordReset: (email) => request('/auth/password-reset/request', { method: 'POST', body: JSON.stringify({ email }) }),
+    resetPassword: (data) => request('/auth/password-reset/confirm', { method: 'POST', body: JSON.stringify(data) }),
+
     /**
      * Get current user profile
      */
