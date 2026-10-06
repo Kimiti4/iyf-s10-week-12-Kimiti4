@@ -66,6 +66,15 @@ const passwordResetLimiter = rateLimit({
   skip: () => isTestEnv()
 });
 
+const refreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: 'Too many session refresh requests. Please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isTestEnv()
+});
+
 const feedbackLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 10,
@@ -90,5 +99,6 @@ module.exports = {
   alertLimiter,
   verificationLimiter,
   feedbackLimiter,
-  passwordResetLimiter
+  passwordResetLimiter,
+  refreshLimiter
 };
