@@ -170,6 +170,10 @@ class UserRepository {
       id: row.id,
       username: row.username,
       email: row.email,
+      emailVerification: {
+        isVerified: row.email_verified || false,
+        verifiedAt: row.email_verified_at || null
+      },
       role: row.role,
       isFounder: row.is_founder,
       profile: {
