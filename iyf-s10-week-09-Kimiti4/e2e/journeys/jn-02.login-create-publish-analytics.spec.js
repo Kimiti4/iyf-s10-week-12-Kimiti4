@@ -57,7 +57,7 @@ test.describe('JN-02: Login → Create → Publish → Analytics', () => {
 
     // Level A: Feed loads after auth
     await page.goto('/');
-    await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Main navigation' }).first()).toBeVisible();
 
     // Level B: Create interaction - navigate to create or find create button
     const createBtn = page.getByRole('button', { name: /create|new post|compose/i }).first();

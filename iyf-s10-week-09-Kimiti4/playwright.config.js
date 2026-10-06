@@ -24,6 +24,17 @@ export default defineConfig({
   },
   webServer: {
     command: 'npm run build && npm run preview -- --port 5174 --strictPort',
+    // Playwright re-runs `npm run build` itself (the workflow's build-step
+    // env does not reach this command), so force the deterministic
+    // same-origin API base here. Without it a production build falls back to
+    // an empty base and every request misses the suite's `**/api/**` route
+    // mocks — auth seeding silently fails and the suite goes green/red for
+    // the wrong reasons. VITE_BACKEND_URL is blanked for the same reason:
+    // a local .env would otherwise bake in the live backend's socket URL.
+    env: {
+      VITE_API_URL: '/api',
+      VITE_BACKEND_URL: '',
+    },
     url: 'http://localhost:5174',
     reuseExistingServer: !process.env.CI,
     timeout: 180000,

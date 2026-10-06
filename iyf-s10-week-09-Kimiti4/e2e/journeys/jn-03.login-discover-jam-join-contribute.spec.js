@@ -22,9 +22,9 @@ async function mockRoutes(page) {
   await page.route('**/api/posts**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ posts: MOCK_POSTS }) })
   );
-  await page.route('**/api/discover**', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ trending: [] }) })
-  );
+  // No page mock for /api/discover/*: discoveryApi unwraps
+  // `data.categories || data`, so a wrong shaped envelope crashes
+  // DiscoveryPage's categories.map. The fixture catch-all serves '[]'.
   await page.route('**/api/notifications**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ notifications: [] }) })
   );

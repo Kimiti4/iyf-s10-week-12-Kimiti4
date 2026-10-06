@@ -1,11 +1,10 @@
 import { test, expect, installCatchAll } from '../fixtures/auth.js';
-import { makePost, makeAlert, makeDiscoveryItem, makeJam, makeReel } from '../fixtures/data.js';
+import { makePost, makeAlert, makeJam, makeReel } from '../fixtures/data.js';
 import { attachConsolePolicy } from '../fixtures/console-policy.js';
 import { attachNetworkPolicy } from '../fixtures/network-policy.js';
 
 const MOCK_POSTS = Array.from({ length: 3 }, () => makePost());
 const MOCK_ALERTS = [makeAlert({ severity: 'emergency' }), makeAlert({ severity: 'info' })];
-const MOCK_DISCOVERY = [makeDiscoveryItem(), makeDiscoveryItem({ type: 'creator' })];
 const MOCK_JAMS = [makeJam(), makeJam({ status: 'completed' })];
 const MOCK_REELS = [makeReel(), makeReel()];
 
@@ -22,18 +21,17 @@ async function mockAllRoutes(page) {
   await page.route('**/api/alerts/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ alerts: MOCK_ALERTS }) })
   );
-  await page.route('**/api/discover*', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ trending: MOCK_DISCOVERY }) })
-  );
-  await page.route('**/api/discover/**', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ trending: MOCK_DISCOVERY }) })
-  );
   await page.route('**/api/jams*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ jams: MOCK_JAMS }) })
   );
   await page.route('**/api/jams/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ jams: MOCK_JAMS }) })
   );
+  // Discovery endpoints are intentionally not page-mocked: discoveryApi
+  // unwraps `data.categories || data` / `data.posts || []`, and a wrong
+  // shaped envelope (e.g. {trending:[...]}) reaches `categories.map` and
+  // crashes DiscoveryPage. The fixture catch-all serves the safe '[]'
+  // contract for all five /discover/* endpoints instead.
   await page.route('**/api/reels*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ reels: MOCK_REELS }) })
   );
@@ -100,7 +98,7 @@ test.describe('JN-01: Register → Feed → Discover → Profile → Alerts', ()
 
     // Level A: Feed loads
     await page.goto('/');
-    await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Main navigation' }).first()).toBeVisible();
 
     // Level A: Discover page reachable
     await page.goto('/discover');
