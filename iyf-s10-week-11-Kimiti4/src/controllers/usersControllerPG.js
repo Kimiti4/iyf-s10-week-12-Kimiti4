@@ -46,10 +46,14 @@ function projectUserForViewer(user, viewer) {
   if (viewer && (viewer.id === user.id || ['admin', 'founder'].includes(viewer.role))) {
     return user; // owner / admin / founder: full
   }
-  // Public-minimal: drop email, mfa, currentOrganization, updatedAt
+  // Public-minimal: drop private account fields and internal verification notes.
   const projected = {};
   for (const key of Object.keys(user)) {
     if (PUBLIC_MINIMAL_KEYS.has(key)) projected[key] = user[key];
+  }
+  if (projected.verification && typeof projected.verification === 'object') {
+    const { verificationNotes, ...publicVerification } = projected.verification;
+    projected.verification = publicVerification;
   }
   return projected;
 }
@@ -131,13 +135,30 @@ const updateProfile = asyncHandler(async (req, res) => {
   } = req.body;
 
   const updates = {};
-  if (bio !== undefined) updates.bio = bio;
-  if (location_county !== undefined) updates.location_county = location_county;
-  if (location_settlement !== undefined) updates.location_settlement = location_settlement;
-  if (location_ward !== undefined) updates.location_ward = location_ward;
-  if (skills !== undefined) updates.skills = skills;
-  if (avatar_url !== undefined) updates.avatar_url = avatar_url;
-  if (avatar_icon !== undefined) updates.avatar_icon = avatar_icon;
+  const validateText = (value, label, maxLength) => {
+    if (typeof value !== 'string' || value.length > maxLength) {
+      throw new ApiError(label + ' must be a string no longer than ' + maxLength + ' characters', 400);
+    }
+    return value.trim();
+  };
+  if (bio !== undefined) updates.bio = validateText(bio, 'Bio', 2000);
+  if (location_county !== undefined) updates.location_county = validateText(location_county, 'County', 100);
+  if (location_settlement !== undefined) updates.location_settlement = validateText(location_settlement, 'Settlement', 150);
+  if (location_ward !== undefined) updates.location_ward = validateText(location_ward, 'Ward', 150);
+  if (skills !== undefined) {
+    if (!Array.isArray(skills) || skills.length > 30 || skills.some((item) => typeof item !== 'string' || item.length > 80)) {
+      throw new ApiError('Skills must be an array of at most 30 strings, each no longer than 80 characters', 400);
+    }
+    updates.skills = skills.map((item) => item.trim()).filter(Boolean);
+  }
+  if (avatar_url !== undefined) {
+    const value = validateText(avatar_url, 'Avatar URL', 1000);
+    if (value && !/^https:\/\//i.test(value)) {
+      throw new ApiError('Avatar URL must use HTTPS', 400);
+    }
+    updates.avatar_url = value;
+  }
+  if (avatar_icon !== undefined) updates.avatar_icon = validateText(avatar_icon, 'Avatar icon', 20);
 
   const user = await UsersRepository.updateProfile(req.user.id, updates);
 
