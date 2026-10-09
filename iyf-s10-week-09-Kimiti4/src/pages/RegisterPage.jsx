@@ -77,8 +77,9 @@ export default function RegisterPage() {
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label>Full Name 👤</label>
+            <label htmlFor="register-name">Full Name 👤</label>
             <input
+              id="register-name"
               type="text"
               name="name"
               value={formData.name}
@@ -89,8 +90,9 @@ export default function RegisterPage() {
           </div>
           
           <div className="form-group">
-            <label>Email 📧</label>
+            <label htmlFor="register-email">Email 📧</label>
             <input
+              id="register-email"
               type="email"
               name="email"
               value={formData.email}
@@ -101,8 +103,9 @@ export default function RegisterPage() {
           </div>
           
           <div className="form-group">
-            <label>Location 🌍</label>
+            <label htmlFor="register-location">Location 🌍</label>
             <input
+              id="register-location"
               type="text"
               name="location"
               value={formData.location}
@@ -113,8 +116,9 @@ export default function RegisterPage() {
           
           <div className="form-row">
             <div className="form-group">
-              <label>Password 🔐</label>
+              <label htmlFor="register-password">Password 🔐</label>
               <input
+                id="register-password"
                 type="password"
                 name="password"
                 value={formData.password}
@@ -124,8 +128,9 @@ export default function RegisterPage() {
               />
             </div>
             <div className="form-group">
-              <label>Confirm 🔒</label>
+              <label htmlFor="register-confirm-password">Confirm Password 🔒</label>
               <input
+                id="register-confirm-password"
                 type="password"
                 name="confirmPassword"
                 value={formData.confirmPassword}

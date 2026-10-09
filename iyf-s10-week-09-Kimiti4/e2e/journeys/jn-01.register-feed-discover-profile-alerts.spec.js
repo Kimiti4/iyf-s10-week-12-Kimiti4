@@ -58,8 +58,10 @@ test.describe('JN-01: Register → Feed → Discover → Profile → Alerts', ()
     await mockAllRoutes(page);
     await installCatchAll(page);
 
-    await page.route('**/api/auth/register', (route) =>
-      route.fulfill({
+    let registrationPayload = null;
+    await page.route('**/api/auth/register', (route) => {
+      registrationPayload = route.request().postDataJSON();
+      return route.fulfill({
         status: 201,
         contentType: 'application/json',
         body: JSON.stringify({
@@ -67,30 +69,24 @@ test.describe('JN-01: Register → Feed → Discover → Profile → Alerts', ()
           token: 'e2e-new-token',
           user: { id: 'usr_new', username: 'newuser', email: 'new@jamii.link', role: 'user' },
         }),
-      })
-    );
+      });
+    });
 
     // Level A: Reachability - register page loads
     await page.goto('/register');
-    await expect(page.getByRole('heading', { name: /join jamii/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /join.*jamii/i })).toBeVisible();
 
-    // Level B: Interaction - fill and submit registration form
-    const nameInput = page.getByLabel(/username|name/i);
-    const emailInput = page.getByLabel(/email/i);
-    const passwordInput = page.getByRole('textbox', { name: 'Password', exact: true });
+    // Level B: Interaction - every required field must be discoverable and filled.
+    await page.getByLabel(/full name/i).fill('newuser');
+    await page.getByLabel(/email/i).fill('new@jamii.link');
+    await page.getByLabel(/^password/i).fill('TestPass123!');
+    await page.getByLabel(/confirm password/i).fill('TestPass123!');
+    await page.getByRole('button', { name: /join jamiilink/i }).click();
 
-    if (await nameInput.isVisible()) await nameInput.fill('newuser');
-    if (await emailInput.isVisible()) await emailInput.fill('new@jamii.link');
-    if (await passwordInput.isVisible()) await passwordInput.fill('TestPass123!');
-
-    const submitBtn = page.getByRole('button', { name: /register|sign up|create/i });
-    if (await submitBtn.isVisible()) await submitBtn.click();
-
-    // Level C: Outcome - navigation to feed
-    await page.waitForTimeout(1500);
-    const url = page.url();
-    const landedOnFeed = url.endsWith('/') || url.includes('/login') || url.includes('/register');
-    expect(landedOnFeed).toBeTruthy();
+    // Level C: Outcome - successful registration should reach the login page.
+    await expect(page).toHaveURL(/\/login$/);
+    expect(registrationPayload).toMatchObject({ username: 'newuser', email: 'new@jamii.link' });
+    expect(registrationPayload.password).toBe('TestPass123!');
 
     // Seed auth for post-registration navigation (register mock doesn't persist token in app state)
     const { seedAuth } = await import('../fixtures/auth.js');
