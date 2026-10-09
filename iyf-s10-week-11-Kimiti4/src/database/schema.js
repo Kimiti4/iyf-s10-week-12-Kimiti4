@@ -18,6 +18,10 @@ const createTables = async () => {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         username VARCHAR(30) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
+        email_verified BOOLEAN DEFAULT FALSE,
+        email_verified_at TIMESTAMP,
+        is_active BOOLEAN DEFAULT TRUE,
+        deleted_at TIMESTAMP,
         password VARCHAR(255) NOT NULL,
         role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'admin', 'moderator', 'founder')),
         is_founder BOOLEAN DEFAULT FALSE,
@@ -527,8 +531,51 @@ const createTables = async () => {
     await query(`CREATE INDEX IF NOT EXISTS idx_stories_user
                  ON stories (user_id, created_at DESC)`);
 
+
+    // Beta feedback: persisted product feedback for support, QA and launch decisions.
+    await query(`
+      CREATE TABLE IF NOT EXISTS feedback (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        name VARCHAR(120),
+        email VARCHAR(255),
+        type VARCHAR(20) NOT NULL CHECK (type IN ('bug', 'feature', 'general')),
+        priority VARCHAR(20) NOT NULL DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
+        message TEXT NOT NULL CHECK (char_length(message) BETWEEN 1 AND 5000),
+        status VARCHAR(20) NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'reviewing', 'resolved', 'closed')),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at DESC)`);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS content_reports (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        reporter_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        target_type VARCHAR(30) NOT NULL CHECK (target_type IN ('post', 'comment', 'user')),
+        target_id UUID NOT NULL,
+        reason VARCHAR(40) NOT NULL CHECK (reason IN ('spam', 'harassment', 'hate', 'scam', 'sexual', 'violence', 'misinformation', 'other')),
+        details VARCHAR(2000),
+        status VARCHAR(20) NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'reviewing', 'resolved', 'dismissed')),
+        reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        review_note VARCHAR(2000),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_content_reports_status_created ON content_reports(status, created_at DESC)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_content_reports_target ON content_reports(target_type, target_id)`);
+
+    await query(`CREATE INDEX IF NOT EXISTS idx_feedback_status ON feedback(status)`);
+
     // Create indexes for performance
     console.log(' Creating indexes...');
+    await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE`);
+    await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP`);
+    await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE`);
+    await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP`);
+
     await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)`);
     

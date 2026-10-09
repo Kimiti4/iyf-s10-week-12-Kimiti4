@@ -126,6 +126,9 @@ export const authAPI = {
         body: JSON.stringify(credentials)
     }),
     
+    requestPasswordReset: (email) => request('/auth/password-reset/request', { method: 'POST', body: JSON.stringify({ email }) }),
+    resetPassword: (data) => request('/auth/password-reset/confirm', { method: 'POST', body: JSON.stringify(data) }),
+
     /**
      * Get current user profile
      */
@@ -172,6 +175,14 @@ export const authAPI = {
      */
     refresh: () => request('/auth/refresh', {
         method: 'POST'
+    })
+};
+
+// ===== BETA FEEDBACK API =====
+export const feedbackAPI = {
+    submit: (feedback) => request('/feedback', {
+        method: 'POST',
+        body: JSON.stringify(feedback)
     })
 };
 
@@ -449,7 +460,18 @@ export const usersAPI = {
     /**
      * Get verified/badged users
      */
-    getVerifiedUsers: () => request('/users/verified')
+    getVerifiedUsers: () => request('/users/verified'),
+
+    /** Delete the authenticated user's account after password confirmation. */
+    deleteMyAccount: (currentPassword) => request('/users/me', {
+        method: 'DELETE',
+        body: JSON.stringify({ currentPassword })
+    }),
+
+    report: (data) => request('/reports', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    })
 };
 
 // ===== UTILITY FUNCTIONS =====

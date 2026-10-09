@@ -45,7 +45,7 @@ const NavBar = memo(function NavBar() {
               </span>
             </button>
             <Link to="/" className="topbar__logo" aria-label="JamiiLink home">
-              <span className="topbar__logo-icon" aria-hidden="true">🌍</span>
+              <span className="topbar__logo-mark" aria-hidden="true">J</span>
               <span className="topbar__logo-text">Jamii<span className="topbar__logo-accent">Link</span></span>
             </Link>
           </div>

@@ -7,17 +7,14 @@ import { ToastProvider } from './components/Toast'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import FeedbackForm from './components/FeedbackForm'
-import TrendingChip from './components/TrendingChip'
 import JamiiModeToggle from './components/JamiiModeToggle'
 import PullToRefreshIndicator from './components/PullToRefresh'
-import ConstellationBackground from './enhanced/components/ConstellationBackground'
 import { usePullToRefresh } from './hooks/usePullToRefresh'
 import { useSwipeGestures } from './hooks/useSwipeGestures'
 import './index.css' // Unified whimsical design system
 import Sidebar from './components/Sidebar'
 import NavBar from './components/NavBar'
 import MobileBottomNav from './components/MobileBottomNav'
-import RegisterPage from './pages/RegisterPage'
 const EnhancedLoginPage = lazy(() => import('./enhanced/pages/EnhancedLoginPage'))
 const EnhancedRegisterPage = lazy(() => import('./enhanced/pages/EnhancedRegisterPage'))
 const ReelsPage = lazy(() => import('./enhanced/pages/ReelsPage'))
@@ -86,7 +83,11 @@ function AppRoutes() {
           <EnhancedLoginPage />
         </Suspense>
       } />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/register" element={
+        <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
+          <EnhancedRegisterPage />
+        </Suspense>
+      } />
       <Route path="/reels" element={
         <Suspense fallback={<div className="page-loading"><div className="loading-spinner" /></div>}>
           <ReelsPage />
@@ -378,9 +379,6 @@ function App() {
           <SidebarProvider>
             <ToastProvider>
             <div className="App app-shell">
-              {/* 🔹 Constellation Background */}
-              <ConstellationBackground />
-              
               {/* Pull to Refresh Indicator */}
               <PullToRefreshIndicator isRefreshing={isRefreshing} progress={progress} />
               
@@ -399,9 +397,6 @@ function App() {
               <div className="jamii-mode-widget">
                 <JamiiModeToggle />
               </div>
-              
-              {/* 🔥 Trending Floating Chip */}
-              <TrendingChip topic="#JamiiLink" count={42} />
               
               <footer className="footer">
                 <div className="container">

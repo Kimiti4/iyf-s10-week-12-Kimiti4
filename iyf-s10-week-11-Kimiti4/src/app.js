@@ -8,7 +8,7 @@ const cors = require('cors');
 const logger = require('./middleware/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 const securityHeaders = require('./middleware/securityHeaders');
-const { generalLimiter, authLimiter, alertLimiter, verificationLimiter } = require('./middleware/rateLimiter');
+const { generalLimiter, alertLimiter } = require('./middleware/rateLimiter');
 const routes = require('./routes');
 
 const app = express();
@@ -24,14 +24,19 @@ app.use(securityHeaders);
 // CORS configuration for full-stack deployment
 const corsOptions = {
     origin: function (origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:5173',  // Vite dev server
-            'http://localhost:5174',  // Vite dev server (port 5174)
-            'http://localhost:3000',  // Local
-            'https://jamii-link.ke.vercel.app',  // Production frontend (Vercel)
-            'https://jamii-link.vercel.app',  // Production frontend (Vercel)
-            process.env.FRONTEND_URL  // Additional production frontend URL
+        const productionOrigins = [
+            'https://jamii-link.ke.vercel.app',
+            'https://jamii-link.vercel.app',
+            process.env.FRONTEND_URL
         ].filter(Boolean);
+        const developmentOrigins = [
+            'http://localhost:5173',
+            'http://localhost:5174',
+            'http://localhost:3000'
+        ];
+        const allowedOrigins = process.env.NODE_ENV === 'production'
+            ? productionOrigins
+            : [...productionOrigins, ...developmentOrigins];
         
         // Allow requests with no origin (mobile apps, curl, etc.)
         if (!origin || allowedOrigins.includes(origin)) {
@@ -47,16 +52,12 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(logger);
 
 // Rate limiting - Apply to main routes
 app.use('/api/', generalLimiter);
-app.use('/api/auth/register', authLimiter);
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/send-verification', verificationLimiter);
-app.use('/api/auth/verify-code', verificationLimiter);
 app.use('/api/alerts', alertLimiter);
 
 // 🌐 Serve static frontend files from /public
@@ -86,7 +87,7 @@ app.get('/health', async (req, res) => {
   try {
     const { query } = require('./config/postgres');
     await query('SELECT 1');
-    res.json({ status: 'ok', db: true, timestamp: new Date().toISOString(), environment: process.env.NODE_ENV || 'development' });
+    res.json({ status: 'ok', db: true, timestamp: new Date().toISOString() });
   } catch {
     res.status(503).json({ status: 'degraded', db: false });
   }

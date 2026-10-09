@@ -199,7 +199,7 @@ const likePost = asyncHandler(async (req, res) => {
   await query(
     `INSERT INTO post_likes (user_id, post_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
     [req.user.id, req.params.id]
-  ).catch(() => {});
+  );
 
   // Notify the post author (not for self-likes; best-effort)
   try {
@@ -261,7 +261,7 @@ const likePost = asyncHandler(async (req, res) => {
       await q2(
         `DELETE FROM post_likes WHERE user_id = $1 AND post_id = $2`,
         [req.user.id, req.params.id]
-      ).catch(() => {});
+      );
       return res.json({ success: true, data: post });
     }
 
@@ -336,10 +336,8 @@ const getTrendingTags = asyncHandler(async (req, res) => {
   `, [parseInt(limit)]);
 
   const formattedTags = result.rows.map(row => ({
-    tag: row.tag.replace(/^#/, ''), // Remove # if it's there
-    count: parseInt(row.count),
-    trend: 'up', // Mock for now
-    change: '+10%' // Mock for now
+    tag: row.tag.replace(/^#/, ''),
+    count: parseInt(row.count, 10)
   }));
 
   res.json({

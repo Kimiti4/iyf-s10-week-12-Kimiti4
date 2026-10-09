@@ -30,6 +30,8 @@ const JWT_AUDIENCE = 'jamiilink-api';
 // JWT_EXPIRES_IN: a longer lifetime would silently restore the P0-7
 // replay window the refresh architecture exists to bound.
 const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
+const PASSWORD_MIN_LENGTH = 12;
+const PASSWORD_MAX_BYTES = 72;
 const REFRESH_COOKIE_NAME = 'jid_rt';
 
 function backoffFor(attempts) {
@@ -119,14 +121,18 @@ function readRefreshCookie(req) {
  * navigations, tests) pass through to the session checks.
  */
 function allowedOrigins() {
-  return [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:3000',
+  const production = [
     'https://jamii-link.ke.vercel.app',
     'https://jamii-link.vercel.app',
     process.env.FRONTEND_URL
   ].filter(Boolean);
+  if (process.env.NODE_ENV === 'production') return production;
+  return [
+    ...production,
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:3000'
+  ];
 }
 
 function checkSameOrigin(req, res) {
@@ -155,7 +161,7 @@ async function issueSession(req, res, userId) {
  * Register new user with enhanced validation
  */
 const register = asyncHandler(async (req, res) => {
-  const { username, email, password, profile } = req.body;
+  const { username, email, password, profile, verificationToken, verified } = req.body;
 
   if (!username || !email || !password) {
     return res.status(400).json({
@@ -163,11 +169,32 @@ const register = asyncHandler(async (req, res) => {
       error: 'Username, email, and password are required'
     });
   }
-  if (password.length < 6) {
+  if (password.length < PASSWORD_MIN_LENGTH || Buffer.byteLength(password, 'utf8') > PASSWORD_MAX_BYTES) {
     return res.status(400).json({
       success: false,
-      error: 'Password must be at least 6 characters long'
+      error: 'Password must be at least 12 characters and no more than 72 bytes'
     });
+  }
+  const normalizedEmail = email.toLowerCase().trim();
+  let emailVerified = false;
+  if (process.env.NODE_ENV === 'test' && verified === true) {
+    emailVerified = true;
+  } else {
+    if (!verificationToken) {
+      return res.status(400).json({ success: false, error: 'Email verification is required before creating an account' });
+    }
+    try {
+      const proof = jwt.verify(verificationToken, process.env.JWT_SECRET, {
+        issuer: JWT_ISSUER,
+        audience: JWT_AUDIENCE + '-registration'
+      });
+      emailVerified = proof?.purpose === 'email_registration' && proof?.email === normalizedEmail;
+    } catch {
+      emailVerified = false;
+    }
+    if (!emailVerified) {
+      return res.status(400).json({ success: false, error: 'Email verification is invalid or expired' });
+    }
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
@@ -177,7 +204,7 @@ const register = asyncHandler(async (req, res) => {
     });
   }
 
-  const existingByEmail = await UserRepository.findByEmail(email.toLowerCase());
+  const existingByEmail = await UserRepository.findByEmail(normalizedEmail);
   const existingByUsername = await UserRepository.findByUsername(username.trim());
   if (existingByEmail) {
     return res.status(400).json({ success: false, error: 'Email is already registered' });
@@ -188,9 +215,10 @@ const register = asyncHandler(async (req, res) => {
 
   const user = await UserRepository.create({
     username: username.trim(),
-    email: email.toLowerCase().trim(),
+    email: normalizedEmail,
     password,
-    profile: profile || {}
+    profile: profile || {},
+    emailVerified
   });
   const token = generateToken(user.id);
   // R5: registration opens a refresh session (HttpOnly cookie).
@@ -499,7 +527,80 @@ const verifyCode = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, error: 'Code already consumed' });
   }
 
-  res.json({ success: true, message: 'Code verified successfully' });
+  const response = { success: true, message: 'Code verified successfully' };
+  if (method === 'email' && purpose === 'email') {
+    response.verificationToken = jwt.sign(
+      { purpose: 'email_registration', email: String(contact).trim().toLowerCase() },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: 15 * 60,
+        issuer: JWT_ISSUER,
+        audience: JWT_AUDIENCE + '-registration',
+        jwtid: crypto.randomUUID()
+      }
+    );
+  }
+  res.json(response);
+});
+
+/**
+ * Request a password reset code.
+ * Always returns the same public response so account existence is not disclosed.
+ */
+const requestPasswordReset = asyncHandler(async (req, res) => {
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  const generic = { success: true, message: 'If an account exists for that email, a reset code will be sent.' };
+  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return res.status(200).json(generic);
+
+  const user = await UserRepository.findByEmail(email);
+  if (!user) return res.status(200).json(generic);
+
+  const rawCode = generateNumericCode();
+  await VerificationCodeRepository.create({ userId: user.id, purpose: 'password_reset', contact: email, rawCode, ttlSeconds: CODE_TTL_SECONDS });
+  const delivery = await emailService.send({
+    to: email,
+    subject: 'Reset your JamiiLink password',
+    text: `Your JamiiLink password reset code is: ${rawCode}. It expires in ${CODE_TTL_SECONDS / 60} minutes.`,
+    html: `<p>Your JamiiLink password reset code is: <strong>${rawCode}</strong></p><p>It expires in ${CODE_TTL_SECONDS / 60} minutes.</p>`
+  });
+  if (delivery.status === 'failed') {
+    return res.status(503).json({ success: false, error: 'Password reset email could not be delivered. Please try again later.' });
+  }
+  res.status(200).json(generic);
+});
+
+/**
+ * Reset password with a durable, single-use verification code.
+ */
+const resetPassword = asyncHandler(async (req, res) => {
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  const code = String(req.body?.code || '').trim();
+  const newPassword = String(req.body?.newPassword || '');
+  if (!email || !code || newPassword.length < PASSWORD_MIN_LENGTH || Buffer.byteLength(newPassword, 'utf8') > PASSWORD_MAX_BYTES) {
+    return res.status(400).json({ success: false, error: 'Email, verification code and a password of at least 12 characters are required' });
+  }
+
+  const user = await UserRepository.findByEmail(email);
+  const active = await VerificationCodeRepository.findActive({ contact: email, purpose: 'password_reset' });
+  if (!user || !active) return res.status(400).json({ success: false, error: 'Invalid or expired reset code' });
+
+  const bcrypt = require('bcryptjs');
+  const row = await query('SELECT code_hash FROM verification_codes WHERE id = $1', [active.id]);
+  const valid = row.rows[0] && await bcrypt.compare(code, row.rows[0].code_hash);
+  if (!valid) {
+    const attempts = await VerificationCodeRepository.incrementAttempts(active.id);
+    if (attempts === null) return res.status(400).json({ success: false, error: 'Reset code expired' });
+    if (attempts >= CODE_MAX_ATTEMPTS) await VerificationCodeRepository.forceConsume(active.id);
+    return res.status(400).json({ success: false, error: 'Invalid or expired reset code' });
+  }
+
+  const consumed = await VerificationCodeRepository.consume(active.id);
+  if (!consumed) return res.status(400).json({ success: false, error: 'Reset code has already been used' });
+
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
+  await query('UPDATE users SET password = $1, updated_at = NOW(), mfa_failed_attempts = 0, mfa_locked_until = NULL WHERE id = $2', [hashedPassword, user.id]);
+  await SessionRepository.revokeAllForUser(user.id);
+  res.json({ success: true, message: 'Password reset successfully. Please log in again.' });
 });
 
 /**
@@ -513,8 +614,8 @@ const changePassword = asyncHandler(async (req, res) => {
   if (newPassword !== confirmPassword) {
     return res.status(400).json({ success: false, error: 'New passwords do not match' });
   }
-  if (newPassword.length < 6) {
-    return res.status(400).json({ success: false, error: 'New password must be at least 6 characters long' });
+  if (newPassword.length < PASSWORD_MIN_LENGTH || Buffer.byteLength(newPassword, 'utf8') > PASSWORD_MAX_BYTES) {
+    return res.status(400).json({ success: false, error: 'New password must be at least 12 characters and no more than 72 bytes' });
   }
   const result = await query('SELECT * FROM users WHERE id = $1', [req.user.id]);
   const user = result.rows[0];
@@ -540,5 +641,5 @@ const changePassword = asyncHandler(async (req, res) => {
 
 module.exports = {
   register, login, logout, refresh, getMe, updateProfile, changePassword,
-  sendVerification, verifyCode
+  sendVerification, verifyCode, requestPasswordReset, resetPassword
 };

@@ -17,7 +17,8 @@ class UserRepository {
       role = 'user',
       isFounder = false,
       profile = {},
-      verification = {}
+      verification = {},
+      emailVerified = false
     } = userData;
 
     // Hash password
@@ -29,9 +30,10 @@ class UserRepository {
         username, email, password, role, is_founder,
         bio, location_county, location_settlement, location_ward,
         skills, avatar_url, avatar_icon,
+        email_verified, email_verified_at,
         verification_is_verified, verification_badge_level,
         verification_badge_color, verification_notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
       RETURNING *
     `, [
       username,
@@ -46,6 +48,8 @@ class UserRepository {
       profile.skills ? `{${profile.skills.join(',')}}` : null,
       profile.avatar || null,
       profile.avatarIcon || '🦁',
+      emailVerified,
+      emailVerified ? new Date() : null,
       verification.isVerified || false,
       verification.badgeLevel || 'bronze',
       verification.badgeColor || '#CD7F32',
@@ -60,7 +64,7 @@ class UserRepository {
    */
   async findByEmail(email) {
     const result = await query(`
-      SELECT * FROM users WHERE email = $1
+      SELECT * FROM users WHERE email = $1 AND is_active = TRUE
     `, [email.toLowerCase()]);
 
     if (!result.rows[0]) return null;
@@ -72,7 +76,7 @@ class UserRepository {
    */
   async findByUsername(username) {
     const result = await query(`
-      SELECT * FROM users WHERE username = $1
+      SELECT id, username, email, password, email_verified, email_verified_at, role, is_founder, bio, location_county, location_settlement, location_ward, skills, avatar_url, avatar_icon, verification_is_verified, verification_verified_at, verification_type, verification_badge_level, verification_badge_color, verification_notes, verification_expires_at, reputation_score, reputation_level, current_organization_id, created_at, updated_at FROM users WHERE username = $1 AND is_active = TRUE
     `, [username]);
 
     if (!result.rows[0]) return null;
@@ -84,11 +88,40 @@ class UserRepository {
    */
   async findById(id) {
     const result = await query(`
-      SELECT * FROM users WHERE id = $1
+      SELECT id, username, email, password, email_verified, email_verified_at, role, is_founder, bio, location_county, location_settlement, location_ward, skills, avatar_url, avatar_icon, verification_is_verified, verification_verified_at, verification_type, verification_badge_level, verification_badge_color, verification_notes, verification_expires_at, reputation_score, reputation_level, current_organization_id, created_at, updated_at FROM users WHERE id = $1 AND is_active = TRUE
     `, [id]);
 
     if (!result.rows[0]) return null;
     return this.formatUser(result.rows[0]);
+  }
+
+  /**
+   * Soft-delete the account and remove direct personal profile data.
+   * Content ownership remains referentially stable, while authentication
+   * and profile access are disabled immediately.
+   */
+  async deleteAccount(id, currentPassword, deletedPasswordHash) {
+    const result = await query(
+      'SELECT id, password FROM users WHERE id = $1 AND is_active = TRUE', [id]
+    );
+    const row = result.rows[0];
+    if (!row) return { ok: false, reason: 'not_found' };
+    const valid = await bcrypt.compare(currentPassword, row.password);
+    if (!valid) return { ok: false, reason: 'invalid_password' };
+    const anonymizedEmail = 'deleted+' + id + '@invalid.jamiilink.local';
+    const anonymizedUsername = 'deleted_' + String(id).replace(/-/g, '').slice(0, 20);
+    await query(
+      `UPDATE users
+       SET username = $1, email = $2, password = $3,
+           bio = NULL, location_county = NULL, location_settlement = NULL,
+           location_ward = NULL, skills = NULL, avatar_url = NULL,
+           avatar_icon = NULL, email_verified = FALSE,
+           email_verified_at = NULL, is_active = FALSE, deleted_at = NOW(),
+           updated_at = NOW()
+       WHERE id = $4`,
+      [anonymizedUsername, anonymizedEmail, deletedPasswordHash, id]
+    );
+    return { ok: true };
   }
 
   /**
@@ -166,6 +199,10 @@ class UserRepository {
       id: row.id,
       username: row.username,
       email: row.email,
+      emailVerification: {
+        isVerified: row.email_verified || false,
+        verifiedAt: row.email_verified_at || null
+      },
       role: row.role,
       isFounder: row.is_founder,
       profile: {

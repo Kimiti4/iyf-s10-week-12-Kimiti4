@@ -119,7 +119,7 @@ export default function UserSafetyMenu({
         isOpen={reportOpen}
         onClose={() => setReportOpen(false)}
         onSubmit={report}
-        targetType="profile"
+        targetType="user"
         targetId={targetUserId}
         isReported={isReported(targetUserId)}
       />

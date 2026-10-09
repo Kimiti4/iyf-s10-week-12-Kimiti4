@@ -11,7 +11,7 @@
 const express = require('express');
 const router = express.Router();
 const reputationController = require('../controllers/reputationController');
-const { protect } = require('../middleware/authPG');
+const { protect, restrictTo } = require('../middleware/authPG');
 
 // ============================================
 // PUBLIC ENDPOINTS (aggregates only)
@@ -66,7 +66,7 @@ router.get('/export', protect, async (req, res) => {
  * GET /api/reputation/:userId
  * Get user's reputation profile
  */
-router.get('/:userId', protect, async (req, res) => {
+router.get('/:userId', protect, restrictTo('admin', 'moderator', 'founder'), async (req, res) => {
   try {
     await reputationController.getUserReputation(req, res);
   } catch (error) {
@@ -79,7 +79,7 @@ router.get('/:userId', protect, async (req, res) => {
  * GET /api/reputation/:userId/badges
  * Get user's badges
  */
-router.get('/:userId/badges', protect, async (req, res) => {
+router.get('/:userId/badges', protect, restrictTo('admin', 'moderator', 'founder'), async (req, res) => {
   try {
     await reputationController.getUserBadges(req, res);
   } catch (error) {
@@ -92,7 +92,7 @@ router.get('/:userId/badges', protect, async (req, res) => {
  * GET /api/reputation/:userId/feedback
  * Get feedback received
  */
-router.get('/:userId/feedback', protect, async (req, res) => {
+router.get('/:userId/feedback', protect, restrictTo('admin', 'moderator', 'founder'), async (req, res) => {
   try {
     await reputationController.getUserFeedback(req, res);
   } catch (error) {
@@ -105,7 +105,7 @@ router.get('/:userId/feedback', protect, async (req, res) => {
  * GET /api/reputation/:userId/ledger
  * Get reputation events ledger
  */
-router.get('/:userId/ledger', protect, async (req, res) => {
+router.get('/:userId/ledger', protect, restrictTo('admin', 'moderator', 'founder'), async (req, res) => {
   try {
     await reputationController.getReputationLedger(req, res);
   } catch (error) {

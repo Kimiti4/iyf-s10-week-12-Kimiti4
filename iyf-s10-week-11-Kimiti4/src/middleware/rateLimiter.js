@@ -57,6 +57,33 @@ const alertLimiter = rateLimit({
  * 5 requests per 15 minutes per IP for send-verification + verify-code.
  * Per-contact attempt counters in the controller still apply (defense in depth).
  */
+const passwordResetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Too many password reset attempts. Please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isTestEnv()
+});
+
+const refreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: 'Too many session refresh requests. Please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isTestEnv()
+});
+
+const feedbackLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: 'Too many feedback submissions. Please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isTestEnv()
+});
+
 const verificationLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -70,5 +97,8 @@ module.exports = {
   generalLimiter,
   authLimiter,
   alertLimiter,
-  verificationLimiter
+  verificationLimiter,
+  feedbackLimiter,
+  passwordResetLimiter,
+  refreshLimiter
 };

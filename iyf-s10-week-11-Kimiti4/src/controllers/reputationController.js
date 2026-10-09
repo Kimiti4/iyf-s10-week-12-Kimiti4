@@ -77,14 +77,16 @@ exports.getUserReputation = async (req, res) => {
  */
 exports.getLeaderboard = async (req, res) => {
   try {
-    const { limit = 20 } = req.query;
+    const requestedLimit = Number.parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), 50) : 20;
 
     const result = await query(`
       SELECT id, username, reputation_score, avatar_icon
       FROM users
+      WHERE is_active = TRUE AND deleted_at IS NULL
       ORDER BY reputation_score DESC
       LIMIT $1
-    `, [parseInt(limit)]);
+    `, [limit]);
 
     res.json({
       success: true,
