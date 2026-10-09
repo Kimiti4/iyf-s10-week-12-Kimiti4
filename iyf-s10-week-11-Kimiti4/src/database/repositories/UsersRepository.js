@@ -11,7 +11,7 @@ class UsersRepository {
   async findAll(filters = {}) {
     const { role, county, skill, search } = filters;
     
-    let conditions = [];
+    let conditions = ['is_active = TRUE'];
     let params = [];
     let paramIndex = 1;
 
