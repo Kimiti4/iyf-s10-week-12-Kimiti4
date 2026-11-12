@@ -4,6 +4,8 @@
  * @module components/primitives/ErrorState
  */
 
+import './StatePrimitives.css';
+
 export default function ErrorState({
   error,
   message,
@@ -15,7 +17,7 @@ export default function ErrorState({
     <div className={`error-state ${className}`} role="alert" {...props}>
       <p className="error-state-message">{error || message || 'Something went wrong'}</p>
       {onRetry && (
-        <button className="error-state-retry" onClick={onRetry}>
+        <button type="button" className="error-state-retry" onClick={onRetry}>
           Try again
         </button>
       )}
