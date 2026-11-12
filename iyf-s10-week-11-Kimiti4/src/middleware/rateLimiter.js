@@ -1,74 +1,74 @@
 /**
- * 🔹 Rate Limiter Middleware
- * Prevents abuse and DDoS attacks
- *
- * Rate limiting is BYPASSED in the test environment (NODE_ENV=test)
- * so contract tests can exercise validation + authorization without
- * hitting the per-IP limit. Each limiter still applies in production.
+ * Rate limiters — bypassed when NODE_ENV=test
  */
 
 const rateLimit = require('express-rate-limit');
 
 const isTestEnv = () => process.env.NODE_ENV === 'test';
 
-/**
- * General API rate limiter: 100 requests per 15 minutes
- */
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: (req) => {
-    // Skip for health checks + test environment
-    return isTestEnv() || req.path === '/api/health' || req.path === '/health';
-  }
+const jsonMessage = (message, code = 'RATE_LIMITED') => ({
+  success: false,
+  error: {
+    message,
+    code,
+    statusCode: 429,
+  },
 });
 
-/**
- * Auth rate limiter: 5 requests per 15 minutes
- * Prevents brute force attacks on login/register
- */
+/** General API: 200 requests / 15 min per IP */
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: Number(process.env.RATE_LIMIT_GENERAL_MAX) || 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: jsonMessage('Too many requests from this IP. Please try again later.'),
+  skip: (req) => isTestEnv() || req.path === '/health' || req.path === '/api/health',
+});
+
+/** Auth (login/register): 10 attempts / 15 min per IP */
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: 'Too many authentication attempts, please try again later.',
+  max: Number(process.env.RATE_LIMIT_AUTH_MAX) || 10,
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => isTestEnv()
+  message: jsonMessage('Too many authentication attempts. Please try again later.'),
+  skip: () => isTestEnv(),
 });
 
-/**
- * Alert creation limiter: 10 alerts per hour per IP
- * Prevents spam
- */
+/** Alert create: 20 / hour per IP */
 const alertLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,
-  message: 'Too many alerts created. Please try again later.',
+  windowMs: 60 * 60 * 1000,
+  max: Number(process.env.RATE_LIMIT_ALERT_MAX) || 20,
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => isTestEnv()
+  message: jsonMessage('Too many alerts created. Please try again later.'),
+  skip: () => isTestEnv(),
 });
 
-/**
- * R2 [P2-1, P2-2]: Verification / MFA limiter
- * 5 requests per 15 minutes per IP for send-verification + verify-code.
- * Per-contact attempt counters in the controller still apply (defense in depth).
- */
+/** Verification / MFA: 5 / 15 min per IP */
 const verificationLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: 'Too many verification attempts, please try again later.',
+  max: Number(process.env.RATE_LIMIT_VERIFY_MAX) || 5,
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => isTestEnv()
+  message: jsonMessage('Too many verification attempts. Please try again later.'),
+  skip: () => isTestEnv(),
+});
+
+/** Message send: 60 / 15 min per IP */
+const messageLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: Number(process.env.RATE_LIMIT_MESSAGE_MAX) || 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: jsonMessage('Too many messages sent. Please slow down.'),
+  skip: () => isTestEnv(),
 });
 
 module.exports = {
   generalLimiter,
   authLimiter,
   alertLimiter,
-  verificationLimiter
+  verificationLimiter,
+  messageLimiter,
 };
