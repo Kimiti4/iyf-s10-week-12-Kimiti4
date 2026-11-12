@@ -1,12 +1,13 @@
 /**
- * 📊 Activity History - backed by the real /api/activity/me endpoint,
- * which aggregates the authenticated user's own persisted actions.
+ * Activity History — backed by /api/activity/me
  */
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { colors } from '../styles/designSystem'
 import { formatRelativeTime } from '../utils/formatTime'
 import { request } from '../services/apiClient'
+import PageHeader from '../components/primitives/PageHeader'
+import EmptyState from '../components/primitives/EmptyState'
+import ErrorState from '../components/primitives/ErrorState'
 import './ActivityHistory.css'
 
 const TYPE_ICONS = {
@@ -14,7 +15,7 @@ const TYPE_ICONS = {
   comment: '💬',
   follow: '🤝',
   jam: '🔥',
-  contribution: '🎨'
+  contribution: '🎨',
 }
 
 const ActivityHistory = () => {
@@ -44,12 +45,12 @@ const ActivityHistory = () => {
   }, [loadActivity])
 
   const filters = [
-    { id: 'all', label: 'All My Adventures', icon: '🚀' },
+    { id: 'all', label: 'All', icon: '📋' },
     { id: 'post', label: 'Posts', icon: '📝' },
     { id: 'comment', label: 'Comments', icon: '💬' },
     { id: 'follow', label: 'Follows', icon: '🤝' },
     { id: 'jam', label: 'Jams', icon: '🔥' },
-    { id: 'contribution', label: 'Contributions', icon: '🎨' }
+    { id: 'contribution', label: 'Contributions', icon: '🎨' },
   ]
 
   const filteredActivities = activeFilter === 'all'
@@ -58,79 +59,69 @@ const ActivityHistory = () => {
 
   if (loading) {
     return (
-      <div className="activity-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading your adventure log... 🗺️</p>
+      <div className="activity-loading" role="status">
+        <div className="loading-spinner" aria-hidden="true" />
+        <p>Loading activity...</p>
       </div>
     )
   }
 
   return (
     <main className="activity-history-page" role="main" aria-label="Activity history">
-      <motion.div
-        className="activity-header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1>📊 Adventure Log</h1>
-        <p>Your journey through JamiiLink! 🌟</p>
-      </motion.div>
+      <PageHeader
+        eyebrow="Your activity"
+        title="Activity"
+        subtitle="Posts, comments, follows, and contributions"
+      />
 
       <div className="stats-overview">
-        <ActivityStat icon="📝" value={stats.posts} label="Posts" color={colors.info} />
-        <ActivityStat icon="💬" value={stats.comments} label="Comments" color={colors.success} />
-        <ActivityStat icon="🤝" value={stats.follows} label="Follows" color={colors.accent[500]} />
-        <ActivityStat icon="🎨" value={stats.contributions} label="Contributions" color={colors.danger} />
+        <ActivityStat icon="📝" value={stats.posts} label="Posts" />
+        <ActivityStat icon="💬" value={stats.comments} label="Comments" />
+        <ActivityStat icon="🤝" value={stats.follows} label="Follows" />
+        <ActivityStat icon="🎨" value={stats.contributions} label="Contributions" />
       </div>
 
       {error && (
-        <div className="activity-error" role="alert">
-          {error}
-          <button onClick={loadActivity}>Try again</button>
-        </div>
+        <ErrorState error={error} onRetry={loadActivity} />
       )}
 
-      <div className="activity-filters">
+      <div className="activity-filters" role="toolbar" aria-label="Filter activity">
         {filters.map(filter => (
-          <motion.button
+          <button
             key={filter.id}
+            type="button"
             className={`filter-btn ${activeFilter === filter.id ? 'active' : ''}`}
             onClick={() => setActiveFilter(filter.id)}
-            whileHover={{ scale: 1.05 }}
+            aria-pressed={activeFilter === filter.id}
           >
-            <span className="filter-icon">{filter.icon}</span>
+            <span className="filter-icon" aria-hidden="true">{filter.icon}</span>
             <span>{filter.label}</span>
-          </motion.button>
+          </button>
         ))}
       </div>
 
       <div className="activity-list">
         <AnimatePresence>
           {filteredActivities.length === 0 ? (
-            <motion.div
-              className="empty-state"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <div className="empty-illustration">📭</div>
-              <h3>No adventures here yet! 🏖️</h3>
-              <p>Start exploring the community to fill your log!</p>
-            </motion.div>
+            <EmptyState
+              icon="📭"
+              title="No activity yet"
+              message="Your posts, comments, and follows will show up here"
+            />
           ) : (
             filteredActivities.map((activity) => (
               <motion.div
                 key={activity.id}
                 className="activity-item"
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
-                whileHover={{ x: 5 }}
               >
-                <span className="activity-icon">
+                <span className="activity-icon" aria-hidden="true">
                   {TYPE_ICONS[activity.type] || '📌'}
                 </span>
                 <div>
                   <p>
-                    <strong>{activity.action}</strong> "{activity.target}"
+                    <strong>{activity.action}</strong> &ldquo;{activity.target}&rdquo;
                     {activity.author && ` by ${activity.author}`}
                   </p>
                   <span className="activity-time">{formatRelativeTime(activity.timestamp)}</span>
@@ -144,16 +135,12 @@ const ActivityHistory = () => {
   )
 }
 
-const ActivityStat = ({ icon, value, label, color }) => (
-  <motion.div
-    className="activity-stat"
-    whileHover={{ scale: 1.05 }}
-    style={{ backgroundColor: `${color}20` }}
-  >
-    <span className="stat-icon" style={{ color }}>{icon}</span>
+const ActivityStat = ({ icon, value, label }) => (
+  <div className="activity-stat">
+    <span className="stat-icon" aria-hidden="true">{icon}</span>
     <strong>{value}</strong>
     <span>{label}</span>
-  </motion.div>
+  </div>
 )
 
 export default ActivityHistory
