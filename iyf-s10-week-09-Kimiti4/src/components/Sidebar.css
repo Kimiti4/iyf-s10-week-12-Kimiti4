@@ -1,14 +1,14 @@
 /* ==========================================================================
    SIDEBAR — Navigation Shell
    Glass surface. Active items get glow left-border + gradient background.
-   Collapse animation is one transition property — clean and non-jarring.
+   Width uses design tokens so AppShell and Sidebar stay aligned.
    ========================================================================== */
 
 .sidebar {
   position: fixed;
   left: 0;
   top: 0;
-  width: 260px;
+  width: var(--sidebar-width, 248px);
   height: 100vh;
 
   /* Glass panel */
@@ -38,7 +38,7 @@
 
 /* Collapsed state */
 .sidebar.collapsed { width: var(--sidebar-collapsed-width, 72px); }
-.sidebar.expanded  { width: 260px; }
+.sidebar.expanded  { width: var(--sidebar-width, 248px); }
 
 /* ── Collapse Toggle Button ── */
 .sidebar-collapse-btn {
@@ -360,7 +360,7 @@
 }
 
 @media (max-width: 768px) {
-  .sidebar { width: 280px; }
+  .sidebar { width: min(280px, 85vw); }
   .sidebar-collapse-btn { display: none; }
   .sidebar-nav a,
   .sidebar-nav button {
