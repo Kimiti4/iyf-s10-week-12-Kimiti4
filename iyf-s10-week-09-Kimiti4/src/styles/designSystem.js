@@ -1,104 +1,94 @@
 /**
- * 🎨 JamiiLink Design System & Icon Library
- * Whimsical, Fun, and Unique UI Components
- * All SVG-based icons (no emojis!)
+ * JamiiLink Design System — JS compatibility layer
+ *
+ * Single source of truth is `tokens.css` (CSS custom properties).
+ * This module re-exports values that match those tokens so existing
+ * JS imports (e.g. HomePage) continue to work without a dual palette.
+ *
+ * Prefer CSS variables in new code:
+ *   color: var(--brand-500);
+ *   background: var(--surface);
+ *
+ * @module styles/designSystem
  */
 
-// ============================================
-// COLOR PALETTE - Warm, Inclusive, Energetic
-// ============================================
 export const colors = {
-  // Primary - Kenyan inspired (emerald green + burnt orange)
   primary: {
-    50: '#F0FDF4',
-    100: '#DCFCE7',
-    200: '#BBF7D0',
-    300: '#86EFAC',
-    400: '#4ADE80',
-    500: '#22C55E', // Main green (hope, growth)
-    600: '#16A34A',
-    700: '#15803D',
-    800: '#166534',
-    900: '#14532D',
+    50: '#f3f0ff',
+    100: '#ede9fe',
+    200: '#ddd6fe',
+    300: '#c4b5fd',
+    400: '#a78bfa',
+    500: '#8b5cf6',
+    600: '#7c3aed',
+    700: '#6d28d9',
+    800: '#5b21b6',
+    900: '#4c1d95',
   },
 
-  // Secondary - Accent (burnt orange - energy, community)
   accent: {
-    50: '#FFF7ED',
-    100: '#FFEDD5',
-    200: '#FED7AA',
-    300: '#FDBA74',
-    400: '#FB923C',
-    500: '#F97316', // Main orange
-    600: '#EA580C',
-    700: '#C2410C',
-    800: '#9A3412',
-    900: '#7C2D12',
+    50: '#f0fdfa',
+    100: '#ccfbf1',
+    200: '#99f6e4',
+    300: '#5eead4',
+    400: '#2dd4bf',
+    500: '#14b8a6',
+    600: '#0d9488',
+    700: '#0f766e',
+    800: '#115e59',
+    900: '#134e4a',
   },
 
-  // Status colors
-  success: '#22C55E',
-  warning: '#FBBF24',
-  danger: '#EF4444',
-  info: '#3B82F6',
+  success: '#22c55e',
+  warning: '#f59e0b',
+  danger: '#ef4444',
+  info: '#0ea5e9',
 
-  // Neutral
   neutral: {
-    50: '#FAFAFA',
-    100: '#F4F4F5',
-    200: '#E4E4E7',
-    300: '#D4D4D8',
-    400: '#A1A1AA',
-    500: '#71717A',
-    600: '#52525B',
-    700: '#3F3F46',
-    800: '#27272A',
-    900: '#18181B',
+    50: '#f8fafc',
+    100: '#f1f5f9',
+    200: '#e2e8f0',
+    300: '#cbd5e1',
+    400: '#94a3b8',
+    500: '#64748b',
+    600: '#475569',
+    700: '#334155',
+    800: '#1e293b',
+    900: '#0f172a',
   },
 
-  // Community colors (for different communities/reputation levels)
   community: {
-    local: '#10B981',      // Local helper (turquoise)
-    skilled: '#8B5CF6',    // Skilled trader (purple)
-    verified: '#F59E0B',   // Verified user (amber)
-    official: '#3B82F6',   // Official source (blue)
+    local: '#14b8a6',
+    skilled: '#8b5cf6',
+    verified: '#f59e0b',
+    official: '#0ea5e9',
   },
 };
 
-// ============================================
-// TYPOGRAPHY - Clear, Friendly, Professional
-// ============================================
 export const typography = {
-  // Fonts
   fontFamily: {
-    display: "'Inter var', sans-serif", // Headlines
-    body: "'Inter var', sans-serif",    // Body text
-    mono: "'Fira Code', monospace",     // Code/prices
+    display: "'Inter', ui-sans-serif, system-ui, sans-serif",
+    body: "'Inter', ui-sans-serif, system-ui, sans-serif",
+    mono: "'Fira Code', ui-monospace, monospace",
   },
-
-  // Sizes (in px)
   fontSize: {
-    xs: '12px',
-    sm: '14px',
-    base: '16px',
-    lg: '18px',
-    xl: '20px',
-    '2xl': '24px',
-    '3xl': '30px',
-    '4xl': '36px',
-    '5xl': '48px',
+    xs: '0.75rem',
+    sm: '0.875rem',
+    base: '1rem',
+    lg: '1.125rem',
+    xl: '1.25rem',
+    '2xl': '1.5rem',
+    '3xl': '1.875rem',
+    '4xl': '2.25rem',
+    '5xl': '3rem',
   },
-
-  // Font weights
   fontWeight: {
-    light: 300,
     normal: 400,
     medium: 500,
     semibold: 600,
     bold: 700,
+    extrabold: 800,
   },
-
-  // Line heights (for readability)
   lineHeight: {
     tight: 1.2,
     normal: 1.5,
@@ -106,9 +96,6 @@ export const typography = {
   },
 };
 
-// ============================================
-// SPACING - Consistent & Predictable
-// ============================================
 export const spacing = {
   xs: '4px',
   sm: '8px',
@@ -119,55 +106,47 @@ export const spacing = {
   '3xl': '64px',
 };
 
-// ============================================
-// BORDER RADIUS - Friendly & Modern
-// ============================================
 export const borderRadius = {
   none: '0px',
-  sm: '4px',
-  base: '8px',
+  sm: '8px',
+  base: '12px',
   md: '12px',
   lg: '16px',
-  xl: '24px',
+  xl: '20px',
+  '2xl': '24px',
   full: '9999px',
 };
 
-// ============================================
-// SHADOWS - Depth & Hierarchy
-// ============================================
 export const shadows = {
   none: 'none',
-  sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-  base: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-  md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-  lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-  xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-  '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+  sm: '0 2px 6px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25)',
+  base: '0 4px 16px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25)',
+  md: '0 4px 16px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25)',
+  lg: '0 10px 30px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.3)',
+  xl: '0 20px 50px rgba(0, 0, 0, 0.6), 0 8px 20px rgba(0, 0, 0, 0.35)',
+  '2xl': '0 32px 64px rgba(0, 0, 0, 0.7)',
 };
 
-// ============================================
-// TRANSITIONS - Smooth & Delightful
-// ============================================
 export const transitions = {
-  fast: 'all 0.15s ease-in-out',
-  base: 'all 0.2s ease-in-out',
-  slow: 'all 0.3s ease-in-out',
+  fast: '150ms cubic-bezier(0.4, 0, 0.2, 1)',
+  base: '220ms cubic-bezier(0.4, 0, 0.2, 1)',
+  slow: '350ms cubic-bezier(0, 0, 0.2, 1)',
 };
 
 export const themes = {
   light: {
-    bg: colors.neutral[50],
-    bgSecondary: colors.neutral[100],
-    text: colors.neutral[900],
-    textSecondary: colors.neutral[600],
-    border: colors.neutral[200],
+    bg: '#f8fafc',
+    bgSecondary: '#f1f5f9',
+    text: '#0f172a',
+    textSecondary: '#475569',
+    border: '#e2e8f0',
   },
   dark: {
-    bg: colors.neutral[900],
-    bgSecondary: colors.neutral[800],
-    text: colors.neutral[50],
-    textSecondary: colors.neutral[300],
-    border: colors.neutral[700],
+    bg: '#080d1a',
+    bgSecondary: '#111b30',
+    text: '#f1f5f9',
+    textSecondary: '#cbd5e1',
+    border: 'rgba(139, 92, 246, 0.15)',
   },
 };
 
