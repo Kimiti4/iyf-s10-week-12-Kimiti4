@@ -1,62 +1,113 @@
 /**
- * 🔹 Task 20.2: Error Handling Middleware
+ * Central error handler — consistent JSON contract for all API errors.
+ *
+ * Success shape: { success: true, data, ... }
+ * Error shape:   { success: false, error: { message, code, statusCode, errors? } }
  */
+
 class ApiError extends Error {
-  constructor(message, statusCode, errors = null) {
+  constructor(message, statusCode = 500, options = {}) {
     super(message);
     this.statusCode = statusCode;
-    this.errors = errors;
+    this.code = options.code || statusFromCode(statusCode);
+    this.errors = options.errors || null;
     this.isOperational = true;
   }
 }
 
+function statusFromCode(statusCode) {
+  const map = {
+    400: 'BAD_REQUEST',
+    401: 'UNAUTHORIZED',
+    403: 'FORBIDDEN',
+    404: 'NOT_FOUND',
+    409: 'CONFLICT',
+    422: 'UNPROCESSABLE',
+    429: 'RATE_LIMITED',
+    500: 'INTERNAL_ERROR',
+    503: 'SERVICE_UNAVAILABLE',
+  };
+  return map[statusCode] || 'ERROR';
+}
+
+function sendError(res, statusCode, message, code, extra = {}) {
+  return res.status(statusCode).json({
+    success: false,
+    error: {
+      message,
+      code: code || statusFromCode(statusCode),
+      statusCode,
+      ...extra,
+    },
+  });
+}
+
 const errorHandler = (err, req, res, next) => {
-  console.error('💥 Error:', err.stack);
+  // Avoid double-send
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('API Error:', err.message, err.code || '', err.stack?.split('\n')[1] || '');
+  }
 
   if (err instanceof ApiError) {
-    return res.status(err.statusCode).json({
-      success: false,
-      error: {
-        message: err.message,
-        errors: err.errors,
-        statusCode: err.statusCode
-      }
+    return sendError(res, err.statusCode, err.message, err.code, {
+      ...(err.errors ? { errors: err.errors } : {}),
     });
+  }
+
+  // express-rate-limit
+  if (err.status === 429 || err.statusCode === 429) {
+    return sendError(
+      res,
+      429,
+      err.message || 'Too many requests. Please try again later.',
+      'RATE_LIMITED'
+    );
   }
 
   // JSON parse errors
   if (err.type === 'entity.parse.failed') {
-    return res.status(400).json({
-      success: false,
-      error: { message: 'Invalid JSON', statusCode: 400 }
-    });
+    return sendError(res, 400, 'Invalid JSON body', 'INVALID_JSON');
   }
 
-  // R4: malformed identifier (e.g. non-UUID in an :id path parameter).
-  // Postgres raises 22P02 (invalid_text_representation). The resource cannot
-  // exist under a malformed id, so this is a 404 — never a 500, and never
-  // a driver message leak.
+  // Payload too large
+  if (err.type === 'entity.too.large') {
+    return sendError(res, 413, 'Request body too large', 'PAYLOAD_TOO_LARGE');
+  }
+
+  // Postgres: invalid text representation (e.g. bad UUID) → 404
   if (err.code === '22P02') {
-    return res.status(404).json({
-      success: false,
-      error: { message: 'Resource not found', statusCode: 404 }
-    });
+    return sendError(res, 404, 'Resource not found', 'NOT_FOUND');
   }
 
-  // Default 500
-  const statusCode = err.statusCode || 500;
-  const message = process.env.NODE_ENV === 'development'
-    ? err.message
-    : 'Internal server error';
+  // Postgres unique violation
+  if (err.code === '23505') {
+    return sendError(res, 409, 'Resource already exists', 'CONFLICT');
+  }
 
-  res.status(statusCode).json({
-    success: false,
-    error: {
-      message,
-      statusCode,
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-    }
+  // Postgres foreign key
+  if (err.code === '23503') {
+    return sendError(res, 400, 'Related resource not found', 'BAD_REQUEST');
+  }
+
+  // CORS rejection
+  if (err.message === 'Not allowed by CORS') {
+    return sendError(res, 403, 'Origin not allowed', 'CORS_BLOCKED');
+  }
+
+  const statusCode = err.statusCode || err.status || 500;
+  const isDev = process.env.NODE_ENV === 'development';
+  const message =
+    statusCode >= 500 && !isDev
+      ? 'Internal server error'
+      : err.message || 'Internal server error';
+
+  return sendError(res, statusCode, message, statusFromCode(statusCode), {
+    ...(isDev && err.stack ? { stack: err.stack } : {}),
   });
 };
 
-module.exports = { errorHandler, ApiError };
+module.exports = { errorHandler, ApiError, sendError };
