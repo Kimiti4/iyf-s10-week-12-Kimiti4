@@ -1,13 +1,14 @@
 /**
- * 💬 Community Chat - Direct messages backed by the real API.
+ * Community Chat — direct messages backed by the API.
  */
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { colors } from '../styles/designSystem'
 import { formatRelativeTime } from '../utils/formatTime'
 import { request } from '../services/apiClient'
 import { initializeSocket } from '../services/socketClient'
+import EmptyState from '../components/primitives/EmptyState'
+import ErrorState from '../components/primitives/ErrorState'
 import './ChatPage.css'
 
 const IDLE = 'idle'
@@ -61,8 +62,6 @@ const ChatPage = () => {
     else setMessages([])
   }, [selectedId, loadMessages])
 
-  // Realtime delivery on the existing Socket.IO infrastructure.
-  // Dedupe against REST responses by message id.
   useEffect(() => {
     let cleanup = null
     try {
@@ -74,7 +73,7 @@ const ChatPage = () => {
       socket.on('message:new', onNew)
       cleanup = () => socket.off('message:new', onNew)
     } catch {
-      // Socket unavailable — REST polling via selection remains functional
+      // Socket unavailable — REST remains functional
     }
     return () => { if (cleanup) cleanup() }
   }, [])
@@ -93,7 +92,6 @@ const ChatPage = () => {
         body: JSON.stringify({ content: messageInput.trim() })
       })
       const sent = res.data
-      // Dedupe: the socket echo of this same message may arrive separately
       setMessages((prev) => (prev.some((m) => String(m.id) === String(sent.id)) ? prev : [...prev, sent]))
       setMessageInput('')
       setConversations((prev) => prev.map((c) =>
@@ -116,49 +114,44 @@ const ChatPage = () => {
 
   return (
     <main className="chat-page" role="main" aria-label="Chat">
-      <motion.div
-        className="chat-sidebar"
-        initial={{ x: -50, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-      >
+      <div className="chat-sidebar">
         <div className="sidebar-header">
-          <h2>💬 Messages</h2>
+          <h2>Messages</h2>
         </div>
 
         <div className="search-box">
           <input
-            type="text"
+            type="search"
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search conversations"
           />
         </div>
 
         <div className="conversations-list">
           {status === LOADING && conversations.length === 0 && (
-            <div className="chat-loading">Loading conversations…</div>
+            <div className="chat-loading" role="status">Loading conversations…</div>
           )}
           {status === ERROR && (
-            <div className="chat-error" role="alert">
-              {error}
-              <button onClick={loadConversations}>Try again</button>
-            </div>
+            <ErrorState error={error} onRetry={loadConversations} />
           )}
           {status === LOADED && filteredConversations.length === 0 && (
-            <div className="chat-empty">
-              <p>No conversations yet.</p>
-              <p>Start one from another user's profile.</p>
-            </div>
+            <EmptyState
+              icon="💬"
+              title="No conversations yet"
+              message="Start one from another user's profile"
+            />
           )}
           {filteredConversations.map(conv => (
-            <motion.div
+            <button
+              type="button"
               key={conv.id}
               className={`conversation-item ${String(selectedId) === String(conv.id) ? 'active' : ''}`}
               onClick={() => setSelectedId(conv.id)}
-              whileHover={{ backgroundColor: colors.primary[50] }}
             >
               <div className="conv-avatar">
-                <span>{conv.participant?.avatarIcon || '🦁'}</span>
+                <span aria-hidden="true">{conv.participant?.avatarIcon || '🦁'}</span>
               </div>
 
               <div className="conv-info">
@@ -174,10 +167,10 @@ const ChatPage = () => {
               {conv.unreadCount > 0 && (
                 <div className="unread-badge">{conv.unreadCount}</div>
               )}
-            </motion.div>
+            </button>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       <div className="chat-main">
         {selectedConversation ? (
@@ -185,7 +178,7 @@ const ChatPage = () => {
             <div className="chat-header">
               <div className="chat-participant-info">
                 <div className="participant-avatar">
-                  <span>{selectedConversation.participant?.avatarIcon || '🦁'}</span>
+                  <span aria-hidden="true">{selectedConversation.participant?.avatarIcon || '🦁'}</span>
                 </div>
                 <div>
                   <h3>{selectedConversation.participant?.username || 'Unknown'}</h3>
@@ -199,13 +192,15 @@ const ChatPage = () => {
                   <motion.div
                     key={msg.id}
                     className={`message ${String(msg.senderId) === String(user?.id) ? 'sent' : 'received'}`}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
                     <div className="message-bubble">
                       <p>{msg.content}</p>
                       <span className="message-time">
-                        {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                        {msg.createdAt
+                          ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                          : ''}
                       </span>
                     </div>
                   </motion.div>
@@ -217,28 +212,28 @@ const ChatPage = () => {
             <form className="message-input-area" onSubmit={handleSendMessage}>
               <input
                 type="text"
-                placeholder="Type a message... 💭"
+                placeholder="Type a message..."
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
+                aria-label="Message"
               />
-              <motion.button
+              <button
                 type="submit"
-                className="btn-send"
+                className="btn-send btn btn-primary"
                 disabled={!messageInput.trim() || sending}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                aria-label="Send message"
               >
-                📤
-              </motion.button>
+                Send
+              </button>
             </form>
           </>
         ) : (
           <div className="no-conversation-selected">
-            <div className="empty-state">
-              <span className="empty-icon">💬</span>
-              <h3>Select a conversation</h3>
-              <p>Pick a chat from the sidebar to start messaging!</p>
-            </div>
+            <EmptyState
+              icon="💬"
+              title="Select a conversation"
+              message="Pick a chat from the sidebar to start messaging"
+            />
           </div>
         )}
       </div>
