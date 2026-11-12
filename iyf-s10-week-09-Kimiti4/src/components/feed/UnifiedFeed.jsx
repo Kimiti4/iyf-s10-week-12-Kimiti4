@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo, useState, useRef } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useUnifiedFeed } from '../../hooks/useUnifiedFeed';
 import { usePosts } from '../../hooks/usePosts';
@@ -10,6 +10,7 @@ import FeedEmptyState from './FeedEmptyState';
 import FeedErrorState from './FeedErrorState';
 import FeedJamBanner from '../jam-signature/FeedJamBanner';
 import IntersectionSentinel from './IntersectionSentinel';
+import PageHeader from '../primitives/PageHeader';
 import { FEED_TAB } from '../../domain/feed/feedTypes';
 
 export default function UnifiedFeed() {
@@ -35,8 +36,7 @@ export default function UnifiedFeed() {
     fetchFeed();
   }, [fetchFeed]);
 
-  const [visibleCount, setVisibleCount] = useState(10);
-  const loadMoreRef = useRef(null);
+  const [visibleCount] = useState(10);
 
   const handleLoadMore = useCallback(() => {
     if (hasMore && status !== 'loading') {
@@ -44,7 +44,6 @@ export default function UnifiedFeed() {
     }
   }, [hasMore, status, loadMore]);
 
-  // Virtualization: only render visible items + buffer
   const visibleItems = useMemo(() => {
     return items.slice(0, visibleCount);
   }, [items, visibleCount]);
@@ -61,6 +60,12 @@ export default function UnifiedFeed() {
 
   return (
     <div className="unified-feed">
+      <PageHeader
+        eyebrow="Home"
+        title="Feed"
+        subtitle="Posts, jams, and updates from your community"
+      />
+
       <FeedTabs activeTab={activeTab} onTabChange={switchTab} />
 
       {status === 'loading' && items.length === 0 && <FeedSkeleton />}
