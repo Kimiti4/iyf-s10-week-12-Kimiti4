@@ -6,17 +6,10 @@ import TrendingSection from '../components/discovery/TrendingSection';
 import CategoryGrid from '../components/discovery/CategoryGrid';
 import SuggestedUsers from '../components/discovery/SuggestedUsers';
 import PostCard from '../components/posts/PostCard';
-import ReelCard from '../components/reels/ReelCard';
 import JamCard from '../components/jam/JamCard';
+import PageHeader from '../components/primitives/PageHeader';
+import EmptyState from '../components/primitives/EmptyState';
 import './DiscoveryPage.css';
-
-const SEARCH_TABS = [
-  { id: 'all', label: 'All' },
-  { id: 'posts', label: 'Posts' },
-  { id: 'reels', label: 'Reels' },
-  { id: 'jams', label: 'Jams' },
-  { id: 'users', label: 'People' },
-];
 
 export default function DiscoveryPage() {
   const {
@@ -49,10 +42,14 @@ export default function DiscoveryPage() {
 
   return (
     <main className="discovery-page" role="main" aria-label="Discovery">
-      <header className="discovery-header">
-        <h1>Discover</h1>
+      <PageHeader
+        eyebrow="Explore"
+        title="Discover"
+        subtitle="Find people, posts, jams, and trends in your jamii"
+      />
+      <div className="discovery-search-wrap">
         <DiscoverySearchBar onSearch={handleSearch} />
-      </header>
+      </div>
 
       <div className="discovery-content">
         {isSearching ? (
@@ -62,7 +59,7 @@ export default function DiscoveryPage() {
             <TrendingSection trending={trending} onWindowChange={fetchTrending} />
 
             <div className="discovery-section">
-              <h2>Explore</h2>
+              <h2 className="discovery-section-title">Explore</h2>
               <CategoryGrid categories={categories} />
             </div>
 
@@ -70,7 +67,7 @@ export default function DiscoveryPage() {
 
             {forYou.posts.length > 0 && (
               <div className="discovery-section">
-                <h2>For You</h2>
+                <h2 className="discovery-section-title">For You</h2>
                 <div className="discovery-grid">
                   {forYou.posts.slice(0, 6).map((post) => (
                     <PostCard key={post.id} post={post} />
@@ -94,12 +91,16 @@ function SearchResults({ results, status, query }) {
 
   return (
     <div className="search-results" role="search" aria-label={`Search results for ${query}`}>
-      {status === 'loading' && <div className="search-loading" aria-live="polite">Searching...</div>}
+      {status === 'loading' && (
+        <div className="search-loading" aria-live="polite">Searching...</div>
+      )}
 
       {!hasResults && status === 'loaded' && (
-        <div className="search-empty" aria-live="polite">
-          <p>No results for "{query}"</p>
-        </div>
+        <EmptyState
+          icon="🔍"
+          title={`No results for “${query}”`}
+          message="Try a different keyword or explore trending topics"
+        />
       )}
 
       {results.users.length > 0 && (
