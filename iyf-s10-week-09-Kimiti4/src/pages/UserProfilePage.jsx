@@ -1,7 +1,5 @@
 /**
- * 👤 User Profile Page - backed by the real API.
- * /profile -> authenticated user's own profile.
- * /profile/:userId -> another user's public profile + real follow state.
+ * User Profile — /profile (self) or /profile/:userId (public)
  */
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -11,6 +9,8 @@ import { usersAPI } from '../services/api';
 import { postsAPI } from '../services/postApi';
 import { request } from '../services/apiClient';
 import CreatorStats from '../components/analytics/CreatorStats';
+import EmptyState from '../components/primitives/EmptyState';
+import ErrorState from '../components/primitives/ErrorState';
 import './UserProfilePage.css';
 
 const UserProfilePage = () => {
@@ -138,8 +138,8 @@ const UserProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="profile-loading" aria-live="polite">
-        <div className="loading-spinner"></div>
+      <div className="profile-loading" aria-live="polite" role="status">
+        <div className="loading-spinner" aria-hidden="true"></div>
         <p>Loading profile...</p>
       </div>
     );
@@ -148,10 +148,7 @@ const UserProfilePage = () => {
   if (error || !userProfile) {
     return (
       <main className="user-profile-page" role="main" aria-label="User profile">
-        <div className="profile-error" role="alert">
-          <p>{error || 'Profile not found.'}</p>
-          <button onClick={loadProfile}>Try again</button>
-        </div>
+        <ErrorState error={error || 'Profile not found'} onRetry={loadProfile} />
       </main>
     );
   }
@@ -169,7 +166,6 @@ const UserProfilePage = () => {
 
   return (
     <main className="user-profile-page" role="main" aria-label="User profile">
-      {/* Profile Header */}
       <div className="profile-header">
         <div className="profile-cover">
           <div className="cover-gradient"></div>
@@ -178,24 +174,25 @@ const UserProfilePage = () => {
         <div className="profile-info">
           <div className="profile-avatar-section">
             <div className="profile-avatar">
-              <span>{avatarIcon}</span>
-              {isVerified && <div className="verified-badge">✓</div>}
+              <span aria-hidden="true">{avatarIcon}</span>
+              {isVerified && <div className="verified-badge" title="Verified">✓</div>}
             </div>
 
             {isOwnProfile ? (
-              <button className="btn-edit-profile" onClick={() => navigate('/settings')}>
+              <button type="button" className="btn btn-secondary btn-edit-profile" onClick={() => navigate('/settings')}>
                 Edit Profile
               </button>
             ) : (
               <div className="profile-actions">
                 <button
-                  className={`btn-follow ${follow.isFollowing ? 'following' : ''}`}
+                  type="button"
+                  className={`btn ${follow.isFollowing ? 'btn-secondary' : 'btn-primary'} btn-follow`}
                   onClick={handleFollowToggle}
                   disabled={followBusy}
                 >
                   {follow.isFollowing ? 'Following' : 'Follow'}
                 </button>
-                <button className="btn-message" onClick={() => navigate('/chat')}>
+                <button type="button" className="btn btn-ghost btn-message" onClick={() => navigate('/chat')}>
                   Message
                 </button>
               </div>
@@ -212,7 +209,6 @@ const UserProfilePage = () => {
             </div>
           </div>
 
-          {/* Stats */}
           <div className="profile-stats">
             <div className="stat-item">
               <span className="stat-value">{formatNumber(posts.length)}</span>
@@ -234,87 +230,88 @@ const UserProfilePage = () => {
         </div>
       </div>
 
-      {/* Creator Analytics (own profile only) */}
       {isOwnProfile && <CreatorStats userId={targetId} compact />}
 
-      {/* Stories Section */}
       <div className="stories-section">
         <h3 className="section-title">Stories</h3>
         <div className="stories-container">
           {isOwnProfile && (
-            <div className="story-item add-story" onClick={() => setShowStoryModal(true)}>
+            <button type="button" className="story-item add-story" onClick={() => setShowStoryModal(true)}>
               <div className="story-avatar add-story-avatar">+</div>
               <span>Add Story</span>
-            </div>
+            </button>
           )}
           {stories.length === 0 && !isOwnProfile && (
             <p className="stories-empty">No active stories.</p>
           )}
           {stories.map((story) => (
-            <motion.div
-              key={story.id}
-              className="story-item"
-              whileHover={{ scale: 1.05 }}
-            >
+            <div key={story.id} className="story-item">
               {story.image_url ? (
-                <img src={story.image_url} alt="Story" />
+                <img src={story.image_url} alt="" />
               ) : (
                 <div className="story-text">{story.text_content}</div>
               )}
               <div className="story-overlay">
                 <span>{story.created_at ? new Date(story.created_at).toLocaleDateString() : ''}</span>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="profile-tabs">
+      <div className="profile-tabs" role="tablist">
         <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'posts'}
           className={`tab-btn ${activeTab === 'posts' ? 'active' : ''}`}
           onClick={() => setActiveTab('posts')}
         >
-           Posts
+          Posts
         </button>
         {isOwnProfile && (
           <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'liked'}
             className={`tab-btn ${activeTab === 'liked' ? 'active' : ''}`}
             onClick={() => setActiveTab('liked')}
           >
-            ❤️ Liked (Private)
+            Liked
           </button>
         )}
         <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'about'}
           className={`tab-btn ${activeTab === 'about' ? 'active' : ''}`}
           onClick={() => setActiveTab('about')}
         >
-          ℹ️ About
+          About
         </button>
       </div>
 
-      {/* Tab Content */}
       <div className="tab-content">
         <AnimatePresence mode="wait">
           {activeTab === 'posts' && (
             <motion.div
               key="posts"
               className="posts-grid"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              exit={{ opacity: 0, y: -12 }}
+              role="tabpanel"
             >
               {posts.length === 0 ? (
-                <div className="profile-empty">
-                  <p>No posts yet.</p>
-                </div>
+                <EmptyState
+                  icon="📝"
+                  title="No posts yet"
+                  message={isOwnProfile ? 'Share something with your jamii' : 'This user has not posted yet'}
+                  action={isOwnProfile ? { label: 'Create post', onClick: () => navigate('/create-post') } : undefined}
+                />
               ) : (
                 posts.map((post) => (
-                  <motion.div
-                    key={post.id}
-                    className="post-card"
-                    whileHover={{ y: -5 }}
-                  >
+                  <div key={post.id} className="post-card">
                     <div className="post-content">
                       <p>{post.content}</p>
                       <div className="post-stats">
@@ -323,7 +320,7 @@ const UserProfilePage = () => {
                         <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ''}</span>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))
               )}
             </motion.div>
@@ -333,17 +330,14 @@ const UserProfilePage = () => {
             <motion.div
               key="liked"
               className="liked-posts"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              exit={{ opacity: 0, y: -12 }}
+              role="tabpanel"
             >
-              <div className="privacy-notice">
-                🔒 These posts are only visible to you
-              </div>
+              <div className="privacy-notice">Only visible to you</div>
               {likedPosts.length === 0 ? (
-                <div className="profile-empty">
-                  <p>No liked posts yet.</p>
-                </div>
+                <EmptyState icon="❤️" title="No liked posts yet" message="Posts you like will appear here" />
               ) : (
                 likedPosts.map((post) => (
                   <div key={post.id} className="liked-post-card">
@@ -362,9 +356,10 @@ const UserProfilePage = () => {
             <motion.div
               key="about"
               className="about-section"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              exit={{ opacity: 0, y: -12 }}
+              role="tabpanel"
             >
               <div className="about-card">
                 <h3>About {displayName}</h3>
@@ -372,13 +367,13 @@ const UserProfilePage = () => {
                 <div className="about-details">
                   {location && (
                     <div className="detail-item">
-                      <span className="detail-icon">📍</span>
+                      <span className="detail-icon" aria-hidden="true">📍</span>
                       <span>Location: {location}</span>
                     </div>
                   )}
                   {joinedDate && (
                     <div className="detail-item">
-                      <span className="detail-icon">📅</span>
+                      <span className="detail-icon" aria-hidden="true">📅</span>
                       <span>Joined: {joinedDate}</span>
                     </div>
                   )}
@@ -388,7 +383,7 @@ const UserProfilePage = () => {
           )}
         </AnimatePresence>
       </div>
-      {/* Story Modal */}
+
       <AnimatePresence>
         {showStoryModal && (
           <motion.div
@@ -400,12 +395,15 @@ const UserProfilePage = () => {
           >
             <motion.div
               className="story-modal"
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
+              exit={{ scale: 0.96, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Add story"
             >
-              <h3>Add New Story</h3>
+              <h3>Add story</h3>
               <div className="story-upload-area">
                 <textarea
                   placeholder="Share a moment (expires in 24h)..."
@@ -421,14 +419,15 @@ const UserProfilePage = () => {
                   onChange={(e) => setStoryFile(e.target.files?.[0] || null)}
                 />
                 <button
-                  className="btn-upload"
+                  type="button"
+                  className="btn btn-primary"
                   onClick={handleCreateStory}
                   disabled={(!storyText.trim() && !storyFile) || storyBusy}
                 >
-                  {storyBusy ? 'Sharing…' : 'Share Story'}
+                  {storyBusy ? 'Sharing…' : 'Share story'}
                 </button>
               </div>
-              <button className="btn-close-modal" onClick={() => setShowStoryModal(false)}>
+              <button type="button" className="btn btn-ghost" onClick={() => setShowStoryModal(false)}>
                 Cancel
               </button>
             </motion.div>
