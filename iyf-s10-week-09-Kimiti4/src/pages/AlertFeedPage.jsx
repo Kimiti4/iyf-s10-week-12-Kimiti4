@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useToast } from '../components/Toast';
 import AlertCard from '../components/AlertCard';
 import CreateAlertForm from '../components/CreateAlertForm';
+import PageHeader from '../components/primitives/PageHeader';
+import EmptyState from '../components/primitives/EmptyState';
+import ErrorState from '../components/primitives/ErrorState';
 import { initializeSocket, onNewAlert, onAlertUpdate, onAlertDelete, disconnectSocket } from '../services/socketClient';
 import { alertsAPI } from '../services/api';
 import './AlertFeedPage.css';
@@ -127,27 +130,28 @@ export default function AlertFeedPage() {
 
   return (
     <div className="alert-feed-page" role="main">
-      {/* Header */}
-      <header className="page-header">
-        <div className="header-content">
-          <h1>Alerts</h1>
-          <p>Community safety and activity alerts</p>
-        </div>
-        <button
-          className="btn-create-alert"
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          aria-expanded={showCreateForm}
-        >
-          {showCreateForm ? 'Cancel' : 'Create Alert'}
-        </button>
-      </header>
+      <PageHeader
+        eyebrow="Community safety"
+        title="Alerts"
+        subtitle="Neighborhood warnings, emergencies, and verified notices"
+        actions={
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            aria-expanded={showCreateForm}
+          >
+            {showCreateForm ? 'Cancel' : 'Create Alert'}
+          </button>
+        }
+      />
 
-      {/* Severity Summary */}
       {!loading && alerts.length > 0 && (
         <div className="severity-summary" role="region" aria-label="Alert summary">
           {SEVERITY_FILTERS.slice(1).map(s => (
             <button
               key={s.value}
+              type="button"
               className={`severity-chip severity-chip--${s.value} ${severityFilter === s.value ? 'active' : ''}`}
               onClick={() => setSeverityFilter(severityFilter === s.value ? 'all' : s.value)}
               aria-pressed={severityFilter === s.value}
@@ -160,14 +164,12 @@ export default function AlertFeedPage() {
         </div>
       )}
 
-      {/* Create Form */}
       {showCreateForm && (
         <div className="create-form-wrapper">
           <CreateAlertForm onSubmit={handleCreateAlert} onCancel={() => setShowCreateForm(false)} />
         </div>
       )}
 
-      {/* Search + Filters */}
       <div className="filter-bar">
         <div className="filter-bar__search">
           <input
@@ -208,7 +210,6 @@ export default function AlertFeedPage() {
         </div>
       </div>
 
-      {/* Alert List */}
       <section className="alerts-container" aria-label="Alerts">
         {loading ? (
           <div className="loading-state" role="status">
@@ -216,18 +217,14 @@ export default function AlertFeedPage() {
             <p>Loading alerts...</p>
           </div>
         ) : loadError ? (
-          <div className="empty-state" role="alert">
-            <div className="empty-state__icon" aria-hidden="true">⚠️</div>
-            <p>Unable to load alerts.</p>
-            <p className="empty-hint">{loadError}</p>
-            <button className="btn-create-alert" onClick={() => fetchAlerts(page)}>Retry</button>
-          </div>
+          <ErrorState error={loadError} onRetry={() => fetchAlerts(page)} />
         ) : alerts.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state__icon" aria-hidden="true">📭</div>
-            <p>No alerts</p>
-            <p className="empty-hint">Nothing to report right now</p>
-          </div>
+          <EmptyState
+            icon="📭"
+            title="No alerts"
+            message="Nothing to report right now"
+            action={!showCreateForm ? { label: 'Create Alert', onClick: () => setShowCreateForm(true) } : undefined}
+          />
         ) : (
           <>
             <ul className="alerts-list" role="list">
@@ -237,10 +234,10 @@ export default function AlertFeedPage() {
                 </li>
               ))}
             </ul>
-            {/* Pagination */}
             {totalPages > 1 && (
               <nav className="pagination" role="navigation" aria-label="Alert pagination">
                 <button
+                  type="button"
                   className="pagination__btn"
                   onClick={() => fetchAlerts(page - 1)}
                   disabled={page <= 1}
@@ -252,6 +249,7 @@ export default function AlertFeedPage() {
                   {page} / {totalPages} ({total} total)
                 </span>
                 <button
+                  type="button"
                   className="pagination__btn"
                   onClick={() => fetchAlerts(page + 1)}
                   disabled={page >= totalPages}
