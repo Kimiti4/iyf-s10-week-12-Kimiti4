@@ -9,8 +9,10 @@ import ContributionComposer from '../components/jam/ContributionComposer';
 import ContributionCard from '../components/jam/ContributionCard';
 import ParticipationStats from '../components/analytics/ParticipationStats';
 import JoinJamModal from '../components/jam/JoinJamModal';
+import ErrorState from '../components/primitives/ErrorState';
+import EmptyState from '../components/primitives/EmptyState';
 import { jamsAPI, participationAPI, contributionAPI } from '../services/jamApi';
-import { JAM_STATUS, isJamOpen, isJamEnded } from '../models/jam';
+import { isJamOpen, isJamEnded } from '../models/jam';
 import '../components/jam/jam.css';
 import './JamDetailPage.css';
 
@@ -32,6 +34,7 @@ export default function JamDetailPage() {
 
   const fetchJam = useCallback(async () => {
     setStatus(LOADING);
+    setError('');
     try {
       const data = await jamsAPI.getById(id);
       setJam(data.jam || data);
@@ -76,25 +79,34 @@ export default function JamDetailPage() {
       await participationAPI.leave(id);
       setIsMember(false);
     } catch {
-      // ignore
+      /* ignore */
     }
   }, [id]);
 
-  const canContribute = isMember && isJamOpen(jam);
+  const canContribute = isMember && jam && isJamOpen(jam);
 
   if (status === LOADING) {
     return (
-      <div className="jam-detail-loading">
-        <div className="jam-detail-spinner" />
+      <div className="jam-detail-loading" role="status">
+        <div className="jam-detail-spinner" aria-hidden="true" />
       </div>
     );
   }
 
   if (status === ERROR) {
     return (
-      <div className="jam-detail-error" role="alert">
-        {error}
-        <button onClick={() => navigate(-1)}>Go back</button>
+      <div className="jam-detail-page">
+        <header className="jam-detail-top">
+          <button
+            type="button"
+            className="jam-detail-back"
+            onClick={() => navigate(-1)}
+            aria-label="Go back"
+          >
+            <FaArrowLeft />
+          </button>
+        </header>
+        <ErrorState error={error} onRetry={fetchJam} />
       </div>
     );
   }
@@ -113,15 +125,18 @@ export default function JamDetailPage() {
 
   return (
     <div className="jam-detail-page">
-      {/* Header */}
       <header className="jam-detail-top">
-        <button className="jam-detail-back" onClick={() => navigate(-1)} aria-label="Go back">
+        <button
+          type="button"
+          className="jam-detail-back"
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+        >
           <FaArrowLeft />
         </button>
         <JamStatusBadge status={jam.status} />
       </header>
 
-      {/* Hero */}
       {jam.coverMediaUrl && (
         <div className="jam-detail-cover">
           <img src={jam.coverMediaUrl} alt="" />
@@ -129,7 +144,6 @@ export default function JamDetailPage() {
       )}
 
       <div className="jam-detail-body">
-        {/* Title + Creator */}
         <div className="jam-detail-header">
           <h1 className="jam-detail-title">
             <FaFire className="jam-detail-fire" aria-hidden="true" />
@@ -137,24 +151,24 @@ export default function JamDetailPage() {
           </h1>
           <div className="jam-detail-creator">
             <AvatarIcon
-              user={jam.creator || { _id: 'unknown', username: 'Anonymous', profile: {} }}
+              user={
+                jam.creator || {
+                  _id: 'unknown',
+                  username: 'Anonymous',
+                  profile: {},
+                }
+              }
               size="small"
             />
             <span>{jam.creator?.username || 'Anonymous'}</span>
           </div>
         </div>
 
-        {/* Prompt */}
-        {jam.prompt && (
-          <p className="jam-detail-prompt">{jam.prompt}</p>
-        )}
-
-        {/* Description */}
+        {jam.prompt && <p className="jam-detail-prompt">{jam.prompt}</p>}
         {jam.description && (
           <p className="jam-detail-description">{jam.description}</p>
         )}
 
-        {/* Stats */}
         <div className="jam-detail-stats">
           <span className="jam-detail-stat">
             <FaUsers aria-hidden="true" />
@@ -168,21 +182,27 @@ export default function JamDetailPage() {
           )}
         </div>
 
-        {/* Actions */}
         <div className="jam-detail-actions">
           {isJamOpen(jam) && !isMember && (
-            <button className="jam-detail-join-btn" onClick={() => setShowJoinModal(true)}>
+            <button
+              type="button"
+              className="btn btn-primary jam-detail-join-btn"
+              onClick={() => setShowJoinModal(true)}
+            >
               Join Jam
             </button>
           )}
           {isMember && !isJamEnded(jam) && (
-            <button className="jam-detail-leave-btn" onClick={handleLeave}>
+            <button
+              type="button"
+              className="btn btn-ghost jam-detail-leave-btn"
+              onClick={handleLeave}
+            >
               Leave Jam
             </button>
           )}
         </div>
 
-        {/* Contribution Composer */}
         {canContribute && (
           <ContributionComposer
             jamId={id}
@@ -191,34 +211,36 @@ export default function JamDetailPage() {
           />
         )}
 
-        {/* Two-column layout for participants + leaderboard */}
         <div className="jam-detail-sidebar-row">
-          <JamParticipantsPanel jamId={id} participantCount={jam.participantCount} />
+          <JamParticipantsPanel
+            jamId={id}
+            participantCount={jam.participantCount}
+          />
           <JamLeaderboard jamId={id} />
         </div>
 
-        {/* Analytics */}
         <ParticipationStats jamId={id} />
 
-        {/* Contributions */}
-        <section className="jam-detail-contributions">
+        <section className="jam-detail-contributions" aria-label="Contributions">
           <h2 className="jam-detail-section-title">
             Contributions ({contributions.length})
           </h2>
-          {contributions.length === 0 && (
-            <p className="jam-detail-empty">
-              No contributions yet. Be the first!
-            </p>
+          {contributions.length === 0 ? (
+            <EmptyState
+              icon="✨"
+              title="No contributions yet"
+              message="Be the first to contribute to this Jam"
+            />
+          ) : (
+            <div className="jam-detail-contributions-list">
+              {contributions.map((c) => (
+                <ContributionCard key={c.id || c._id} contribution={c} />
+              ))}
+            </div>
           )}
-          <div className="jam-detail-contributions-list">
-            {contributions.map((c) => (
-              <ContributionCard key={c.id || c._id} contribution={c} />
-            ))}
-          </div>
         </section>
       </div>
 
-      {/* Join Modal */}
       <JoinJamModal
         jam={jam}
         isOpen={showJoinModal}
