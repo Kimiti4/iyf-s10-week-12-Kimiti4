@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import PostCard from '../components/posts/PostCard';
 import { usePosts } from '../hooks/usePosts';
 import { usePostActions } from '../hooks/usePostActions';
-import { postsAPI } from '../services/postApi';
+import PageHeader from '../components/primitives/PageHeader';
+import EmptyState from '../components/primitives/EmptyState';
+import ErrorState from '../components/primitives/ErrorState';
 import '../components/posts/posts.css';
 import './FollowingPage.css';
 
-const IDLE = 'idle';
 const LOADING = 'loading';
 const LOADED = 'loaded';
 const ERROR = 'error';
@@ -21,31 +22,29 @@ export default function FollowingPage() {
 
   return (
     <div className="following-page">
-      <header className="following-page-header">
-        <h1>Following</h1>
-      </header>
+      <PageHeader
+        eyebrow="Network"
+        title="Following"
+        subtitle="Posts from people you follow"
+      />
 
       <div className="following-page-content">
         {status === LOADING && posts.length === 0 && (
-          <div className="following-page-loading">
-            <div className="following-page-spinner" />
+          <div className="following-page-loading" role="status">
+            <div className="following-page-spinner" aria-hidden="true" />
           </div>
         )}
 
         {status === ERROR && (
-          <div className="following-page-error" role="alert">
-            {error}
-            <button onClick={() => fetchPosts({ sort: 'recent' })}>Try again</button>
-          </div>
+          <ErrorState error={error} onRetry={() => fetchPosts({ sort: 'recent' })} />
         )}
 
         {status === LOADED && posts.length === 0 && (
-          <div className="following-page-empty">
-            <p>No posts from people you follow yet</p>
-            <p className="following-page-empty-hint">
-              Follow creators to see their posts here
-            </p>
-          </div>
+          <EmptyState
+            icon="🤝"
+            title="No posts from people you follow"
+            message="Follow creators to see their posts here"
+          />
         )}
 
         <div className="following-page-posts">
@@ -55,14 +54,14 @@ export default function FollowingPage() {
         </div>
 
         {hasMore && status !== LOADING && (
-          <button className="following-page-load-more" onClick={loadMore}>
+          <button type="button" className="btn btn-ghost following-page-load-more" onClick={loadMore}>
             Load more
           </button>
         )}
 
         {status === LOADING && posts.length > 0 && (
-          <div className="following-page-loading-more">
-            <div className="following-page-spinner" />
+          <div className="following-page-loading-more" role="status">
+            <div className="following-page-spinner" aria-hidden="true" />
           </div>
         )}
       </div>
