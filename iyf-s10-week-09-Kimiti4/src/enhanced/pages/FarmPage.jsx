@@ -3,10 +3,10 @@ import UnavailableFeaturePage from '../../components/UnavailableFeaturePage';
 export default function FarmPage() {
   return (
     <UnavailableFeaturePage
-      title="Farm"
+      title="Farm market"
       icon="🌱"
-      description="Share farming knowledge and connect local produce with buyers."
-      capability="The current backend does not provide an authoritative live farm marketplace feed."
+      description="Connect local produce and farming knowledge."
+      capability="No live farm marketplace feed is available yet."
     />
   );
 }
