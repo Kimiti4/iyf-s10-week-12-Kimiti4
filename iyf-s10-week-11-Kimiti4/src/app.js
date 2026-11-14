@@ -1,5 +1,5 @@
 /**
- * 🔹 Express App Configuration
+ * Express App Configuration
  * Centralized middleware and routing with security hardening
  */
 const express = require('express');
@@ -8,7 +8,12 @@ const cors = require('cors');
 const logger = require('./middleware/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 const securityHeaders = require('./middleware/securityHeaders');
-const { generalLimiter, authLimiter, alertLimiter, verificationLimiter } = require('./middleware/rateLimiter');
+const {
+  generalLimiter,
+  authLimiter,
+  alertLimiter,
+  verificationLimiter,
+} = require('./middleware/rateLimiter');
 const routes = require('./routes');
 
 const app = express();
@@ -16,34 +21,30 @@ const app = express();
 // Trust proxy for deployment
 app.set('trust proxy', 1);
 
-// Middleware - Order matters!
-// Security headers should be early
+// Security headers early
 app.use(securityHeaders);
 
-// Middleware
-// CORS configuration for full-stack deployment
 const corsOptions = {
-    origin: function (origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:5173',  // Vite dev server
-            'http://localhost:5174',  // Vite dev server (port 5174)
-            'http://localhost:3000',  // Local
-            'https://jamii-link.ke.vercel.app',  // Production frontend (Vercel)
-            'https://jamii-link.vercel.app',  // Production frontend (Vercel)
-            process.env.FRONTEND_URL  // Additional production frontend URL
-        ].filter(Boolean);
-        
-        // Allow requests with no origin (mobile apps, curl, etc.)
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.log(`CORS blocked origin: ${origin}`);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:3000',
+      'https://jamii-link.ke.vercel.app',
+      'https://jamii-link.vercel.app',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean);
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 app.use(cors(corsOptions));
@@ -51,7 +52,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(logger);
 
-// Rate limiting - Apply to main routes
+// Rate limiting
 app.use('/api/', generalLimiter);
 app.use('/api/auth/register', authLimiter);
 app.use('/api/auth/login', authLimiter);
@@ -59,7 +60,7 @@ app.use('/api/auth/send-verification', verificationLimiter);
 app.use('/api/auth/verify-code', verificationLimiter);
 app.use('/api/alerts', alertLimiter);
 
-// 🌐 Serve static frontend files from /public
+// Static frontend from /public
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // API Routes
@@ -70,30 +71,35 @@ if (process.env.NODE_ENV === 'staging') {
   app.use('/api/test', testRoutes);
 }
 
-// R4: unknown /api/* paths must return a truthful JSON 404. Without this,
-// the SPA fallback below serves index.html with 200 for unknown API GETs,
-// which misrepresents absent capabilities as successful responses.
+// Unknown /api/* → structured 404 (never SPA HTML)
 app.use('/api', (req, res) => {
   res.status(404).json({
     success: false,
-    error: 'API endpoint not found',
-    code: 'API_NOT_FOUND'
+    error: {
+      message: 'API endpoint not found',
+      code: 'API_NOT_FOUND',
+      statusCode: 404,
+    },
   });
 });
 
-// Health check endpoint (not rate limited)
+// Health check (not under /api rate limit path quirks)
 app.get('/health', async (req, res) => {
   try {
     const { query } = require('./config/postgres');
     await query('SELECT 1');
-    res.json({ status: 'ok', db: true, timestamp: new Date().toISOString(), environment: process.env.NODE_ENV || 'development' });
+    res.json({
+      status: 'ok',
+      db: true,
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+    });
   } catch {
     res.status(503).json({ status: 'degraded', db: false });
   }
 });
 
-// SPA Fallback: Send index.html for any non-API routes
-// (Allows frontend routing without 404 on refresh)
+// SPA fallback for non-API routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
@@ -102,4 +108,3 @@ app.get('*', (req, res) => {
 app.use(errorHandler);
 
 module.exports = app;
-
