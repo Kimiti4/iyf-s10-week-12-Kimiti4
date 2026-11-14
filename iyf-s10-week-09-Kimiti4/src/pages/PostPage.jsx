@@ -3,13 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import PostCard from '../components/posts/PostCard';
 import CommentList from '../components/posts/CommentList';
-import { usePosts } from '../hooks/usePosts';
 import { usePostActions } from '../hooks/usePostActions';
 import { useComments } from '../hooks/useComments';
 import { postsAPI } from '../services/postApi';
-import { normalizePost } from '../contracts/postContract';
 import { trackView } from '../contracts/socialEventContract';
 import { useAuth } from '../context/AuthContext';
+import ErrorState from '../components/primitives/ErrorState';
 import '../components/posts/posts.css';
 import './PostPage.css';
 
@@ -27,7 +26,6 @@ export default function PostPage() {
   const [status, setStatus] = useState(IDLE);
   const [error, setError] = useState('');
 
-  const { updatePost } = usePosts();
   const actions = usePostActions((postId, updates) => {
     setPost((prev) => (prev?.id === postId ? { ...prev, ...updates } : prev));
   });
@@ -43,6 +41,7 @@ export default function PostPage() {
 
   const fetchPost = useCallback(async () => {
     setStatus(LOADING);
+    setError('');
     try {
       const data = await postsAPI.getById(id);
       setPost(data);
@@ -61,17 +60,23 @@ export default function PostPage() {
 
   if (status === LOADING) {
     return (
-      <div className="post-page-loading">
-        <div className="post-page-spinner" />
+      <div className="post-page-loading" role="status">
+        <div className="post-page-spinner" aria-hidden="true" />
+        <p>Loading post…</p>
       </div>
     );
   }
 
   if (status === ERROR) {
     return (
-      <div className="post-page-error" role="alert">
-        {error}
-        <button onClick={() => navigate(-1)}>Go back</button>
+      <div className="post-page">
+        <header className="post-page-header">
+          <button type="button" className="post-page-back btn btn-ghost" onClick={() => navigate(-1)} aria-label="Go back">
+            <FaArrowLeft />
+          </button>
+          <span className="post-page-title">Post</span>
+        </header>
+        <ErrorState error={error} onRetry={fetchPost} />
       </div>
     );
   }
@@ -81,7 +86,7 @@ export default function PostPage() {
   return (
     <div className="post-page">
       <header className="post-page-header">
-        <button className="post-page-back" onClick={() => navigate(-1)} aria-label="Go back">
+        <button type="button" className="post-page-back btn btn-ghost" onClick={() => navigate(-1)} aria-label="Go back">
           <FaArrowLeft />
         </button>
         <span className="post-page-title">Post</span>
@@ -90,10 +95,8 @@ export default function PostPage() {
       <div className="post-page-content">
         <PostCard post={post} actions={actions} />
 
-        <section className="post-page-comments">
-          <h2 className="post-page-section-title">
-            Comments
-          </h2>
+        <section className="post-page-comments" aria-label="Comments">
+          <h2 className="post-page-section-title">Comments</h2>
           <CommentList
             comments={comments}
             status={commentsStatus}
