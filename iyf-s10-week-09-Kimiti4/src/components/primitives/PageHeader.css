@@ -19,7 +19,9 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted, #64748b);
+  /* slate-400 keeps the eyebrow muted while clearing WCAG AA on the dark
+     canvas (slate-500 at 11px bold measured 4.07:1, below the 4.5:1 minimum). */
+  color: var(--prim-slate-400, #94a3b8);
   margin: 0 0 var(--space-2, 8px);
 }
 

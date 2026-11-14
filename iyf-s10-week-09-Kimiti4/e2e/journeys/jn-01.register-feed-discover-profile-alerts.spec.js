@@ -72,16 +72,18 @@ test.describe('JN-01: Register → Feed → Discover → Profile → Alerts', ()
 
     // Level A: Reachability - register page loads
     await page.goto('/register');
-    await expect(page.getByRole('heading', { name: /join jamii/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /create your account/i })).toBeVisible();
 
     // Level B: Interaction - fill and submit registration form
-    const nameInput = page.getByLabel(/username|name/i);
+    const nameInput = page.getByLabel(/display name/i);
     const emailInput = page.getByLabel(/email/i);
     const passwordInput = page.getByRole('textbox', { name: 'Password', exact: true });
+    const confirmInput = page.getByRole('textbox', { name: 'Confirm password', exact: true });
 
     if (await nameInput.isVisible()) await nameInput.fill('newuser');
     if (await emailInput.isVisible()) await emailInput.fill('new@jamii.link');
     if (await passwordInput.isVisible()) await passwordInput.fill('TestPass123!');
+    if (await confirmInput.isVisible()) await confirmInput.fill('TestPass123!');
 
     const submitBtn = page.getByRole('button', { name: /register|sign up|create/i });
     if (await submitBtn.isVisible()) await submitBtn.click();
