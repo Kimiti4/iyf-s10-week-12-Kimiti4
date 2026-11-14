@@ -5,17 +5,29 @@ import MetricsBar from '../components/creator/MetricsBar';
 import TopContentList from '../components/creator/TopContentList';
 import ContentCalendar from '../components/creator/ContentCalendar';
 import DraftsList from '../components/creator/DraftsList';
+import PageHeader from '../components/primitives/PageHeader';
 import './CreatorStudioPage.css';
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
-  { id: 'content', label: 'My Content' },
+  { id: 'content', label: 'My content' },
   { id: 'calendar', label: 'Calendar' },
   { id: 'drafts', label: 'Drafts' },
 ];
 
 export default function CreatorStudioPage() {
-  const { posts, reels, jams, metrics, analytics, drafts, status, fetchAnalytics, fetchDrafts, deleteDraft } = useCreatorStudio();
+  const {
+    posts,
+    reels,
+    jams,
+    metrics,
+    analytics,
+    drafts,
+    status,
+    fetchAnalytics,
+    fetchDrafts,
+    deleteDraft,
+  } = useCreatorStudio();
   const [activeTab, setActiveTab] = useState('overview');
   const [analyticsPeriod, setAnalyticsPeriod] = useState('7d');
 
@@ -26,18 +38,29 @@ export default function CreatorStudioPage() {
 
   return (
     <main className="creator-studio" role="main" aria-label="Creator studio">
-      <header className="creator-studio-header">
-        <h1>Creator Studio</h1>
-        <div className="creator-studio-actions">
-          <Link to="/create/jam" className="creator-studio-btn primary">New Jam</Link>
-          <Link to="/create/post" className="creator-studio-btn">New Post</Link>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Create"
+        title="Creator Studio"
+        subtitle="Metrics, content, calendar, and drafts"
+        actions={
+          <div className="creator-studio-actions">
+            <Link to="/create/jam" className="btn btn-primary">
+              New Jam
+            </Link>
+            <Link to="/create-post" className="btn btn-secondary">
+              New post
+            </Link>
+          </div>
+        }
+      />
 
-      <nav className="creator-studio-tabs">
+      <nav className="creator-studio-tabs" role="tablist">
         {TABS.map((tab) => (
           <button
             key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
             className={`creator-studio-tab ${activeTab === tab.id ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
@@ -47,18 +70,23 @@ export default function CreatorStudioPage() {
       </nav>
 
       <div className="creator-studio-content">
-        {status === 'loading' && <div className="creator-studio-loading">Loading...</div>}
+        {status === 'loading' && (
+          <div className="creator-studio-loading" role="status">
+            Loading…
+          </div>
+        )}
 
         {activeTab === 'overview' && (
           <div className="creator-studio-overview">
             <MetricsBar metrics={metrics} />
             <div className="creator-studio-section">
               <div className="creator-studio-section-header">
-                <h2>Top Content</h2>
+                <h2>Top content</h2>
                 <select
                   value={analyticsPeriod}
                   onChange={(e) => setAnalyticsPeriod(e.target.value)}
                   className="creator-studio-period"
+                  aria-label="Analytics period"
                 >
                   <option value="7d">Last 7 days</option>
                   <option value="30d">Last 30 days</option>
@@ -79,9 +107,7 @@ export default function CreatorStudioPage() {
           </div>
         )}
 
-        {activeTab === 'calendar' && (
-          <ContentCalendar posts={posts} jams={jams} />
-        )}
+        {activeTab === 'calendar' && <ContentCalendar posts={posts} jams={jams} />}
 
         {activeTab === 'drafts' && (
           <DraftsList drafts={drafts} onDelete={deleteDraft} />
