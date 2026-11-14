@@ -1,192 +1,138 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
+import PageHeader from '../components/primitives/PageHeader';
+import EmptyState from '../components/primitives/EmptyState';
+import ErrorState from '../components/primitives/ErrorState';
+import './FounderDashboard.css';
+
 /**
- * 👑 Founder's Command Center - Rule Your Empire!
+ * Founder dashboard — real API only; never shows invented citizens/posts.
+ * Wire metrics endpoint when available: GET /api/metrics/platform
  */
-
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth } from '../context/AuthContext'
-import { colors } from '../styles/designSystem'
-import './FounderDashboard.css'
-
 export default function FounderDashboard() {
-  const { user } = useAuth()
-  const [activeTab, setActiveTab] = useState('overview')
-  const [loading, setLoading] = useState(true)
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [metrics, setMetrics] = useState(null);
+
+  const fetchMetrics = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const base = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+      const token =
+        typeof window !== 'undefined'
+          ? sessionStorage.getItem('accessToken') || ''
+          : '';
+      const res = await fetch(`${base}/metrics/platform`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (res.status === 404) {
+        setMetrics(null);
+        setError('');
+        return;
+      }
+      if (!res.ok) throw new Error('Failed to load platform metrics');
+      const data = await res.json();
+      setMetrics(data.data || data);
+    } catch (err) {
+      setMetrics(null);
+      setError(err.message || 'Metrics unavailable');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 800)
-  }, [])
+    if (user && (user.role === 'founder' || user.isFounder)) {
+      fetchMetrics();
+    } else {
+      setLoading(false);
+    }
+  }, [user, fetchMetrics]);
 
   if (!user || (user.role !== 'founder' && !user.isFounder)) {
     return (
-      <div className="access-denied">
-        <div className="denied-content">
-          <span className="denied-icon">🚫</span>
-          <h1>Access Denied</h1>
-          <p>This royal chamber is only for the platform founder! 👑</p>
-        </div>
-      </div>
-    )
+      <main className="founder-dashboard" role="main">
+        <PageHeader title="Founder dashboard" />
+        <EmptyState
+          icon="🔒"
+          title="Access restricted"
+          message="This area is only available to the platform founder account."
+        />
+      </main>
+    );
   }
 
   const tabs = [
-    { id: 'overview', icon: '📊', label: 'Overview' },
-    { id: 'users', icon: '👥', label: 'Users' },
-    { id: 'content', icon: '📝', label: 'Content' },
-    { id: 'alerts', icon: '🚨', label: 'Alerts' },
-    { id: 'ai', icon: '🤖', label: 'Tiannara AI' }
-  ]
+    { id: 'overview', label: 'Overview' },
+    { id: 'ops', label: 'Operations' },
+  ];
 
   return (
     <main className="founder-dashboard" role="main" aria-label="Founder dashboard">
-      <motion.div 
-        className="dashboard-header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="header-left">
-          <span className="crown-icon">👑</span>
-          <div>
-            <h1>Welcome, Founder! 🎉</h1>
-            <p>Your Kingdom's Control Panel</p>
-          </div>
-        </div>
-        <div className="header-right">
-          <span className="founder-badge">💎 Diamond Tier</span>
-        </div>
-      </motion.div>
+      <PageHeader
+        eyebrow="Platform"
+        title="Founder dashboard"
+        subtitle="Operational overview for JamiiLink"
+      />
 
-      <motion.div 
-        className="dashboard-tabs"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
+      <div className="dashboard-tabs" role="tablist">
         {tabs.map((tab) => (
-          <motion.button
+          <button
             key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
             className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.id)}
-            whileHover={{ scale: 1.05 }}
           >
-            <span className="tab-icon">{tab.icon}</span>
-            <span className="tab-label">{tab.label}</span>
-          </motion.button>
+            {tab.label}
+          </button>
         ))}
-      </motion.div>
+      </div>
 
-      <AnimatePresence mode="wait">
-        {activeTab === 'overview' && (
-          <motion.div 
-            key="overview"
-            className="overview-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
+      {loading && (
+        <div role="status" className="founder-loading">
+          Loading…
+        </div>
+      )}
+
+      {!loading && error && (
+        <ErrorState error={error} onRetry={fetchMetrics} />
+      )}
+
+      {!loading && !error && activeTab === 'overview' && (
+        <section className="overview-section">
+          {metrics ? (
             <div className="stats-grid">
-              <StatCard title="Total Citizens" value="1,247" icon="👥" color={colors.primary[500]} trend="+12%" />
-              <StatCard title="Active Posts" value="845" icon="📝" color={colors.success} trend="+8%" />
-              <StatCard title="Happy Groups" value="23" icon="🏢" color="#667eea" trend="+5%" />
-              <StatCard title="Events Thrown" value="34" icon="🎉" color={colors.accent[500]} trend="+15%" />
+              {Object.entries(metrics).map(([key, value]) => (
+                <div key={key} className="stat-card">
+                  <h3>{key}</h3>
+                  <strong className="stat-value">{String(value)}</strong>
+                </div>
+              ))}
             </div>
+          ) : (
+            <EmptyState
+              icon="📊"
+              title="No live metrics yet"
+              message="Connect GET /api/metrics/platform (or similar) to show real platform counts. Sample user or post numbers are not displayed."
+            />
+          )}
+        </section>
+      )}
 
-            <div className="ai-status-section">
-              <h2>🤖 AI Assistant Status</h2>
-              <div className="ai-grid">
-                <AILinkCard title="Tiannara AI" status="active" requests="24/7" accuracy="95%" />
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'users' && (
-          <motion.div 
-            key="users"
-            className="users-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h2>👥 Manage Citizens</h2>
-            <div className="users-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>User</th>
-                    <th>Role</th>
-                    <th>Power</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Jane Doe <span className="online-dot">🟢</span></td>
-                    <td>Admin</td>
-                    <td>💎 Diamond</td>
-                  </tr>
-                  <tr>
-                    <td>John Smith <span className="offline-dot">⚪</span></td>
-                    <td>User</td>
-                    <td>🥉 Bronze</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'alerts' && (
-          <motion.div 
-            key="alerts"
-            className="alerts-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h2>🚨 Emergency Alerts</h2>
-            <p className="warning-text">Use with royal responsibility! ⚠️</p>
-            
-            <div className="alert-form">
-              <input type="text" placeholder="Alert title..." />
-              <textarea placeholder="Important message to citizens..." rows="4" />
-              <select>
-                <option>Security 🛡️</option>
-                <option>Weather ⛈️</option>
-                <option>Health 🏥</option>
-              </select>
-              <motion.button 
-                className="btn-danger"
-                whileHover={{ scale: 1.02 }}
-              >
-                🚨 Broadcast Alert
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {!loading && activeTab === 'ops' && (
+        <section className="ops-section">
+          <EmptyState
+            icon="🛠️"
+            title="Operations tools"
+            message="User moderation, content review, and alert broadcast should call authenticated admin APIs. UI actions stay disabled until those endpoints are confirmed."
+          />
+        </section>
+      )}
     </main>
-  )
+  );
 }
-
-const StatCard = ({ title, value, icon, color, trend }) => (
-  <motion.div 
-    className="stat-card"
-    whileHover={{ y: -5, boxShadow: `0 10px 30px ${color}33` }}
-  >
-    <span className="stat-icon">{icon}</span>
-    <div>
-      <h3>{title}</h3>
-      <strong className="stat-value">{value}</strong>
-      {trend && <span className="trend">📈 {trend}</span>}
-    </div>
-  </motion.div>
-)
-
-const AILinkCard = ({ title, status, requests, accuracy }) => (
-  <motion.div 
-    className="ai-card"
-    whileHover={{ scale: 1.02 }}
-  >
-    <h3>{title}</h3>
-    <p>Status: <span className="status-active">✅ Active</span></p>
-    <p>Requests: {requests}</p>
-    <p>Accuracy: {accuracy}</p>
-  </motion.div>
-)
