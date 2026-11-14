@@ -6,6 +6,7 @@ const router = express.Router();
 const messagesController = require('../controllers/messagesControllerPG');
 const { protect } = require('../middleware/authPG');
 const { messageLimiter } = require('../middleware/rateLimiter');
+const { validateMessage } = require('../middleware/validate');
 
 router.get('/conversations', protect, messagesController.listConversations);
 router.post('/conversations', protect, messagesController.getOrCreateConversation);
@@ -14,6 +15,7 @@ router.post(
   '/conversations/:id/messages',
   protect,
   messageLimiter,
+  validateMessage,
   messagesController.sendMessage
 );
 router.patch('/conversations/:id/read', protect, messagesController.markRead);
