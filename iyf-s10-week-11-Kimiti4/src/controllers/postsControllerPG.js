@@ -1,24 +1,42 @@
 /**
- * 🔹 Posts Controller - PostgreSQL Version
- * Handles CRUD + filtering for Mtaani/Skills/Farm/Gigs
- * Integrated with Tiannara AI for content moderation
+ * Posts Controller — PostgreSQL
+ * CRUD + filtering; Tiannara moderation is fail-closed on create.
  */
 const { PostRepository } = require('../database');
 const asyncHandler = require('../utils/asyncHandler');
 const { ApiError } = require('../middleware/errorHandler');
 const tiannaraService = require('../services/tiannaraService');
 
-// GET all posts with advanced filtering
+const MAX_LIMIT = 50;
+
+function parsePageLimit(page, limit) {
+  const p = Math.max(1, parseInt(page, 10) || 1);
+  const l = Math.min(MAX_LIMIT, Math.max(1, parseInt(limit, 10) || 10));
+  return { page: p, limit: l };
+}
+
 const getAllPosts = asyncHandler(async (req, res) => {
   const {
-    category, location, county, settlement, zone,
-    search, author, tag,
-    sort = 'newest', page = 1, limit = 10,
-    minPrice, maxPrice, crop, skill,
-    organization
+    category,
+    location,
+    county,
+    settlement,
+    zone,
+    search,
+    author,
+    tag,
+    sort = 'newest',
+    page = 1,
+    limit = 10,
+    minPrice,
+    maxPrice,
+    crop,
+    skill,
+    organization,
   } = req.query;
 
-  // Build filter object
+  const { page: pageNum, limit: limitNum } = parsePageLimit(page, limit);
+
   const filters = {
     category,
     organizationId: organization,
@@ -27,11 +45,10 @@ const getAllPosts = asyncHandler(async (req, res) => {
     authorId: author,
     search,
     sort,
-    page: parseInt(page),
-    limit: parseInt(limit)
+    page: pageNum,
+    limit: limitNum,
   };
 
-  // Execute query
   const result = await PostRepository.find(filters);
 
   res.json({
@@ -40,11 +57,10 @@ const getAllPosts = asyncHandler(async (req, res) => {
     total: result.pagination.total,
     pages: result.pagination.pages,
     currentPage: result.pagination.page,
-    data: result.posts
+    data: result.posts,
   });
 });
 
-// GET single post by ID
 const getPostById = asyncHandler(async (req, res) => {
   const post = await PostRepository.findById(req.params.id);
 
@@ -52,54 +68,41 @@ const getPostById = asyncHandler(async (req, res) => {
     throw new ApiError('Post not found', 404);
   }
 
-  // Increment views
   await PostRepository.incrementViews(req.params.id);
 
   res.json({
     success: true,
-    data: post
+    data: post,
   });
 });
 
-// CREATE new post with AI moderation
 const createPost = asyncHandler(async (req, res) => {
-  const { title, content, category, location, metadata, tags, organization } = req.body;
+  const { title, content, category, location, metadata, tags, organization } =
+    req.body;
 
-  // Validate required fields
-  if (!title || !content || !category) {
-    throw new ApiError('Title, content, and category are required', 400);
-  }
+  // validatePost middleware already enforced title/content/category
 
-  // 🔹 STEP 1: Moderate content BEFORE saving (Tiannara integration)
-  // R3 [P1-4]: FAIL-CLOSED. If moderation is unavailable the post is NOT
-  // created (503). No synthetic `{ safe: true }` fallback, no
-  // `moderationChecked: true` row for an unmoderated post.
   let moderationResult = null;
   try {
     moderationResult = await tiannaraService.moderateContent(content);
   } catch (error) {
-    return res.status(503).json({
-      success: false,
-      error: 'Content moderation is unavailable; post not created',
-      code: 'MODERATION_UNAVAILABLE'
-    });
+    throw new ApiError(
+      'Content moderation is unavailable; post not created',
+      503,
+      { code: 'MODERATION_UNAVAILABLE' }
+    );
   }
 
-  // 🔹 STEP 2: Check if content is safe
   if (!tiannaraService.isContentSafe(moderationResult)) {
-    return res.status(400).json({
-      success: false,
-      message: 'Content violates community guidelines',
-      reason: tiannaraService.getFlagReason(moderationResult),
-      details: {
-        toxicity: moderationResult.toxicity_score,
-        spam: moderationResult.spam_probability,
-        scam: moderationResult.scam_probability
-      }
+    throw new ApiError('Content violates community guidelines', 400, {
+      code: 'CONTENT_REJECTED',
+      errors: [
+        tiannaraService.getFlagReason(moderationResult) ||
+          'Flagged by moderation',
+      ],
     });
   }
 
-  // 🔹 STEP 3: Content is safe, proceed with creation
   const postData = {
     title,
     content,
@@ -108,12 +111,11 @@ const createPost = asyncHandler(async (req, res) => {
     category,
     location: location || {},
     metadata: metadata || {},
-    tags: tags || []
+    tags: tags || [],
   };
 
   const post = await PostRepository.create(postData);
 
-  // Store moderation metadata
   await PostRepository.update(post.id, {
     moderationChecked: true,
     moderationTimestamp: new Date(),
@@ -121,7 +123,7 @@ const createPost = asyncHandler(async (req, res) => {
     moderationSpamScore: moderationResult.spam_probability,
     moderationScamScore: moderationResult.scam_probability,
     moderationFlagged: !moderationResult.safe,
-    moderationCategories: moderationResult.categories_flagged
+    moderationCategories: moderationResult.categories_flagged,
   });
 
   res.status(201).json({
@@ -130,12 +132,11 @@ const createPost = asyncHandler(async (req, res) => {
     moderation: {
       checked: true,
       safe: moderationResult.safe,
-      scores: moderationResult.scores
-    }
+      scores: moderationResult.scores,
+    },
   });
 });
 
-// UPDATE post
 const updatePost = asyncHandler(async (req, res) => {
   const post = await PostRepository.findById(req.params.id);
 
@@ -143,7 +144,6 @@ const updatePost = asyncHandler(async (req, res) => {
     throw new ApiError('Post not found', 404);
   }
 
-  // Check authorization (only author can update)
   if (post.author.id !== req.user.id && req.user.role !== 'admin') {
     throw new ApiError('Not authorized to update this post', 403);
   }
@@ -151,7 +151,7 @@ const updatePost = asyncHandler(async (req, res) => {
   const allowedFields = ['title', 'content', 'location', 'metadata', 'tags'];
   const updates = {};
 
-  allowedFields.forEach(field => {
+  allowedFields.forEach((field) => {
     if (req.body[field] !== undefined) {
       updates[field] = req.body[field];
     }
@@ -161,11 +161,10 @@ const updatePost = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: updatedPost
+    data: updatedPost,
   });
 });
 
-// DELETE post
 const deletePost = asyncHandler(async (req, res) => {
   const post = await PostRepository.findById(req.params.id);
 
@@ -173,7 +172,6 @@ const deletePost = asyncHandler(async (req, res) => {
     throw new ApiError('Post not found', 404);
   }
 
-  // Check authorization (author or admin only)
   if (post.author.id !== req.user.id && req.user.role !== 'admin') {
     throw new ApiError('Not authorized to delete this post', 403);
   }
@@ -182,11 +180,10 @@ const deletePost = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Post deleted successfully'
+    message: 'Post deleted successfully',
   });
 });
 
-// LIKE post
 const likePost = asyncHandler(async (req, res) => {
   const post = await PostRepository.like(req.params.id);
 
@@ -194,100 +191,102 @@ const likePost = asyncHandler(async (req, res) => {
     throw new ApiError('Post not found', 404);
   }
 
-  // Record per-user like for the Liked tab (idempotent)
   const { query } = require('../config/postgres');
   await query(
     `INSERT INTO post_likes (user_id, post_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
     [req.user.id, req.params.id]
   ).catch(() => {});
 
-  // Notify the post author (not for self-likes; best-effort)
   try {
     const authorId = post.author?.id;
     if (authorId && String(authorId) !== String(req.user.id)) {
-      const { createNotification, emitToUser } = require('./notificationsControllerPG');
+      const {
+        createNotification,
+        emitToUser,
+      } = require('./notificationsControllerPG');
       const note = await createNotification({
         userId: authorId,
-        actorId: req.user.id, type: 'like', targetType: 'post', referenceId: post.id
+        actorId: req.user.id,
+        type: 'like',
+        targetType: 'post',
+        referenceId: post.id,
       });
       emitToUser(authorId, 'notification:new', { id: note.id, type: 'like' });
     }
   } catch {
-    // Notification delivery is best-effort
+    // best-effort
   }
 
   res.json({
     success: true,
-    data: post
+    data: post,
   });
 });
 
-  // UPVOTE post (for alerts)
-  const upvotePost = asyncHandler(async (req, res) => {
-    const post = await PostRepository.upvote(req.params.id);
+const upvotePost = asyncHandler(async (req, res) => {
+  const post = await PostRepository.upvote(req.params.id);
 
+  if (!post) {
+    throw new ApiError('Post not found', 404);
+  }
+
+  res.json({
+    success: true,
+    data: post,
+  });
+});
+
+const engagePost = asyncHandler(async (req, res) => {
+  const { type } = req.query;
+
+  if (type === 'like') {
+    const post = await PostRepository.like(req.params.id);
     if (!post) {
       throw new ApiError('Post not found', 404);
     }
+    return res.json({ success: true, data: post });
+  }
 
-    res.json({
-      success: true,
-      data: post
-    });
-  });
-
-  // R3 [P1-9 U1]: unified engage endpoint used by the live frontend
-  // (postApi.js, distributionApi.js). like/unlike operate on the real
-  // `likes` counter. repost/unrepost/save/unsave have no backing storage
-  // (creating it is R6 schema work) and therefore return explicit 501
-  // instead of fabricated counters.
-  const engagePost = asyncHandler(async (req, res) => {
-    const { type } = req.query;
-
-    if (type === 'like') {
-      const post = await PostRepository.like(req.params.id);
-      if (!post) {
-        throw new ApiError('Post not found', 404);
-      }
-      return res.json({ success: true, data: post });
+  if (type === 'unlike') {
+    const post = await PostRepository.unlike(req.params.id);
+    if (!post) {
+      throw new ApiError('Post not found', 404);
     }
+    const { query: q2 } = require('../config/postgres');
+    await q2(`DELETE FROM post_likes WHERE user_id = $1 AND post_id = $2`, [
+      req.user.id,
+      req.params.id,
+    ]).catch(() => {});
+    return res.json({ success: true, data: post });
+  }
 
-    if (type === 'unlike') {
-      const post = await PostRepository.unlike(req.params.id);
-      if (!post) {
-        throw new ApiError('Post not found', 404);
-      }
-      const { query: q2 } = require('../config/postgres');
-      await q2(
-        `DELETE FROM post_likes WHERE user_id = $1 AND post_id = $2`,
-        [req.user.id, req.params.id]
-      ).catch(() => {});
-      return res.json({ success: true, data: post });
-    }
-
-    if (type === 'repost' || type === 'unrepost') {
-      return res.status(501).json({
-        success: false,
-        error: `Engagement type '${type}' is not available`,
-        code: 'ENGAGE_NOT_IMPLEMENTED'
-      });
-    }
-
-    return res.status(400).json({
+  if (type === 'repost' || type === 'unrepost') {
+    return res.status(501).json({
       success: false,
-      error: `Unknown engagement type '${type}'. Expected like, unlike, repost, or unrepost.`
+      error: {
+        message: `Engagement type '${type}' is not available`,
+        code: 'ENGAGE_NOT_IMPLEMENTED',
+        statusCode: 501,
+      },
     });
-  });
+  }
 
-// GET user's posts
+  throw new ApiError(
+    `Unknown engagement type '${type}'. Expected like, unlike, repost, or unrepost.`,
+    400,
+    { code: 'BAD_REQUEST' }
+  );
+});
+
 const getUserPosts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, category } = req.query;
+  const { page: pageNum, limit: limitNum } = parsePageLimit(page, limit);
 
   const result = await PostRepository.find({
     authorId: req.user.id,
     category,
-    page: parseInt(page),
-    limit: parseInt(limit)
+    page: pageNum,
+    limit: limitNum,
   });
 
   res.json({
@@ -296,19 +295,19 @@ const getUserPosts = asyncHandler(async (req, res) => {
     total: result.pagination.total,
     pages: result.pagination.pages,
     currentPage: result.pagination.page,
-    data: result.posts
+    data: result.posts,
   });
 });
 
-// GET organization posts
 const getOrganizationPosts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, category } = req.query;
+  const { page: pageNum, limit: limitNum } = parsePageLimit(page, limit);
 
   const result = await PostRepository.find({
     organizationId: req.params.orgId,
     category,
-    page: parseInt(page),
-    limit: parseInt(limit)
+    page: pageNum,
+    limit: limitNum,
   });
 
   res.json({
@@ -317,47 +316,47 @@ const getOrganizationPosts = asyncHandler(async (req, res) => {
     total: result.pagination.total,
     pages: result.pagination.pages,
     currentPage: result.pagination.page,
-    data: result.posts
+    data: result.posts,
   });
 });
 
-// GET trending hashtags
 const getTrendingTags = asyncHandler(async (req, res) => {
-  const { limit = 10 } = req.query;
+  const limitNum = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10));
   const { query } = require('../config/postgres');
-  
-  const result = await query(`
+
+  const result = await query(
+    `
     SELECT unnest(tags) AS tag, COUNT(*) AS count
     FROM posts
     WHERE tags IS NOT NULL
     GROUP BY tag
     ORDER BY count DESC
     LIMIT $1
-  `, [parseInt(limit)]);
+  `,
+    [limitNum]
+  );
 
-  const formattedTags = result.rows.map(row => ({
-    tag: row.tag.replace(/^#/, ''), // Remove # if it's there
-    count: parseInt(row.count),
-    trend: 'up', // Mock for now
-    change: '+10%' // Mock for now
+  const formattedTags = result.rows.map((row) => ({
+    tag: String(row.tag).replace(/^#/, ''),
+    count: parseInt(row.count, 10),
   }));
 
   res.json({
     success: true,
-    data: formattedTags
+    data: formattedTags,
   });
 });
 
-  module.exports = {
-    getAllPosts,
-    getPostById,
-    createPost,
-    updatePost,
-    deletePost,
-    likePost,
-    upvotePost,
-    engagePost,
-    getUserPosts,
-    getOrganizationPosts,
-    getTrendingTags
-  };
+module.exports = {
+  getAllPosts,
+  getPostById,
+  createPost,
+  updatePost,
+  deletePost,
+  likePost,
+  upvotePost,
+  engagePost,
+  getUserPosts,
+  getOrganizationPosts,
+  getTrendingTags,
+};
