@@ -5,6 +5,12 @@ import JamPublish from './JamPublish';
 
 const STEPS = ['configure', 'preview', 'publish'];
 
+const STEP_LABELS = {
+  configure: 'Configure',
+  preview: 'Preview',
+  publish: 'Publish',
+};
+
 const INITIAL_STATE = {
   title: '',
   description: '',
@@ -17,7 +23,7 @@ const INITIAL_STATE = {
   tags: [],
 };
 
-export default function JamCreationWizard({ onComplete, onCancel }) {
+export default function JamCreationWizard({ onComplete, onCancel, isSubmitting = false }) {
   const [step, setStep] = useState(0);
   const [jamData, setJamData] = useState(INITIAL_STATE);
   const [errors, setErrors] = useState({});
@@ -41,7 +47,7 @@ export default function JamCreationWizard({ onComplete, onCancel }) {
       if (!jamData.prompt.trim()) {
         newErrors.prompt = 'A prompt helps people know what to do';
       }
-      if (jamData.participationTypes.length === 0) {
+      if (!jamData.participationTypes.length) {
         newErrors.participationTypes = 'Select at least one participation type';
       }
     }
@@ -59,63 +65,75 @@ export default function JamCreationWizard({ onComplete, onCancel }) {
     setStep((prev) => Math.max(prev - 1, 0));
   }, []);
 
-  const handlePublish = useCallback(() => {
-    onComplete(jamData);
-  }, [jamData, onComplete]);
+  const handlePublish = useCallback(
+    (overrides = {}) => {
+      if (isSubmitting) return;
+      onComplete({ ...jamData, ...overrides });
+    },
+    [jamData, onComplete, isSubmitting]
+  );
 
   return (
     <div className="jam-wizard">
-      <div className="jam-wizard-header">
-        <h1>Start a Jam</h1>
-        <p className="jam-wizard-subtitle">
-          Turn your audience into participants
-        </p>
-
-        <div className="jam-wizard-steps" role="tablist" aria-label="Creation steps">
-          {STEPS.map((s, i) => (
-            <div
-              key={s}
-              className={`jam-wizard-step ${i === step ? 'active' : ''} ${i < step ? 'completed' : ''}`}
-              role="tab"
-              aria-selected={i === step}
-              aria-label={`Step ${i + 1}: ${s}`}
-            >
-              <span className="step-number">{i < step ? '✓' : i + 1}</span>
-              <span className="step-label">{s}</span>
-            </div>
-          ))}
-        </div>
+      <div className="jam-wizard-steps" role="tablist" aria-label="Creation steps">
+        {STEPS.map((s, i) => (
+          <div
+            key={s}
+            className={`jam-wizard-step ${i === step ? 'active' : ''} ${i < step ? 'completed' : ''}`}
+            role="tab"
+            aria-selected={i === step}
+            aria-label={`Step ${i + 1}: ${STEP_LABELS[s]}`}
+          >
+            <span className="step-number" aria-hidden="true">
+              {i < step ? '✓' : i + 1}
+            </span>
+            <span className="step-label">{STEP_LABELS[s]}</span>
+          </div>
+        ))}
       </div>
 
       <div className="jam-wizard-content" role="tabpanel">
         {currentStep === 'configure' && (
-          <JamConfigForm
-            data={jamData}
-            onChange={updateJamData}
-            errors={errors}
-          />
+          <JamConfigForm data={jamData} onChange={updateJamData} errors={errors} />
         )}
-        {currentStep === 'preview' && (
-          <JamPreview data={jamData} />
-        )}
+        {currentStep === 'preview' && <JamPreview data={jamData} />}
         {currentStep === 'publish' && (
-          <JamPublish data={jamData} onPublish={handlePublish} />
+          <JamPublish
+            data={jamData}
+            onPublish={handlePublish}
+            isSubmitting={isSubmitting}
+          />
         )}
       </div>
 
       <div className="jam-wizard-footer">
-        <button className="jam-wizard-btn cancel" onClick={onCancel}>
+        <button
+          type="button"
+          className="btn btn-ghost jam-wizard-btn cancel"
+          onClick={onCancel}
+          disabled={isSubmitting}
+        >
           Cancel
         </button>
 
         {step > 0 && (
-          <button className="jam-wizard-btn back" onClick={handleBack}>
+          <button
+            type="button"
+            className="btn btn-secondary jam-wizard-btn back"
+            onClick={handleBack}
+            disabled={isSubmitting}
+          >
             Back
           </button>
         )}
 
         {currentStep !== 'publish' && (
-          <button className="jam-wizard-btn next" onClick={handleNext}>
+          <button
+            type="button"
+            className="btn btn-primary jam-wizard-btn next"
+            onClick={handleNext}
+            disabled={isSubmitting}
+          >
             Next
           </button>
         )}
