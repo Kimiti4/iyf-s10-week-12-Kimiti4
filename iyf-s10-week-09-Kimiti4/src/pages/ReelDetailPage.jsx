@@ -5,9 +5,15 @@ import ReelPlayer from '../components/reels/ReelPlayer';
 import ReelCaption from '../components/reels/ReelCaption';
 import ReelActions from '../components/reels/ReelActions';
 import ReelJamCTA from '../components/reels/ReelJamCTA';
+import ErrorState from '../components/primitives/ErrorState';
 import { reelsAPI } from '../services/reelApi';
-import { normalizeReel } from '../contracts/reelContract';
-import { trackLike, trackUnlike, trackShare, trackSave, trackUnsave } from '../contracts/socialEventContract';
+import {
+  trackLike,
+  trackUnlike,
+  trackShare,
+  trackSave,
+  trackUnsave,
+} from '../contracts/socialEventContract';
 import '../components/reels/reels.css';
 
 const IDLE = 'idle';
@@ -24,6 +30,7 @@ export default function ReelDetailPage() {
 
   const fetchReel = useCallback(async () => {
     setStatus(LOADING);
+    setError('');
     try {
       const data = await reelsAPI.getById(id);
       setReel(data);
@@ -39,7 +46,7 @@ export default function ReelDetailPage() {
   }, [fetchReel]);
 
   const updateReel = useCallback((updates) => {
-    setReel((prev) => prev ? { ...prev, ...updates } : prev);
+    setReel((prev) => (prev ? { ...prev, ...updates } : prev));
   }, []);
 
   const handleLike = useCallback(async () => {
@@ -70,21 +77,36 @@ export default function ReelDetailPage() {
     if (!reel) return;
     updateReel({ isSaved: true });
     trackSave('reel', reel.id);
-    try { await reelsAPI.save(reel.id); } catch { updateReel({ isSaved: false }); }
+    try {
+      await reelsAPI.save(reel.id);
+    } catch {
+      updateReel({ isSaved: false });
+    }
   }, [reel, updateReel]);
 
   const handleUnsave = useCallback(async () => {
     if (!reel) return;
     updateReel({ isSaved: false });
     trackUnsave('reel', reel.id);
-    try { await reelsAPI.unsave(reel.id); } catch { updateReel({ isSaved: true }); }
+    try {
+      await reelsAPI.unsave(reel.id);
+    } catch {
+      updateReel({ isSaved: true });
+    }
   }, [reel, updateReel]);
 
   const handleShare = useCallback(async () => {
     if (!reel) return;
     trackShare('reel', reel.id);
     if (navigator.share) {
-      try { await navigator.share({ title: reel.caption?.slice(0, 100), url: window.location.href }); } catch {}
+      try {
+        await navigator.share({
+          title: reel.caption?.slice(0, 100),
+          url: window.location.href,
+        });
+      } catch {
+        /* user cancelled */
+      }
     } else {
       await navigator.clipboard.writeText(window.location.href);
     }
@@ -93,7 +115,9 @@ export default function ReelDetailPage() {
   if (status === LOADING) {
     return (
       <div className="reel-detail-page">
-        <div className="reel-feed-loading"><div className="reel-feed-spinner" /></div>
+        <div className="reel-feed-loading" role="status">
+          <div className="reel-feed-spinner" aria-hidden="true" />
+        </div>
       </div>
     );
   }
@@ -102,12 +126,17 @@ export default function ReelDetailPage() {
     return (
       <div className="reel-detail-page">
         <div className="reel-detail-header">
-          <button className="reel-detail-back" onClick={() => navigate(-1)}><FaArrowLeft /></button>
+          <button
+            type="button"
+            className="reel-detail-back"
+            onClick={() => navigate(-1)}
+            aria-label="Go back"
+          >
+            <FaArrowLeft />
+          </button>
           <span className="reel-detail-title">Reel</span>
         </div>
-        <div style={{ padding: '2rem', color: '#fff', textAlign: 'center' }}>
-          {error || 'Not found'}
-        </div>
+        <ErrorState error={error || 'Reel not found'} onRetry={fetchReel} />
       </div>
     );
   }
@@ -115,13 +144,18 @@ export default function ReelDetailPage() {
   return (
     <div className="reel-detail-page">
       <header className="reel-detail-header">
-        <button className="reel-detail-back" onClick={() => navigate(-1)} aria-label="Go back">
+        <button
+          type="button"
+          className="reel-detail-back"
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+        >
           <FaArrowLeft />
         </button>
         <span className="reel-detail-title">Reel</span>
       </header>
 
-      <div style={{ position: 'relative', height: 'calc(100vh - 60px)' }}>
+      <div className="reel-detail-stage">
         <ReelPlayer reel={reel} isActive={true} />
 
         <div className="reel-card-sidebar">
@@ -137,7 +171,11 @@ export default function ReelDetailPage() {
 
         <div className="reel-card-bottom">
           <ReelCaption reel={reel} />
-          <ReelJamCTA jamId={reel.jamId} jamTitle={reel.jamTitle} jamCTA={reel.jamCTA} />
+          <ReelJamCTA
+            jamId={reel.jamId}
+            jamTitle={reel.jamTitle}
+            jamCTA={reel.jamCTA}
+          />
         </div>
       </div>
     </div>
