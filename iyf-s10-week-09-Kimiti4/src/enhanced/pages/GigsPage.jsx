@@ -5,8 +5,8 @@ export default function GigsPage() {
     <UnavailableFeaturePage
       title="Gigs"
       icon="💼"
-      description="Find short-term work, side hustles, and flexible opportunities."
-      capability="The current backend does not provide a verified live gigs feed."
+      description="Short-term work and flexible opportunities."
+      capability="No verified live gigs feed is available yet."
     />
   );
 }
