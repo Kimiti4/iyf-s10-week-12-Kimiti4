@@ -1,15 +1,16 @@
 /**
  * Authentication Routes
- *
- * Login/register use validateLogin / validateRegister (Phase 4).
- * MFA enrollment/verify require protect.
  */
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authControllerPG');
 const { enrollTotp, verifyTotp } = require('../controllers/mfaControllerPG');
 const { protect } = require('../middleware/authPG');
-const { validateLogin, validateRegister } = require('../middleware/validate');
+const {
+  validateLogin,
+  validateRegister,
+  validateChangePassword,
+} = require('../middleware/validate');
 
 // Public routes
 router.post('/register', validateRegister, authController.register);
@@ -29,19 +30,32 @@ router.post('/mfa/totp/verify', protect, verifyTotp);
 router.get('/google', (req, res) => {
   res.status(501).json({
     success: false,
-    error: { message: 'Google OAuth is not configured', code: 'NOT_IMPLEMENTED', statusCode: 501 },
+    error: {
+      message: 'Google OAuth is not configured',
+      code: 'NOT_IMPLEMENTED',
+      statusCode: 501,
+    },
   });
 });
 router.get('/google/callback', (req, res) => {
   res.status(501).json({
     success: false,
-    error: { message: 'Google OAuth is not configured', code: 'NOT_IMPLEMENTED', statusCode: 501 },
+    error: {
+      message: 'Google OAuth is not configured',
+      code: 'NOT_IMPLEMENTED',
+      statusCode: 501,
+    },
   });
 });
 
 // Protected routes
 router.get('/me', protect, authController.getMe);
 router.put('/me', protect, authController.updateProfile);
-router.put('/change-password', protect, authController.changePassword);
+router.put(
+  '/change-password',
+  protect,
+  validateChangePassword,
+  authController.changePassword
+);
 
 module.exports = router;
