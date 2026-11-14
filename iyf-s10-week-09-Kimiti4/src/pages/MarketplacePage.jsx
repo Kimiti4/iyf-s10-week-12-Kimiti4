@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import PageHeader from '../components/primitives/PageHeader';
+import EmptyState from '../components/primitives/EmptyState';
 import './MarketplacePage.css';
 
 export default function MarketplacePage() {
@@ -8,10 +10,11 @@ export default function MarketplacePage() {
 
   return (
     <main className="marketplace-page" role="main" aria-label="Marketplace">
-      <header className="marketplace-header">
-        <h1>🛍️ JamiiLink Marketplace</h1>
-        <p>Discover products and stores from the community.</p>
-      </header>
+      <PageHeader
+        eyebrow="Commerce"
+        title="Marketplace"
+        subtitle="Products and stores from the community"
+      />
 
       <div className="marketplace-search">
         <label htmlFor="marketplace-search">Search marketplace</label>
@@ -24,26 +27,24 @@ export default function MarketplacePage() {
         />
       </div>
 
-      <section className="empty-state" role="status" aria-live="polite">
-        <div className="empty-illustration" aria-hidden="true">🛍️</div>
-        <h2>Marketplace data is unavailable</h2>
-        <p>
-          The current backend does not expose a real product/store catalogue yet.
-          No sample listings are shown so the UI never presents fabricated products,
-          prices, sellers, ratings, or inventory as real data.
-        </p>
-        {searchQuery && <p>Search “{searchQuery}” returned no verified marketplace data.</p>}
-      </section>
+      <EmptyState
+        icon="🛍️"
+        title="Marketplace data is unavailable"
+        message={
+          searchQuery
+            ? `No verified results for “${searchQuery}”. The catalogue API is not live yet.`
+            : 'The backend does not expose a product catalogue yet. No sample listings are shown so the UI never presents fabricated products or prices.'
+        }
+      />
 
       {user && (
         <button
           type="button"
-          className="create-listing-btn"
+          className="btn btn-secondary create-listing-btn"
           disabled
-          title="Marketplace listing creation requires a backend listing service"
+          title="Listing creation requires a backend listing service"
         >
-          <span className="btn-icon" aria-hidden="true">+</span>
-          <span className="btn-text">Sell Something — unavailable</span>
+          Sell something — unavailable
         </button>
       )}
     </main>
