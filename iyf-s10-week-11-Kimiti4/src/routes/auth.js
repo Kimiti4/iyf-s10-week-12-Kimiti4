@@ -1,21 +1,20 @@
 /**
- * 🔹 Authentication Routes
+ * Authentication Routes
  *
- * R2 [P0-5]: /mfa/totp/enroll + /mfa/totp/verify are server-authoritative
- * TOTP enrollment/verification. The client never supplies the authoritative
- * secret for verification.
+ * Login/register use validateLogin / validateRegister (Phase 4).
+ * MFA enrollment/verify require protect.
  */
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authControllerPG'); // PostgreSQL version
+const authController = require('../controllers/authControllerPG');
 const { enrollTotp, verifyTotp } = require('../controllers/mfaControllerPG');
-const { protect } = require('../middleware/authPG'); // PostgreSQL version
+const { protect } = require('../middleware/authPG');
+const { validateLogin, validateRegister } = require('../middleware/validate');
 
 // Public routes
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+router.post('/register', validateRegister, authController.register);
+router.post('/login', validateLogin, authController.login);
 router.post('/logout', authController.logout);
-// R5 [P0-7]: rotating refresh sessions (HttpOnly cookie transport).
 router.post('/refresh', authController.refresh);
 
 // Verification routes
@@ -26,12 +25,18 @@ router.post('/verify-code', authController.verifyCode);
 router.post('/mfa/totp/enroll', protect, enrollTotp);
 router.post('/mfa/totp/verify', protect, verifyTotp);
 
-// OAuth routes (Scaffolded)
+// OAuth scaffold (not production-ready)
 router.get('/google', (req, res) => {
-    res.json({ success: true, message: "Redirecting to Google OAuth (Mock)" });
+  res.status(501).json({
+    success: false,
+    error: { message: 'Google OAuth is not configured', code: 'NOT_IMPLEMENTED', statusCode: 501 },
+  });
 });
 router.get('/google/callback', (req, res) => {
-    res.json({ success: true, message: "Google OAuth callback successful" });
+  res.status(501).json({
+    success: false,
+    error: { message: 'Google OAuth is not configured', code: 'NOT_IMPLEMENTED', statusCode: 501 },
+  });
 });
 
 // Protected routes
