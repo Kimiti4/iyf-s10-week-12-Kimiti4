@@ -5,8 +5,8 @@ export default function MtaaniPage() {
     <UnavailableFeaturePage
       title="Mtaani"
       icon="🏘️"
-      description="Local neighborhood news, events, and community activity."
-      capability="The backend currently has no real Mtaani activity feed."
+      description="Local neighborhood news, events, and activity."
+      capability="No dedicated Mtaani activity feed is available yet."
     />
   );
 }
