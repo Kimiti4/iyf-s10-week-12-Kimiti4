@@ -1,13 +1,6 @@
 /**
- * 🔹 Authentication & Authorization Middleware - PostgreSQL Version
- * JWT verification, role-based access control
- *
- * R5 [P0-7]:
- *  - strict claim validation: signature + exp + iss + aud required.
- *    Pre-R5 tokens without iss/aud are rejected (all clients re-login once).
- *  - any JWT decode/verify failure normalizes to 401 (previously an
- *    altered-payload edge could surface as 500).
- *  - DB lookup failures still propagate to the error handler.
+ * Authentication & Authorization — PostgreSQL
+ * JWT: signature + exp + iss + aud required.
  */
 const jwt = require('jsonwebtoken');
 const { UserRepository } = require('../database');
@@ -16,15 +9,21 @@ const JWT_ISSUER = 'jamiilink';
 const JWT_AUDIENCE = 'jamiilink-api';
 
 function verifyAccessToken(token) {
-  // Throws on any verification problem; callers normalize to 401.
   return jwt.verify(token, process.env.JWT_SECRET, {
     issuer: JWT_ISSUER,
-    audience: JWT_AUDIENCE
+    audience: JWT_AUDIENCE,
   });
 }
 
-function unauthorized(res, error) {
-  return res.status(401).json({ success: false, error });
+function unauthorized(res, message, code = 'UNAUTHORIZED') {
+  return res.status(401).json({
+    success: false,
+    error: {
+      message,
+      code,
+      statusCode: 401,
+    },
+  });
 }
 
 /**
@@ -33,13 +32,12 @@ function unauthorized(res, error) {
 const protect = async (req, res, next) => {
   let token;
 
-  // Check Authorization header
   if (req.headers.authorization?.startsWith('Bearer ')) {
     token = req.headers.authorization.split(' ')[1];
   }
 
   if (!token) {
-    return unauthorized(res, 'Access denied. No token provided.');
+    return unauthorized(res, 'Access denied. No token provided.', 'NO_TOKEN');
   }
 
   let decoded;
@@ -47,22 +45,18 @@ const protect = async (req, res, next) => {
     decoded = verifyAccessToken(token);
   } catch (error) {
     if (error && error.name === 'TokenExpiredError') {
-      return unauthorized(res, 'Token expired');
+      return unauthorized(res, 'Token expired', 'TOKEN_EXPIRED');
     }
-    // R5: every other JWT failure (bad signature, malformed, alg mismatch,
-    // missing/wrong iss/aud, tampered payload) is a 401, never a 500.
-    return unauthorized(res, 'Invalid token');
+    return unauthorized(res, 'Invalid token', 'INVALID_TOKEN');
   }
 
   try {
-    // Get user from database
     const user = await UserRepository.findById(decoded.id);
 
     if (!user) {
-      return unauthorized(res, 'User no longer exists');
+      return unauthorized(res, 'User no longer exists', 'USER_GONE');
     }
 
-    // Attach user to request
     req.user = user;
     req.auth = { jti: decoded.jti || null };
     next();
@@ -72,7 +66,7 @@ const protect = async (req, res, next) => {
 };
 
 /**
- * Optional auth: Attach user if token exists, continue if not
+ * Optional auth: attach user if token valid, else continue
  */
 const optionalAuth = async (req, res, next) => {
   try {
@@ -83,12 +77,11 @@ const optionalAuth = async (req, res, next) => {
         req.user = await UserRepository.findById(decoded.id);
         if (req.user) req.auth = { jti: decoded.jti || null };
       } catch {
-        // Invalid token on an optional route: continue unauthenticated.
+        // continue unauthenticated
       }
     }
     next();
   } catch {
-    // Continue without user
     next();
   }
 };
@@ -101,7 +94,11 @@ const restrictTo = (...roles) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        error: 'You do not have permission to perform this action'
+        error: {
+          message: 'You do not have permission to perform this action',
+          code: 'FORBIDDEN',
+          statusCode: 403,
+        },
       });
     }
     next();
