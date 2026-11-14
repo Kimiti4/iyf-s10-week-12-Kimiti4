@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import api from '../services/api';
 import SkillMatchCard from '../components/SkillMatchCard';
 import { useToast } from '../components/Toast';
+import PageHeader from '../components/primitives/PageHeader';
+import EmptyState from '../components/primitives/EmptyState';
+import ErrorState from '../components/primitives/ErrorState';
 import './SkillExchange.css';
 
 export default function SkillExchange() {
@@ -12,21 +15,21 @@ export default function SkillExchange() {
   const [profile, setProfile] = useState({ offering: [], seeking: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [newOffer, setNewOffer] = useState('');
   const [newSeek, setNewSeek] = useState('');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const [profRes, matchRes] = await Promise.all([
         api.skills.getProfile(),
-        api.skills.getMatches()
+        api.skills.getMatches(),
       ]);
       if (profRes.data) setProfile(profRes.data);
       if (matchRes.data) setMatches(matchRes.data);
     } catch {
-      setError('Failed to load skill exchange data. Please try again.');
+      setError('Failed to load skill exchange data.');
     } finally {
       setLoading(false);
     }
@@ -39,61 +42,82 @@ export default function SkillExchange() {
   const handleSaveProfile = async () => {
     try {
       await api.skills.saveProfile(profile);
-      toast.success('Profile updated! We will recalculate your matches.');
+      toast.success('Profile updated');
       fetchData();
     } catch {
-      toast.error('Failed to save profile. Please try again.');
+      toast.error('Failed to save profile');
     }
   };
 
   const addOffer = () => {
     if (newOffer.trim()) {
-      setProfile({ ...profile, offering: [...profile.offering, { skill: newOffer.trim() }] });
+      setProfile({
+        ...profile,
+        offering: [...profile.offering, { skill: newOffer.trim() }],
+      });
       setNewOffer('');
     }
   };
 
   const addSeek = () => {
     if (newSeek.trim()) {
-      setProfile({ ...profile, seeking: [...profile.seeking, { skill: newSeek.trim() }] });
+      setProfile({
+        ...profile,
+        seeking: [...profile.seeking, { skill: newSeek.trim() }],
+      });
       setNewSeek('');
     }
   };
 
   return (
     <main className="skill-exchange-page" role="main" aria-label="Skill exchange">
-      <div className="header-section">
-        <h1>🤝 #DevSwapKE</h1>
-        <p>Exchange skills. Build reputation. Grow together.</p>
-        
-        <div className="tabs">
-          <button className={activeTab === 'matches' ? 'active' : ''} onClick={() => setActiveTab('matches')}>
-            Smart Matches
-          </button>
-          <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
-            My Profile
-          </button>
-        </div>
+      <PageHeader
+        eyebrow="Skills"
+        title="Skill exchange"
+        subtitle="Offer what you know. Find what you need."
+      />
+
+      <div className="tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'matches'}
+          className={activeTab === 'matches' ? 'active' : ''}
+          onClick={() => setActiveTab('matches')}
+        >
+          Matches
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'profile'}
+          className={activeTab === 'profile' ? 'active' : ''}
+          onClick={() => setActiveTab('profile')}
+        >
+          My profile
+        </button>
       </div>
 
       <div className="content-section">
         {loading ? (
-          <div aria-live="polite">Loading...</div>
+          <div role="status">Loading…</div>
         ) : error ? (
-          <div className="error-state" role="alert">
-            <p>{error}</p>
-            <button onClick={fetchData}>Try Again</button>
-          </div>
+          <ErrorState error={error} onRetry={fetchData} />
         ) : activeTab === 'matches' ? (
           <div className="matches-grid">
             {matches.length === 0 ? (
-              <p>No perfect matches right now. Try updating your profile or seeking more generic skills like 'React' or 'Design'.</p>
+              <EmptyState
+                icon="🤝"
+                title="No matches yet"
+                message="Update your profile with skills you offer and seek"
+                action={{ label: 'Edit profile', onClick: () => setActiveTab('profile') }}
+              />
             ) : (
-              matches.map(match => (
-                <SkillMatchCard 
-                  key={match.match_id} 
-                  match={match} 
-                  onComplete={() => fetchData()} 
+              matches.map((match) => (
+                <SkillMatchCard
+                  key={match.match_id}
+                  match={match}
+                  onComplete={() => fetchData()}
                 />
               ))
             )}
@@ -101,46 +125,78 @@ export default function SkillExchange() {
         ) : (
           <motion.div className="profile-editor" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className="editor-column">
-              <h3>I can offer:</h3>
+              <h3>I can offer</h3>
               <div className="input-group">
-                <input 
-                  value={newOffer} 
-                  onChange={(e) => setNewOffer(e.target.value)} 
+                <input
+                  value={newOffer}
+                  onChange={(e) => setNewOffer(e.target.value)}
                   placeholder="e.g. React, UX Design"
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addOffer())}
                 />
-                <button onClick={addOffer}>Add</button>
+                <button type="button" className="btn btn-secondary" onClick={addOffer}>
+                  Add
+                </button>
               </div>
               <ul className="skill-list">
                 {profile.offering.map((item, idx) => (
-                  <li key={idx}>
-                    {item.skill} 
-                    <button onClick={() => setProfile({...profile, offering: profile.offering.filter((_, i) => i !== idx)})}>x</button>
+                  <li key={`${item.skill}-${idx}`}>
+                    {item.skill}
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      aria-label={`Remove ${item.skill}`}
+                      onClick={() =>
+                        setProfile({
+                          ...profile,
+                          offering: profile.offering.filter((_, i) => i !== idx),
+                        })
+                      }
+                    >
+                      ×
+                    </button>
                   </li>
                 ))}
               </ul>
             </div>
 
             <div className="editor-column">
-              <h3>I am seeking:</h3>
+              <h3>I am seeking</h3>
               <div className="input-group">
-                <input 
-                  value={newSeek} 
-                  onChange={(e) => setNewSeek(e.target.value)} 
-                  placeholder="e.g. Backend API, Marketing"
+                <input
+                  value={newSeek}
+                  onChange={(e) => setNewSeek(e.target.value)}
+                  placeholder="e.g. Backend, Marketing"
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSeek())}
                 />
-                <button onClick={addSeek}>Add</button>
+                <button type="button" className="btn btn-secondary" onClick={addSeek}>
+                  Add
+                </button>
               </div>
               <ul className="skill-list">
                 {profile.seeking.map((item, idx) => (
-                  <li key={idx}>
+                  <li key={`${item.skill}-${idx}`}>
                     {item.skill}
-                    <button onClick={() => setProfile({...profile, seeking: profile.seeking.filter((_, i) => i !== idx)})}>x</button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      aria-label={`Remove ${item.skill}`}
+                      onClick={() =>
+                        setProfile({
+                          ...profile,
+                          seeking: profile.seeking.filter((_, i) => i !== idx),
+                        })
+                      }
+                    >
+                      ×
+                    </button>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <button className="btn-primary save-btn" onClick={handleSaveProfile}>Save Profile</button>
+            <button type="button" className="btn btn-primary save-btn" onClick={handleSaveProfile}>
+              Save profile
+            </button>
           </motion.div>
         )}
       </div>
