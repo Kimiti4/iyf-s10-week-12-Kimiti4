@@ -3,10 +3,10 @@ import UnavailableFeaturePage from '../components/UnavailableFeaturePage';
 export default function CommunityGovernance() {
   return (
     <UnavailableFeaturePage
-      title="CommunityGovernance"
+      title="Community governance"
       icon="🗳️"
-      description="Shape community decisions through transparent proposals and voting."
-      capability="The backend currently has no real governance proposal/voting service."
+      description="Propose and vote on community decisions."
+      capability="The backend does not yet expose a proposal or voting service."
     />
   );
 }
