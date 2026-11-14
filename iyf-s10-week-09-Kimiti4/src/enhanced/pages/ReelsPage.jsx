@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaHeart, FaComment, FaShare, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import {
+  FaArrowLeft,
+  FaHeart,
+  FaComment,
+  FaShare,
+  FaVolumeUp,
+  FaVolumeMute,
+} from 'react-icons/fa';
 import { reelsAPI } from '../../services/reelApi';
+import ErrorState from '../../components/primitives/ErrorState';
+import EmptyState from '../../components/primitives/EmptyState';
 import './ReelsPage.css';
 
 export default function ReelsPage() {
@@ -36,9 +45,9 @@ export default function ReelsPage() {
       const result = reel.isLiked
         ? await reelsAPI.unlike(reel.id)
         : await reelsAPI.like(reel.id);
-      setReels((items) => items.map((item) => item.id === reel.id
-        ? { ...item, ...result }
-        : item));
+      setReels((items) =>
+        items.map((item) => (item.id === reel.id ? { ...item, ...result } : item))
+      );
     } catch (err) {
       setError(err?.message || 'Unable to update the like.');
     } finally {
@@ -49,7 +58,7 @@ export default function ReelsPage() {
   if (loading) {
     return (
       <main className="reels-page" role="main" aria-label="Reels">
-        <div className="reels-loading" role="status" aria-live="polite">
+        <div className="reels-loading" role="status">
           <div className="loading-spinner" aria-hidden="true" />
           <p>Loading reels…</p>
         </div>
@@ -62,15 +71,12 @@ export default function ReelsPage() {
       <main className="reels-page" role="main" aria-label="Reels">
         <header className="reels-page-header">
           <button type="button" className="back-button" onClick={() => navigate('/')}>
-            <FaArrowLeft aria-hidden="true" /><span>Feed</span>
+            <FaArrowLeft aria-hidden="true" />
+            <span>Feed</span>
           </button>
           <h1>Reels</h1>
         </header>
-        <div className="reels-error" role="alert">
-          <h2>Reels are unavailable</h2>
-          <p>{error}</p>
-          <button type="button" onClick={loadReels}>Retry</button>
-        </div>
+        <ErrorState error={error} onRetry={loadReels} />
       </main>
     );
   }
@@ -80,14 +86,16 @@ export default function ReelsPage() {
       <main className="reels-page" role="main" aria-label="Reels">
         <header className="reels-page-header">
           <button type="button" className="back-button" onClick={() => navigate('/')}>
-            <FaArrowLeft aria-hidden="true" /><span>Feed</span>
+            <FaArrowLeft aria-hidden="true" />
+            <span>Feed</span>
           </button>
           <h1>Reels</h1>
         </header>
-        <div className="reels-empty">
-          <h2>No reels yet</h2>
-          <p>Published reels from the community will appear here.</p>
-        </div>
+        <EmptyState
+          icon="🎬"
+          title="No reels yet"
+          message="Published reels from the community will appear here."
+        />
       </main>
     );
   }
@@ -96,7 +104,8 @@ export default function ReelsPage() {
     <main className="reels-page" role="main" aria-label="Reels">
       <header className="reels-page-header">
         <button type="button" className="back-button" onClick={() => navigate('/')}>
-          <FaArrowLeft aria-hidden="true" /><span>Feed</span>
+          <FaArrowLeft aria-hidden="true" />
+          <span>Feed</span>
         </button>
         <h1>Reels</h1>
         <button
@@ -141,7 +150,9 @@ export default function ReelsPage() {
                 disabled={busyId === reel.id}
                 onClick={() => toggleLike(reel)}
               >
-                <span className="action-icon-wrapper like-wrapper"><FaHeart /></span>
+                <span className="action-icon-wrapper like-wrapper">
+                  <FaHeart />
+                </span>
                 <span className="action-count">{reel.likeCount}</span>
               </button>
               <button
@@ -150,7 +161,9 @@ export default function ReelsPage() {
                 aria-label="Open comments"
                 onClick={() => navigate('/reels/' + reel.id)}
               >
-                <span className="action-icon-wrapper comment-wrapper"><FaComment /></span>
+                <span className="action-icon-wrapper comment-wrapper">
+                  <FaComment />
+                </span>
                 <span className="action-count">{reel.commentCount}</span>
               </button>
               <button
@@ -159,28 +172,38 @@ export default function ReelsPage() {
                 aria-label="Open reel"
                 onClick={() => navigate('/reels/' + reel.id)}
               >
-                <span className="action-icon-wrapper share-wrapper"><FaShare /></span>
+                <span className="action-icon-wrapper share-wrapper">
+                  <FaShare />
+                </span>
                 <span className="action-count">{reel.shareCount}</span>
               </button>
             </div>
 
             <div className="reel-info-bottom">
               <div className="reel-author-info">
-                {reel.author.avatar ? (
+                {reel.author?.avatar ? (
                   <img src={reel.author.avatar} alt="" className="author-avatar-large" />
                 ) : (
                   <div className="author-avatar-large" aria-hidden="true">
-                    {reel.author.username?.charAt(0)?.toUpperCase() || '?'}
+                    {reel.author?.username?.charAt(0)?.toUpperCase() || '?'}
                   </div>
                 )}
                 <div className="author-details">
-                  <span className="author-name">@{reel.author.username}</span>
-                  {reel.author.isVerified && <span className="verified-badge" aria-label="Verified">✓</span>}
+                  <span className="author-name">@{reel.author?.username}</span>
+                  {reel.author?.isVerified && (
+                    <span className="verified-badge" aria-label="Verified">
+                      ✓
+                    </span>
+                  )}
                 </div>
               </div>
               <p className="reel-description-full">{reel.caption}</p>
               {reel.jamId && (
-                <button type="button" className="follow-button" onClick={() => navigate('/jams/' + reel.jamId)}>
+                <button
+                  type="button"
+                  className="follow-button"
+                  onClick={() => navigate('/jams/' + reel.jamId)}
+                >
                   {reel.jamCTA || 'View Jam'}
                 </button>
               )}
